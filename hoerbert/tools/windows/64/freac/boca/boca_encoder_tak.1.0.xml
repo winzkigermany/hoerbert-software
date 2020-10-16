@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Tom's Audiokompressor</name>
+  <version>1.0</version>
+  <id>tak-enc</id>
+  <type>encoder</type>
+  <format>
+    <name>Tom's Audio</name>
+    <lossless>true</lossless>
+    <extension>tak</extension>
+    <tag id="apev2-tag" mode="append">APEv2</tag>
+  </format>
+  <input bits="8" signed="false" channels="1-6"/>
+  <input bits="16-24" channels="1-6"/>
+  <external>
+    <command>takc</command>
+    <arguments>-e -ihs %OPTIONS - %OUTFILE</arguments>
+    <mode>stdio</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Encoder preset" argument="-p%VALUE" default="2">
+	<min alias="fastest">0</min>
+	<max alias="strongest">4</max>
+      </range>
+      <selection name="Frame size limit" argument="-fsl%VALUE">
+	<option>512</option>
+	<option>1024</option>
+	<option>2048</option>
+	<option>4096</option>
+	<option>8192</option>
+	<option>16384</option>
+      </selection>
+      <switch name="Add MD5 checksum" argument="-md5" enabled="true"/>
+    </parameters>
+  </external>
+</component>

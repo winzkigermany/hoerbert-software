@@ -1,0 +1,4 @@
+custom ffmpeg build.
+
+For mac, this ffmpeg build mainly does this:
+Add version numbers to the dlls, so this ffmpeg does not pull the wrong dlls, even when they reside in the same directory

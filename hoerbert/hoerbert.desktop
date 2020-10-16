@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=hörbert
+GenericName=hörbert
+Comment=hörbert software
+Comment[de]=hörbert Software
+Comment[en]=hörbert software
+Comment[fr]=hörbert logiciel
+Keywords=hörbert;
+Keywords[de]=hörbert;
+Keywords[en]=hoerbert;
+Keywords[fr]=hoerbert;
+Categories=AudioVideo;
+Exec=hoerbert
+Icon=hoerbert

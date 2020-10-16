@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/pie_overlay.png</file>
+        <file>images/plus.png</file>
+        <file>images/cancel.png</file>
+        <file>images/confirm.png</file>
+        <file>images/minus.png</file>
+        <file>images/scissors.png</file>
+        <file>images/hoerbert.png</file>
+        <file>languages/hoerbert_de.ts</file>
+        <file>languages/hoerbert_en.ts</file>
+        <file>languages/hoerbert_fr.ts</file>
+        <file>images/play.png</file>
+        <file>images/stop.png</file>
+        <file>images/pappelholz.jpg</file>
+        <file>images/eject.png</file>
+        <file>languages/hoerbert_fr.qm</file>
+        <file>languages/hoerbert_de.qm</file>
+        <file>languages/hoerbert_en.qm</file>
+        <file>images/colorblind_hint_01.png</file>
+        <file>images/colorblind_hint_02.png</file>
+        <file>images/colorblind_hint_03.png</file>
+        <file>images/colorblind_hint_04.png</file>
+        <file>images/colorblind_hint_05.png</file>
+        <file>images/colorblind_hint_06.png</file>
+        <file>images/colorblind_hint_07.png</file>
+        <file>images/colorblind_hint_08.png</file>
+        <file>images/colorblind_hint_09.png</file>
+    </qresource>
+</RCC>

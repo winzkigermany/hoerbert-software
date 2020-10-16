@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>WavPack Audio Decoder</name>
+  <version>1.0</version>
+  <id>wv-dec</id>
+  <type>decoder</type>
+  <replace>avconv-wv-dec</replace>
+  <format>
+    <name>WavPack Files</name>
+    <extension>wv</extension>
+    <tag id="apev2-tag" mode="append">APEv2</tag>
+  </format>
+  <external>
+    <command ignoreExitCode="true">wvunpack</command>
+    <arguments>%OPTIONS %INFILE -o -</arguments>
+    <mode>stdio</mode>
+    <outformat>wave</outformat>
+    <md5 require="lossless" prefix="original md5:">-s %INFILE</md5>
+  </external>
+</component>

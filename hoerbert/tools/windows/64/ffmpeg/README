@@ -1,0 +1,5 @@
+custom ffmpeg build.
+
+For windows, this ffmpeg build mainly does two things:
+a) Add version numbers and bitness to the dlls, so this ffmpeg does not pull the wrong dlls, even when they reside in the same directory
+b) A fix for ffplay to work under Windows 7 to fix "WASAPI can't initialize audio client error"

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+  <Name>hörbert Software</Name>
+  <Version>2.0.7</Version>
+  <Title>hörbert Software</Title>
+  <Publisher>WINZKI GmbH &amp; Co. KG</Publisher>
+  <ProductUrl>https://www.hoerbert.com</ProductUrl>
+  <InstallerWindowIcon>@InstallerFilePath@/hoerbert.iconset/icon_512x512.png</InstallerWindowIcon>
+  <StartMenuDir>hörbert</StartMenuDir>
+  <TargetDir>@ApplicationsDirX64@/hoerbert</TargetDir>
+  <RunProgram>@TargetDir@/hoerbert.exe</RunProgram>
+  <AllowSpaceInPath>true</AllowSpaceInPath>
+  <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
+  <SupportsModify>false</SupportsModify>
+  <MaintenanceToolName>hoerbert_install</MaintenanceToolName>
+</Installer>
