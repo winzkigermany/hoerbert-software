@@ -1,4 +1,4 @@
-# hoerbert-software
+# hörbert-software
 Hörbert playlist management software. 
 
 Our hörbert-software is a tool to manage and transfer audio data for hörbert (https://www.hoerbert.com) memory cards.  
