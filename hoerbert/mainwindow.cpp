@@ -125,6 +125,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_featuresDlg, &AdvancedFeaturesDialog::collectInformationForSupportRequested, this, &MainWindow::collectInformationForSupport);
 
+    connect(m_featuresDlg, &AdvancedFeaturesDialog::buttonSettingsChanged, this, [this]() {
+        m_cardPage->updateButtons();
+    });
+
     connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
         m_stackWidget->setCurrentIndex(0);
         m_cardPage->update();

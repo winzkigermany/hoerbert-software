@@ -33,6 +33,7 @@ class QHBoxLayout;
 class QGridLayout;
 class QPushButton;
 class QCheckBox;
+class QButtonGroup;
 
 /**
  * @brief The AdvancedFeaturesDialog Class
@@ -84,6 +85,11 @@ signals:
      */
     void collectInformationForSupportRequested();
 
+    /**
+     * @brief buttonSettingsChanged
+     */
+    void buttonSettingsChanged();
+
 private:
     QSettings *m_settings;
 
@@ -91,6 +97,14 @@ private:
     QLabel *m_companyLabel;
     QLabel *m_siteUrlLabel;
     QLabel *m_maxVolumeLabel;
+    QLabel *m_showButtonsLabel;
+
+    QButtonGroup *m_buttonGroup;
+    QButtonGroup *m_volumeGroup;
+
+    QRadioButton *m_showNineButtons;
+    QRadioButton *m_showThreeButtons;
+    QRadioButton *m_showOneButton;
 
     QRadioButton *m_lowVolumeOption;
     QRadioButton *m_normalVolumeOption;
@@ -108,6 +122,7 @@ private:
 
     QVBoxLayout *m_layout;
     QHBoxLayout *m_companyLayout;
+    QHBoxLayout *m_showButtonLayout;
     QHBoxLayout *m_optionLayout;
     QVBoxLayout *m_checkLayout;
     QHBoxLayout *m_diagLayout;

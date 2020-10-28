@@ -34,6 +34,7 @@
 #include <QShortcut>
 #include <QProgressDialog>
 #include <QApplication>
+#include <QSettings>
 #include <QDebug>
 #ifdef Q_OS_LINUX
 #include <QInputDialog>
@@ -65,7 +66,6 @@ CardPage::CardPage(QWidget *parent)
     m_cardMngLayout = new QHBoxLayout(m_cardMngContainer);
     m_cardMngLayout->setMargin(0);
     m_cardMngLayout->setSpacing(10);
-
 
     m_driveList = new QComboBox(this);
     m_driveList->setObjectName("DriveComboBox");
@@ -102,7 +102,6 @@ CardPage::CardPage(QWidget *parent)
     m_cardMngLayout->addWidget(m_selectDriveButton);
     m_cardMngLayout->addWidget(m_ejectButtonLabel);
     m_cardMngLayout->addWidget(m_ejectDriveButton);
-
 
     m_mainLayout->addWidget(m_cardMngContainer);
 
@@ -143,7 +142,7 @@ CardPage::CardPage(QWidget *parent)
     m_dirs[DIR7] = m_dir7;
     m_dirs[DIR8] = m_dir8;
 
-    for (auto dir_button : m_dirs)
+    for (const auto& dir_button : m_dirs)
     {
         dir_button->setToolTip(tr("Edit directory") + QString(" %1 (Ctrl+%1)").arg(dir_button->ID() + 1));
         QShortcut *shortcut = new QShortcut(QKeySequence(QString("Ctrl+%1").arg(dir_button->ID() + 1)), this);
@@ -207,6 +206,8 @@ CardPage::CardPage(QWidget *parent)
     m_mainLayout->addSpacerItem(new QSpacerItem(20, 50, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     m_driveList->addItems(m_deviceManager->getDeviceList());
+
+    updateButtons();
 
     for (const auto& key : m_dirs.keys())
     {
@@ -719,6 +720,37 @@ void CardPage::update()
     selectDrive();
 }
 
+void CardPage::updateButtons()
+{
+    QSettings settings;
+    settings.beginGroup("Global");
+    auto count = settings.value("buttons").toInt();
+    settings.endGroup();
+    for (const auto & btn : m_dirs) {
+        auto id_= btn->ID();
+
+        if (count == 3) {
+            btn->setOverlaySize(128, 128);
+            btn->setFixedSize(128, 128);
+            if ( id_ != 1 && id_ != 6 && id_ != 8)
+                btn->hide();
+            else
+                btn->show();
+        } else if (count == 1) {
+            btn->setOverlaySize(128, 128);
+            btn->setFixedSize(128, 128);
+            if (id_ != 4)
+                btn->hide();
+            else
+                btn->show();
+        } else {
+            btn->setOverlaySize(96, 96);
+            btn->setFixedSize(96, 96);
+            btn->show();
+        }
+    }
+}
+
 void CardPage::updateUsedSpace()
 {
     m_deviceManager->refresh();
@@ -802,7 +834,7 @@ void CardPage::setIsProcessing(bool flag)
 
 bool CardPage::isProcessing()
 {
-    for (auto dir_button : m_dirs)
+    for (const auto& dir_button : m_dirs)
     {
         if (dir_button->percentage() != 0)
         {

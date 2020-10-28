@@ -120,6 +120,12 @@ public:
     void update();
 
     /**
+     * @brief updateButtons
+     * @param count
+     */
+    void updateButtons();
+
+    /**
      * @brief set the percent value for the pie chart (completion percent)
      * @param buttonIndex the button to set
      * @param percentage the percentage to set

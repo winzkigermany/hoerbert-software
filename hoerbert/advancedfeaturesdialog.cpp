@@ -30,6 +30,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QButtonGroup>
 #include <QDebug>
 
 #include "version.h"
@@ -71,6 +72,32 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_maxVolumeLabel->setAlignment(Qt::AlignCenter);
     m_maxVolumeLabel->setText(tr("Maximum volume:"));
 
+    m_showButtonsLabel = new QLabel(this);
+    m_showButtonsLabel->setAlignment(Qt::AlignCenter);
+    m_showButtonsLabel->setText(tr("Show buttons:"));
+
+    m_showNineButtons = new QRadioButton(this);
+    m_showNineButtons->setText(tr("9(default)"));
+
+    m_showThreeButtons = new QRadioButton(this);
+    m_showThreeButtons->setText("3");
+
+    m_showOneButton = new QRadioButton(this);
+    m_showOneButton->setText("1");
+
+    m_buttonGroup = new QButtonGroup(this);
+    m_buttonGroup->addButton(m_showNineButtons, 9);
+    m_buttonGroup->addButton(m_showThreeButtons, 3);
+    m_buttonGroup->addButton(m_showOneButton, 1);
+
+    m_showButtonLayout = new QHBoxLayout();
+    m_showButtonLayout->setContentsMargins(0, 0, 0, 0);
+    m_showButtonLayout->setAlignment(Qt::AlignCenter);
+    m_showButtonLayout->addWidget(m_showButtonsLabel);
+    m_showButtonLayout->addWidget(m_showNineButtons);
+    m_showButtonLayout->addWidget(m_showThreeButtons);
+    m_showButtonLayout->addWidget(m_showOneButton);
+
     m_lowVolumeOption = new QRadioButton(this);
     m_lowVolumeOption->setText(tr("-6dB (very low)"));
 
@@ -79,6 +106,11 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
 
     m_maxVolumeOption = new QRadioButton(this);
     m_maxVolumeOption->setText(tr("0dB (maximum)"));
+
+    m_volumeGroup = new QButtonGroup(this);
+    m_volumeGroup->addButton(m_lowVolumeOption);
+    m_volumeGroup->addButton(m_normalVolumeOption);
+    m_volumeGroup->addButton(m_maxVolumeOption);
 
     m_optionLayout = new QHBoxLayout();
     m_optionLayout->setContentsMargins(0, 0, 0, 0);
@@ -122,12 +154,21 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
 
     m_layout->addWidget(m_versionLabel);
     m_layout->addLayout(m_companyLayout);
+    m_layout->addLayout(m_showButtonLayout);
     m_layout->addLayout(m_optionLayout);
     m_layout->addLayout(m_checkLayout, 0);
     m_layout->addLayout(m_diagLayout);
     m_layout->addWidget(m_collectSupportInfoButton, 0, Qt::AlignCenter);
     m_layout->addItem(new QSpacerItem(100, 15, QSizePolicy::Fixed, QSizePolicy::Maximum));
     m_layout->addWidget(m_closeButton, 1, Qt::AlignHCenter);
+
+    connect(m_buttonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this](int count) {
+        m_settings->beginGroup("Global");
+        m_settings->setValue("buttons", count);
+        m_settings->endGroup();
+
+        emit buttonSettingsChanged();
+    });
 
     connect(m_lowVolumeOption, &QRadioButton::clicked, [this] () {
         this->writeVolumeSettings("-6");
@@ -169,6 +210,23 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
 void AdvancedFeaturesDialog::readSettings()
 {
     m_settings->beginGroup("Global");
+
+    auto buttons = m_settings->value("buttons").toInt();
+    switch (buttons) {
+    case 9:
+        m_showNineButtons->setChecked(true);
+        break;
+    case 3:
+        m_showThreeButtons->setChecked(true);
+        break;
+    case 1:
+        m_showOneButton->setChecked(true);
+        break;
+    default:
+        m_showNineButtons->setChecked(true);
+        break;
+    }
+
     auto volume = m_settings->value("volume").toString();
 
     if (volume.compare("-6") == 0)

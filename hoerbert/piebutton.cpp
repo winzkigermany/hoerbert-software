@@ -31,7 +31,6 @@
 PieButton::PieButton(QWidget *parent, int id) : QPushButton(parent)
 {
     setObjectName("PieButton");
-    setFixedSize(96, 96);
 
 #ifdef Q_OS_MACOS
     setFont(QFont(HOERBERT_FONTFAMILY, 21, QFont::DemiBold));
@@ -66,6 +65,8 @@ PieButton::PieButton(QWidget *parent, int id) : QPushButton(parent)
     m_mainPixmap->setVisible(false);
 
     updateStyleSheet();
+    setFixedSize(96, 96);
+    setOverlaySize(96, 96);
 }
 
 void PieButton::setID(qint8 id)
