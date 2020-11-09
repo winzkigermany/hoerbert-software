@@ -382,7 +382,7 @@ void CardPage::formatSelectedDrive(bool retry)
     }
     else if (result == MOUNT_FAILURE)
     {
-        QMessageBox::information(this, tr("Format"), tr("Remounting the memory card failed. You may have to mount it    manually."));
+        QMessageBox::information(this, tr("Format"), tr("Remounting the memory card failed. You may have to mount it manually."));
         deselectDrive();
         updateDriveList();
     }
@@ -558,6 +558,9 @@ void CardPage::selectDrive(const QString &driveName)
     m_selectDriveButton->hide();
 
     m_deviceManager->refresh(driveName);    // refresh the storageInfo object, or else cached info will persist between drive (e.g. memory card) changes
+
+    this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
+    qApp->processEvents();
 
     if (m_deviceManager->isWriteProtected(driveName))
     {
