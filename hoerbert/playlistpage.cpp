@@ -71,11 +71,12 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_leftToolLayout = new QHBoxLayout();
     m_leftToolLayout->setAlignment(Qt::AlignLeft);
 
-    m_colorBlindHintImg = new QLabel(this);
-    m_colorBlindHintImg->setObjectName("BlindHint");
-    m_colorBlindHintImg->setStyleSheet("#BlindHint { background-color: white }");
-    m_colorBlindHintImg->setScaledContents(true);
-    m_colorBlindHintImg->setFixedSize(48, 48);
+    m_viewConfigButton = new QPushButton(this);
+    m_viewConfigButton->setFlat(true);
+    m_viewConfigButton->setObjectName("BlindHint");
+    m_viewConfigButton->setStyleSheet("#BlindHint { background-color: white }");
+    m_viewConfigButton->setGeometry(QRect(QPoint(0, 0), QSize(42, 42)));
+    connect( m_viewConfigButton, SIGNAL (released()), this, SLOT (setTableColumns()) );
 
     m_silenceLabel = new QLabel(this);
     m_silenceLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
@@ -97,7 +98,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));
     m_addSilenceButton->setToolTip(tr("Add silence of given duration") + QString(" (Ctrl+S)"));
 
-    m_leftToolLayout->addWidget(m_colorBlindHintImg);
+    m_leftToolLayout->addWidget(m_viewConfigButton);
     m_leftToolLayout->addSpacing(10);
     m_leftToolLayout->addWidget(m_silenceLabel);
     m_leftToolLayout->addWidget(m_silenceDuration);
@@ -161,7 +162,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     setTabOrder(m_playlistView, m_silenceDuration);
     m_playlistView->setFocus();
 
-    m_contextMenu = new QMenu(this);
+    m_configViewMenu = new QMenu(this);
 
     m_actionAlbumVisible = new QAction(tr("Show album"), this);
     m_actionAlbumVisible->setCheckable(true);
@@ -179,11 +180,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
        this->m_playlistView->setColumnVisible(METADATA_COMMENT_COLUMN_INDEX, m_actionCommentVisible->isChecked());
     });
 
-    m_contextMenu->setTitle(tr("Show/Hide columns"));
-    m_contextMenu->addSeparator();
-
-    m_contextMenu->addAction(m_actionAlbumVisible);
-    m_contextMenu->addAction(m_actionCommentVisible);
+    m_configViewMenu->addAction(m_actionAlbumVisible);
+    m_configViewMenu->addAction(m_actionCommentVisible);
 
     if (!columnVisibleFromSettings("album"))
         m_playlistView->setColumnVisible(METADATA_ALBUM_COLUMN_INDEX, false);
@@ -211,7 +209,11 @@ void PlaylistPage::setDirecytory(const QString &dir_path, quint8 dir_num, const 
     m_dirNum = dir_num;
     assert(m_dirNum < 9);
 
-    m_colorBlindHintImg->setPixmap(QPixmap(QString(":/images/colorblind_hint_0%1.png").arg(dir_num + 1)).copy(100, 100, 400, 400));
+    QPixmap pixmap(QString(":/images/colorblind_hint_0%1.png").arg(dir_num + 1));
+    QIcon iconBack( pixmap.copy(100, 100, 400, 400));
+    m_viewConfigButton->setIcon(iconBack);
+    m_viewConfigButton->setIconSize(QSize(42,42));
+    m_viewConfigButton->setFixedSize(QSize(42,42));
 
     m_originalList[dir_num] = result;
     m_playlistView->load(result, dir_num);
@@ -390,7 +392,12 @@ void PlaylistPage::setDriveSpaceDetails(quint64 used, quint64 total, quint64 est
 
 void PlaylistPage::contextMenuEvent(QContextMenuEvent *e)
 {
-    m_contextMenu->exec(e->globalPos());
+    ;       // no context menu (yet?)
+}
+
+void PlaylistPage::setTableColumns()
+{
+      m_configViewMenu->exec(QCursor::pos());
 }
 
 void PlaylistPage::onClosePage(bool commitChanges)

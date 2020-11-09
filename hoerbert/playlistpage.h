@@ -30,6 +30,7 @@ class QComboBox;
 class QVBoxLayout;
 class QHBoxLayout;
 class QLabel;
+class QPushButton;
 class QFileInfo;
 class QMenu;
 
@@ -149,6 +150,11 @@ private slots:
      */
     void onClosePage(bool commitChanges);
 
+    /**
+     * @brief this signal must open the configuration menu for the view configuration
+     */
+    void setTableColumns();
+
 private:
     /**
      * @brief getSelectedSilenceDurationInSeconds get duration of silence from combobox in seconds
@@ -178,7 +184,7 @@ private:
     QMap<int, AudioList> m_originalList;
     QMap<int, AudioList> m_implicitlyMovedList;
 
-    QLabel *m_colorBlindHintImg;
+    QPushButton *m_viewConfigButton;
     QLabel *m_silenceLabel;
     QComboBox *m_silenceDuration;
     PieButton *m_addSilenceButton;
@@ -196,7 +202,7 @@ private:
 
     QPalette m_pal;
 
-    QMenu *m_contextMenu;
+    QMenu *m_configViewMenu;
     QAction *m_actionAlbumVisible;
     QAction *m_actionCommentVisible;
 };
