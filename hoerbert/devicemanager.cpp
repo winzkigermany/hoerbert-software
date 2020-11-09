@@ -56,9 +56,14 @@ DeviceManager::DeviceManager()
     getDeviceList();
 }
 
-void DeviceManager::refresh()
+void DeviceManager::refresh( const QString &driveName )
 {
-    auto ret = _deviceName2Root.find(m_currentDriveName);
+    std::map<QString, VolumeInfo_ptr>::const_iterator ret;
+    if( driveName != NULL ){
+        ret = _deviceName2Root.find(driveName);
+    } else {
+        ret = _deviceName2Root.find(m_currentDriveName);
+    }
     ret->second->storageInfo.refresh();
 }
 

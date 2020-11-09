@@ -557,6 +557,8 @@ void CardPage::selectDrive(const QString &driveName)
     m_driveList->setEnabled(false);
     m_selectDriveButton->hide();
 
+    m_deviceManager->refresh(driveName);    // refresh the storageInfo object, or else cached info will persist between drive (e.g. memory card) changes
+
     if (m_deviceManager->isWriteProtected(driveName))
     {
         QMessageBox::information(this, tr("Select drive"), tr("The selected device is write-protected. Please eject the device and remove the write protection, if you want to modify any playlists on it."));

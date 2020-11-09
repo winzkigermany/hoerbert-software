@@ -156,7 +156,7 @@ public:
     /**
      * @brief refresh the underlying StorageObject
      */
-    void refresh();
+    void refresh( const QString &driveName=NULL );
 
 #if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
     /**
