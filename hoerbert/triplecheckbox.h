@@ -23,6 +23,7 @@
 #define TRIPLECHECKBOX_H
 
 #include <QWidget>
+#include <QPainterPath>
 
 /*!
  * @brief Custom checkbox widget which has three states - unchecked, checked and "3"
