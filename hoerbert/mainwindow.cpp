@@ -795,6 +795,9 @@ void MainWindow::sync()
     arguments.append("-r");
     arguments.append(m_cardPage->currentDrivePath().left(1));
 #endif
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
     process.start(SYNC_PATH, arguments);
 
     if (!process.waitForStarted())
@@ -802,6 +805,10 @@ void MainWindow::sync()
         m_dbgDlg->appendLog("- Sync failed. Failed to start.");
         process.close();
         m_isWritingToDisk = false;
+
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
+
         return;
     }
 
@@ -810,9 +817,16 @@ void MainWindow::sync()
         m_dbgDlg->appendLog("- Sync failed. Failed to complete.");
         process.close();
         m_isWritingToDisk = false;
+
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
+
         return;
     }
     process.close();
+
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 
     qDebug() << "Sync is successful!";
 
@@ -821,7 +835,9 @@ void MainWindow::sync()
 
 void MainWindow::collectInformationForSupport()
 {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
     QStringList info_list;
     info_list << "[Operating System]" << QSysInfo::prettyProductName() << "";
 
@@ -874,6 +890,7 @@ void MainWindow::collectInformationForSupport()
 
     if (output_file_path.isEmpty()) {
         QApplication::restoreOverrideCursor();
+        qApp->processEvents();
         return;
     }
 
@@ -971,6 +988,7 @@ void MainWindow::collectInformationForSupport()
     }
 #endif
     QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 }
 void MainWindow::backupCard()
 {
@@ -994,7 +1012,8 @@ void MainWindow::backupCard()
 
     destPath = tailPath(destPath) + backup_dir;
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
 
     printTableOfContent(destPath);
 
@@ -1055,6 +1074,7 @@ void MainWindow::backupCard()
     m_progress->deleteLater();
 
     QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 }
 
 void MainWindow::restoreBackup()
@@ -1109,7 +1129,8 @@ void MainWindow::restoreBackup()
         restore_only = true;
     }
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
 
     QString destPath = m_cardPage->currentDrivePath();
 
@@ -1165,6 +1186,7 @@ void MainWindow::restoreBackup()
     m_cardPage->update();
 
     QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 }
 
 void MainWindow::formatCard()
@@ -1222,7 +1244,9 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
     m_progress->setValue(0);
     m_progress->show();
     QApplication::processEvents();
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
 
     m_isWritingToDisk = true;
 
@@ -1432,6 +1456,7 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
     m_formatAction->setEnabled(!enabled);
 
     QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 }
 
 void MainWindow::about()
@@ -1446,14 +1471,18 @@ void MainWindow::findMusicAndAudioBooks()
 
 void MainWindow::checkForUpdates()
 {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
     QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkVersion2"));
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
     connect(manager, &QNetworkAccessManager::finished, this, [this] (QNetworkReply *reply) {
         if (reply->error()) {
             qDebug() << "Failed retrieving version code:" << reply->errorString();
+
             QApplication::setOverrideCursor(Qt::ArrowCursor);
+            qApp->processEvents();
             return;
         }
 
@@ -1461,7 +1490,9 @@ void MainWindow::checkForUpdates()
         QString version = result.section(":", 1);
 
         this->showVersion(version);
+
         QApplication::restoreOverrideCursor();
+        qApp->processEvents();
     });
 
     manager->get(request);

@@ -231,7 +231,14 @@ RetCode DeviceManager::formatDrive(const QString &driveName, const QString &pass
 #ifndef Q_OS_LINUX
     QString cmd = getFormatCommand(root, new_drive_label);
     if ( !cmd.isEmpty() ){
+
+        QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+        qApp->processEvents();
+
         auto output = executeCommand(cmd);
+
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
 
         if (output.contains("Finished erase", Qt::CaseInsensitive) || output.contains("Format complete", Qt::CaseInsensitive))
         {
@@ -255,7 +262,13 @@ RetCode DeviceManager::formatDrive(const QString &driveName, const QString &pass
     ret_code = -1;
     output = "";
 
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
     std::tie(ret_code, output) = executeCommandWithSudo(QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(root), passwd);
+
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 
     qDebug() << "mkfs.vfat:\n" << output;
     if (ret_code == PASSWORD_INCORRECT) {
@@ -274,7 +287,14 @@ RetCode DeviceManager::formatDrive(const QString &driveName, const QString &pass
         ret_code = -1;
         output = "";
 
+        QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+        qApp->processEvents();
+
         std::tie(ret_code, output) = executeCommandWithSudo(QString("mkdir \"/media/%1/%2\"").arg(user_name).arg(new_drive_label), passwd);
+
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
+
         qDebug() << "mkdir:\n" << output;
         if (ret_code == PASSWORD_INCORRECT) {
             return PASSWORD_INCORRECT;
@@ -288,7 +308,14 @@ RetCode DeviceManager::formatDrive(const QString &driveName, const QString &pass
         ret_code = -1;
         output = "";
 
+        QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+        qApp->processEvents();
+
         std::tie(ret_code, output) = executeCommandWithSudo(QString("sudo -S mount %1 \"/media/%2/%3\" -o uid=%2 -o gid=%2").arg(root).arg(user_name).arg(new_drive_label), passwd);
+
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
+
         qDebug() << "mount:\n" << output;
 
         if (ret_code == PASSWORD_INCORRECT) {
@@ -368,13 +395,27 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 #ifdef _WIN32
     auto driveLetter = diskName.at(0);
   
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
     if ( 0 != EjectDriveWin(driveLetter.unicode()) ){
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
         return FAILURE;
     }
 
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+
 #elif defined (Q_OS_MACOS)
     // we use the "unmount" command, since it does not ask for admin privileges.
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
     QString output = executeCommand("diskutil unmount " + diskName);               // execute the umount command synchronously.
+
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 
     if ( !(output.contains("Volume", Qt::CaseInsensitive) && output.contains("unmounted", Qt::CaseInsensitive)) )       // The positive result of "unmount" looks like this: Volume NO NAME on disk2s1 unmounted
     {
@@ -382,7 +423,15 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
     }
 #elif defined (Q_OS_LINUX)
     // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
     QString output = executeCommand("udisksctl unmount -b " + diskName);
+
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+
     if (!output.contains("Unmounted "))
         return FAILURE;
 

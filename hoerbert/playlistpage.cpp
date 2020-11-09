@@ -327,6 +327,7 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
         m_playlistView->removeRow(index);
     }
     QApplication::restoreOverrideCursor();
+    qApp->processEvents();
 }
 
 void PlaylistPage::clearDirectoryEstimation(quint8 dirIndex)
