@@ -71,9 +71,9 @@ CardPage::CardPage(QWidget *parent)
     m_driveList = new QComboBox(this);
     m_driveList->setObjectName("DriveComboBox");
     m_driveList->setStyleSheet("#DriveComboBox QList {}");
-    m_driveList->setEditable(true);
-    m_driveList->lineEdit()->setReadOnly(true);
-    m_driveList->lineEdit()->setAlignment(Qt::AlignCenter);
+    m_driveList->setEditable(false);
+//    m_driveList->lineEdit()->setReadOnly(true);
+//    m_driveList->lineEdit()->setAlignment(Qt::AlignCenter);
     m_driveList->setToolTip(tr("Shows available memory cards or drives of this computer"));
 //    m_driveList->setMinimumSize(100, 42);   // minimum height - this looks better because of the eject button making the whole row jump when it appears otherwise.
 
@@ -336,7 +336,7 @@ void CardPage::updateDriveList()
 
 void CardPage::formatSelectedDrive(bool retry)
 {
-    QString selectedDrive = m_driveList ->currentText();
+    QString selectedDrive = m_driveList->currentText();
 
     if (!retry)
     {
@@ -908,6 +908,20 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
     thread->start();
 }
 
-void CardPage::releaseButtonLock(){
+void CardPage::releaseButtonLock()
+{
     m_audioInputThreadMutex.unlock();
+}
+
+bool CardPage::isDriveWritable( const QString *driveName )
+{
+    QString deviceName = m_driveList->currentText();
+    if( driveName==NULL ){
+        deviceName = QString(*driveName);
+    }
+    if (!deviceName.isEmpty()){
+        return m_deviceManager->isWriteProtected(deviceName);
+    }
+
+    return false;
 }
