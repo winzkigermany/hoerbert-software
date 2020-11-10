@@ -36,7 +36,6 @@ class QGraphicsDropShadowEffect;
 class QAction;
 class QMenu;
 class QProgressDialog;
-class QMutex;
 
 class AboutDialog;
 class AdvancedFeaturesDialog;
@@ -145,8 +144,6 @@ private:
     QAction *m_formatAction;
     QAction *m_advancedFeaturesAction;
     QAction *m_selectManually;
-
-    QMutex m_plausibilityCheckMutex;
 
     QMap<int, QString> m_errorLog;
 };
