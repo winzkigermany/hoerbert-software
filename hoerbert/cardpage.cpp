@@ -888,6 +888,7 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
     if (list.isEmpty())
     {
         AudioList empty_list;
+        m_audioInputThreadMutex.unlock();
         emit directoryChanged(dir_num, m_deviceManager->getDrivePath(), empty_list);
         return;
     }
