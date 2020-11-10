@@ -49,6 +49,7 @@ class QGridLayout;
 class QSpacerItem;
 class QLabel;
 class QStackedWidget;
+class QMutex;
 
 class DeviceManager;
 class PieButton;
@@ -219,6 +220,11 @@ public:
      */
     void selectDriveByPath(const QString &path);
 
+    /**
+     * @brief releaseButtonLock
+     */
+    void releaseButtonLock();
+
 signals:
 
     /**
@@ -347,6 +353,8 @@ private:
     QSpacerItem *m_verticalGridSpacer2;
     QSpacerItem *m_leftGridSpacer;
     QSpacerItem *m_rightGridSpacer;
+
+    QMutex m_audioInputThreadMutex;
 };
 
 #endif // CARDPAGE_H

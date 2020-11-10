@@ -36,6 +36,7 @@
 #include <QApplication>
 #include <QSettings>
 #include <QDebug>
+#include <QMutex>
 #ifdef Q_OS_LINUX
 #include <QInputDialog>
 #endif
@@ -869,6 +870,9 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
     if (m_deviceManager->selectedDrive().isEmpty())
         return;
 
+    if( !m_audioInputThreadMutex.tryLock() )
+        return;
+
     QString drive_path = currentDrivePath();
     QString sub_dir = QString();
 
@@ -897,7 +901,12 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
         m_dirs[dir_num]->setPercentage(100);
         emit directoryChanged(dir_num, m_deviceManager->getDrivePath(), result);
     });
+    connect(thread, &QThread::finished, this, &CardPage::releaseButtonLock);
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
     thread->start();
+}
+
+void CardPage::releaseButtonLock(){
+    m_audioInputThreadMutex.unlock();
 }

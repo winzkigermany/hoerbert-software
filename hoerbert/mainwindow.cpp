@@ -43,6 +43,7 @@
 #include <QDesktopWidget>
 #include <QSettings>
 #include <QDebug>
+#include <QMutex>
 
 #include "aboutdialog.h"
 #include "advancedfeaturesdialog.h"
@@ -256,9 +257,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::makePlausible(std::list <int> fixList)
 {
+    m_plausibilityCheckMutex.lock();    // We need to carefully unlock this lock whenever we return from this method anywhere.
     auto clean_selected = QMessageBox::question(this, tr("Plausibility check"), tr("The files on the memory card need some cleanup. Should this app do some clean up?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
 
     if (clean_selected == QMessageBox::No)
+        m_plausibilityCheckMutex.unlock();
         return;
 
     auto backup_selected = QMessageBox::question(this, tr("Backup"), tr("It is recommended to backup memory card before cleaning up. Do you want to backup now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
@@ -275,6 +278,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
         QDir dir(sub_dir);
         if (!dir.exists()) {
             qDebug() << "Sub-directory does not exist - " << i;
+            m_plausibilityCheckMutex.unlock();
             return;
         }
         dir.setFilter(QDir::Files | QDir::NoSymLinks);
@@ -309,6 +313,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
     }
 
     m_cardPage->update();
+    m_plausibilityCheckMutex.unlock();
 }
 
 void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list)
