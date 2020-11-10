@@ -131,6 +131,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
+        m_cardPage->enableButtons(true);
+
         m_stackWidget->setCurrentIndex(0);
         m_cardPage->update();
         m_capBar->resetEstimation();
@@ -148,6 +150,9 @@ MainWindow::MainWindow(QWidget *parent)
         m_backupAction->setEnabled(true);
         m_restoreAction->setEnabled(true);
         m_formatAction->setEnabled(true);
+
+        this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
+        qApp->processEvents();
     });
 
     connect(m_playlistPage, &PlaylistPage::errorOccurred, this, [this] (const QString &errorString) {
@@ -200,8 +205,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
         m_stackWidget->setCurrentIndex(1);
         m_playlistPage->setDirecytory(dir_path, dir_num, result);
-        m_playlistPage->setBackgroundColor(m_cardPage->getDirectoryColor(dir_num));
-        m_shadow->setColor(m_cardPage->getDirectoryColor(dir_num));
+        m_playlistPage->setBackgroundColor(m_cardPage->getPlaylistColor(dir_num));
+        m_shadow->setColor(m_cardPage->getPlaylistColor(dir_num));
 #if defined(Q_OS_MAC)
         m_subMenuBegin->setEnabled(true);
         m_subMenuEnd->setEnabled(true);
@@ -318,6 +323,11 @@ void MainWindow::makePlausible(std::list <int> fixList)
 
 void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list)
 {
+    m_cardPage->enableButtons(true);
+
+    this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
+    qApp->processEvents();
+
     quint8 dir_index = m_playlistPage->directory();
 
     if (list.count() == 0) {

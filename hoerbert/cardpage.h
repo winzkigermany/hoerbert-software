@@ -231,6 +231,12 @@ public:
      */
     bool isDriveWritable( const QString *driveName=NULL );
 
+    /**
+     * @brief enable or disable the playlist buttons
+     * @param onOff if true, enable the playlist buttons
+     */
+    void enableButtons( bool onOff );
+
 signals:
 
     /**

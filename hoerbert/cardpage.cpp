@@ -36,7 +36,6 @@
 #include <QApplication>
 #include <QSettings>
 #include <QDebug>
-#include <QMutex>
 #ifdef Q_OS_LINUX
 #include <QInputDialog>
 #endif
@@ -151,7 +150,7 @@ CardPage::CardPage(QWidget *parent)
             if (dir_button->percentage() > 0)
                 return;
             if (!m_deviceManager->selectedDrive().isEmpty())
-                this->onDirectoryClicked(dir_button->ID());
+                this->onPlaylistButtonClicked(dir_button->ID());
         });
     }
 
@@ -216,7 +215,7 @@ CardPage::CardPage(QWidget *parent)
             if (m_dirs[key]->percentage() > 0)
                 return;
             if (!m_deviceManager->selectedDrive().isEmpty())
-                this->onDirectoryClicked(static_cast<qint8>(key));
+                this->onPlaylistButtonClicked(static_cast<qint8>(key));
         });
     }
 
@@ -318,7 +317,7 @@ void CardPage::updateDriveList()
 
     if (!selectedDriveExists || m_deviceManager->selectedDrive().isEmpty())
     {
-        initializeDirectories();
+        initializePlaylists();
         //selectDrive(m_driveList->currentText());
     }
 
@@ -517,7 +516,7 @@ void CardPage::recreateXml()
     m_hoerbertXMLIsDirty = false;
 }
 
-void CardPage::initializeDirectories()
+void CardPage::initializePlaylists()
 {
     for (int i = 0; i < 9; i++)
     {
@@ -533,7 +532,7 @@ void CardPage::selectDrive()
 
 void CardPage::deselectDrive()
 {
-    initializeDirectories();
+    initializePlaylists();
 
     m_ejectDriveButton->hide();
     m_ejectButtonLabel->hide();
@@ -713,6 +712,9 @@ void CardPage::selectDrive(const QString &driveName)
 
     updateUsedSpace();
     emit driveSelected(driveName);
+
+    this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
+    qApp->processEvents();
 }
 
 void CardPage::selectDriveByPath(const QString &path)
@@ -860,18 +862,18 @@ bool CardPage::isHoerbertXMLDirty(){
     return m_hoerbertXMLIsDirty;
 }
 
-QColor CardPage::getDirectoryColor(quint8 id)
+QColor CardPage::getPlaylistColor(quint8 id)
 {
     return m_dirs[id]->backgroundColor();
 }
 
-void CardPage::onDirectoryClicked(qint8 dir_num)
+void CardPage::onPlaylistButtonClicked(qint8 dir_num)
 {
     if (m_deviceManager->selectedDrive().isEmpty())
         return;
 
-    if( !m_audioInputThreadMutex.tryLock() )
-        return;
+    enableButtons(false);
+
 
     QString drive_path = currentDrivePath();
     QString sub_dir = QString();
@@ -888,7 +890,6 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
     if (list.isEmpty())
     {
         AudioList empty_list;
-        m_audioInputThreadMutex.unlock();
         emit playlistChanged(dir_num, m_deviceManager->getDrivePath(), empty_list);
         return;
     }
@@ -902,16 +903,11 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
         m_dirs[dir_num]->setPercentage(100);
         emit playlistChanged(dir_num, m_deviceManager->getDrivePath(), result);
     });
-    connect(thread, &QThread::finished, this, &CardPage::releaseButtonLock);
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
     thread->start();
 }
 
-void CardPage::releaseButtonLock()
-{
-    m_audioInputThreadMutex.unlock();
-}
 
 bool CardPage::isDriveWritable( const QString *driveName )
 {
@@ -924,4 +920,14 @@ bool CardPage::isDriveWritable( const QString *driveName )
     }
 
     return false;
+}
+
+void CardPage::enableButtons( bool onOff )
+{
+    //go through list of buttons an enable/disable them
+    for (const auto& dir_button : m_dirs)
+    {
+        dir_button->setEnabled(onOff);
+    }
+
 }
