@@ -145,7 +145,7 @@ CardPage::CardPage(QWidget *parent)
 
     for (const auto& dir_button : m_dirs)
     {
-        dir_button->setToolTip(tr("Edit directory") + QString(" %1 (Ctrl+%1)").arg(dir_button->ID() + 1));
+        dir_button->setToolTip(tr("Edit playlist") + QString(" %1 (Ctrl+%1)").arg(dir_button->ID() + 1));
         QShortcut *shortcut = new QShortcut(QKeySequence(QString("Ctrl+%1").arg(dir_button->ID() + 1)), this);
         connect(shortcut, &QShortcut::activated, this, [this, dir_button] () {
             if (dir_button->percentage() > 0)
