@@ -225,6 +225,12 @@ public:
      */
     void releaseButtonLock();
 
+    /**
+     * @brief isCurrentDriveWritable
+     * @return true if the currently selected drive is writable
+     */
+    bool isDriveWritable( const QString *driveName=NULL );
+
 signals:
 
     /**
