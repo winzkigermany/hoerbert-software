@@ -1833,7 +1833,7 @@ void MainWindow::createActions()
 
     m_formatAction = new QAction(tr("&Format memory card"), this);
     m_formatAction->setStatusTip(tr("Format memory card"));
-    m_formatAction->setEnabled(false);
+    m_formatAction->setEnabled(true);
     connect(m_formatAction, &QAction::triggered, this, &MainWindow::formatCard);
     extrasMenu->addAction(m_formatAction);
 
