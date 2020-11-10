@@ -109,11 +109,11 @@ public:
     void selectDrive();
 
     /**
-     * @brief get the color for a given directory number
+     * @brief get the color for a given playlist number
      * @param id
-     * @return color of the given directory number
+     * @return color of the given playlist number
      */
-    QColor getDirectoryColor(quint8 id);
+    QColor getPlaylistColor(quint8 id);
 
     /**
      * @brief update
@@ -234,12 +234,12 @@ public:
 signals:
 
     /**
-     * @brief this signal is emitted when the directory is selected
-     * @param id directory identifier
+     * @brief this signal is emitted when the playlist is selected
+     * @param id playlist identifier
      * @param drivePath absolute path to the directory on the drive
-     * @param audioList list of audio info in the directory
+     * @param audioList list of audio info in the playlist
      */
-    void directoryChanged(qint8 id, const QString &drivePath, const AudioList &audioList);
+    void playlistChanged(qint8 id, const QString &drivePath, const AudioList &audioList);
 
     /**
      * @brief this signal is emitted when there's change in drive space
@@ -280,10 +280,10 @@ public slots:
 private slots:
 
     /**
-     * @brief called when a directory button is clicked
-     * @param dirIndex index of directory(equals to actual directory name)
+     * @brief called when a playlist button is clicked
+     * @param dirIndex index of playlist (equals to actual directory name)
      */
-    void onDirectoryClicked(qint8 dirIndex);
+    void onPlaylistButtonClicked(qint8 dirIndex);
 
     /**
      * @brief called when a removable device is added
@@ -298,9 +298,9 @@ private slots:
 private:
 
     /**
-     * @brief initialize directory buttons
+     * @brief initialize playlist buttons
      */
-    void initializeDirectories();
+    void initializePlaylists();
 
     /**
      * @brief read the drive and shows directories
@@ -309,7 +309,7 @@ private:
     void selectDrive(const QString &driveName);
 
     /**
-     * @brief initialize directory buttons and hide directory details
+     * @brief initialize playlist buttons and hide playlist details
      */
     void deselectDrive();
 

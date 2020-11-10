@@ -197,7 +197,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    connect(m_cardPage, &CardPage::directoryChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
+    connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
         m_stackWidget->setCurrentIndex(1);
         m_playlistPage->setDirecytory(dir_path, dir_num, result);
         m_playlistPage->setBackgroundColor(m_cardPage->getDirectoryColor(dir_num));

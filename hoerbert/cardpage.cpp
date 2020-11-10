@@ -889,7 +889,7 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
     {
         AudioList empty_list;
         m_audioInputThreadMutex.unlock();
-        emit directoryChanged(dir_num, m_deviceManager->getDrivePath(), empty_list);
+        emit playlistChanged(dir_num, m_deviceManager->getDrivePath(), empty_list);
         return;
     }
     std::sort(list.begin(), list.end(), sortByNumber);
@@ -900,7 +900,7 @@ void CardPage::onDirectoryClicked(qint8 dir_num)
     });
     connect(thread, &AudioInfoThread::taskCompleted, this, [this, dir_num] (const AudioList &result) {
         m_dirs[dir_num]->setPercentage(100);
-        emit directoryChanged(dir_num, m_deviceManager->getDrivePath(), result);
+        emit playlistChanged(dir_num, m_deviceManager->getDrivePath(), result);
     });
     connect(thread, &QThread::finished, this, &CardPage::releaseButtonLock);
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
