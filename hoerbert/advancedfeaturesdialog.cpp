@@ -40,7 +40,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     : QDialog (parent)
 {
     setWindowTitle(tr("Advanced features"));
-    setFixedSize(600, 300);
+    setFixedSize(600, 480);
 
     m_settings = new QSettings(this);
 
@@ -124,13 +124,17 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_reminderOption->setText(tr("Restore backup reminder"));
 
     m_showLargeDriveCheck = new QCheckBox(this);
-    m_showLargeDriveCheck->setText(tr("Show drives >= %1GB:").arg(VOLUME_SIZE_LIMIT));
+    m_showLargeDriveCheck->setText(tr("Show drives >= %1GB").arg(VOLUME_SIZE_LIMIT));
+
+    m_regenerateXmlCheck = new QCheckBox(this);
+    m_regenerateXmlCheck->setText( tr("Regenerate hoerbert.xml when closing the app") );
 
     m_checkLayout = new QVBoxLayout;
     m_checkLayout->setAlignment(Qt::AlignCenter);
 
     m_checkLayout->addWidget(m_reminderOption);
     m_checkLayout->addWidget(m_showLargeDriveCheck);
+    m_checkLayout->addWidget(m_regenerateXmlCheck);
 
     m_diagLayout = new QHBoxLayout;
     m_diagLayout->setAlignment(Qt::AlignCenter);
@@ -154,10 +158,10 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
 
     m_layout->addWidget(m_versionLabel);
     m_layout->addLayout(m_companyLayout);
-    m_layout->addLayout(m_showButtonLayout);
     m_layout->addLayout(m_optionLayout);
     m_layout->addLayout(m_checkLayout, 0);
     m_layout->addLayout(m_diagLayout);
+    m_layout->addLayout(m_showButtonLayout);
     m_layout->addWidget(m_collectSupportInfoButton, 0, Qt::AlignCenter);
     m_layout->addItem(new QSpacerItem(100, 15, QSizePolicy::Fixed, QSizePolicy::Maximum));
     m_layout->addWidget(m_closeButton, 1, Qt::AlignHCenter);
@@ -200,6 +204,13 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
         m_settings->endGroup();
     });
 
+    connect(m_regenerateXmlCheck, &QCheckBox::stateChanged, this, [this] (int state) {
+        Q_UNUSED(state);
+        m_settings->beginGroup("Global");
+        m_settings->setValue("regenerateHoerbertXml", m_regenerateXmlCheck->isChecked());
+        m_settings->endGroup();
+    });
+
     connect(m_collectSupportInfoButton, &QPushButton::clicked, this, &AdvancedFeaturesDialog::collectInformationForSupport);
 
     connect(m_closeButton, &QPushButton::clicked, this, &QDialog::close);
@@ -213,36 +224,35 @@ void AdvancedFeaturesDialog::readSettings()
 
     auto buttons = m_settings->value("buttons").toInt();
     switch (buttons) {
-    case 9:
-        m_showNineButtons->setChecked(true);
-        break;
-    case 3:
-        m_showThreeButtons->setChecked(true);
-        break;
-    case 1:
-        m_showOneButton->setChecked(true);
-        break;
-    default:
-        m_showNineButtons->setChecked(true);
-        break;
+        case 1:
+            m_showOneButton->setChecked(true);
+            break;
+        case 3:
+            m_showThreeButtons->setChecked(true);
+            break;
+        case 9:
+        default:
+            m_showNineButtons->setChecked(true);
     }
 
-    auto volume = m_settings->value("volume").toString();
+    QString volume = m_settings->value("volume").toString();
 
     if (volume.compare("-6") == 0)
         m_lowVolumeOption->setChecked(true);
-    else if (volume.compare("-1.5") == 0)
-        m_normalVolumeOption->setChecked(true);
     else if (volume.compare("0") == 0)
         m_maxVolumeOption->setChecked(true);
     else
-        qDebug() << "Unknown option!" << volume;
+        m_normalVolumeOption->setChecked(true);
 
     bool showReminder = m_settings->value("showBackupReminder").toBool();
     m_reminderOption->setChecked(showReminder);
 
     bool showLarge = m_settings->value("showLargeDrives").toBool();
     m_showLargeDriveCheck->setChecked(showLarge);
+
+    bool generateXml = m_settings->value("regenerateHoerbertXml").toBool();
+    m_regenerateXmlCheck->setChecked(generateXml);
+
     m_settings->endGroup();
 }
 

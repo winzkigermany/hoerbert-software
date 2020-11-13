@@ -229,13 +229,17 @@ int main(int argc, char *argv[])
     // default settings of the app
     QSettings settings;
     settings.beginGroup("Global");
-    auto audio_volume = settings.value("volume").toString();
+    QString audio_volume = settings.value("volume").toString();
     if (audio_volume.isEmpty())
         settings.setValue("volume", "-1.5");
 
-    auto show_reminder = settings.value("showBackupReminder").toString();
+    QString show_reminder = settings.value("showBackupReminder").toString();
     if (show_reminder.isEmpty())
         settings.setValue("showBackupReminder", false);
+
+    QString generateXml = settings.value("regenerateHoerbertXml").toString();
+    if (generateXml.isEmpty())
+        settings.setValue("regenerateHoerbertXml", true);
 
     settings.endGroup();
 

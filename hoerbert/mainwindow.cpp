@@ -44,6 +44,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QMutex>
+#include <QSettings>
 
 #include "aboutdialog.h"
 #include "advancedfeaturesdialog.h"
@@ -250,7 +251,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    if( m_cardPage->isHoerbertXMLDirty() ){
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool regenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
+    if( m_cardPage->isHoerbertXMLDirty() && regenerateHoerbertXml ){
         m_cardPage->recreateXml();
     }
 
@@ -264,10 +268,11 @@ void MainWindow::makePlausible(std::list <int> fixList)
 {
     m_plausibilityCheckMutex.lock();    // We need to carefully unlock this lock whenever we return from this method anywhere.
     auto clean_selected = QMessageBox::question(this, tr("Plausibility check"), tr("The files on the memory card need some cleanup. Should this app do some clean up?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
-
     if (clean_selected == QMessageBox::No)
+    {
         m_plausibilityCheckMutex.unlock();
         return;
+    }
 
     auto backup_selected = QMessageBox::question(this, tr("Backup"), tr("It is recommended to backup memory card before cleaning up. Do you want to backup now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
     if (backup_selected == QMessageBox::Yes)
@@ -468,7 +473,7 @@ void MainWindow::migrate(const QString &dirPath)
         m_progress->disconnect(abort_button);
 
         // then define custom connections
-        connect(abort_button, &QPushButton::clicked, this, [this, processor, is_completed, abort_button] () {
+        connect(abort_button, &QPushButton::clicked, this, [=] () {
             m_progress->setLabelText(tr("Aborting..."));
             m_progress->show();
             QCoreApplication::processEvents();
@@ -491,7 +496,7 @@ void MainWindow::migrate(const QString &dirPath)
             this->processorErrorOccurred("On migration\n" + errorString);
         });
 
-        connect(processor, &QThread::finished, this, [this, processor, dirPath, is_completed] () {
+        connect(processor, &QThread::finished, this, [=] () {
             processor->quit();
             processor->deleteLater();
 
@@ -512,8 +517,10 @@ void MainWindow::migrate(const QString &dirPath)
 
         m_isWritingToDisk = true;
 
-        m_cardPage->setHoerbertXMLDirty( true );
+        m_cardPage->recreateXml();
+        m_cardPage->setHoerbertXMLDirty( false );
     }
+
 
 }
 

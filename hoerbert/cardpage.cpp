@@ -380,7 +380,10 @@ void CardPage::ejectDrive()
         return;
     }
 
-    if( this->isHoerbertXMLDirty() ){
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool regenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
+    if( this->isHoerbertXMLDirty() && regenerateHoerbertXml ){
         recreateXml();
     }
 
@@ -671,9 +674,9 @@ void CardPage::selectDrive(const QString &driveName)
     }
 
     if (isPlausible)
-        qDebug() << "This hoerbert card is plausible!";
+        qDebug() << "This hoerbert card is plausible.";
     else {
-        qDebug() << "This hoerbert card is not plausible!";
+        qDebug() << "This hoerbert card is not plausible.";
         emit plausibilityFixNeeded(plausibilityFixList);
     }
 

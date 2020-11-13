@@ -112,6 +112,7 @@ private:
 
     QCheckBox *m_reminderOption;
     QCheckBox *m_showLargeDriveCheck;
+    QCheckBox *m_regenerateXmlCheck;
 
     QLabel *m_diagnosticsLabel;
     QPushButton *m_diagnosticsButton;
