@@ -87,7 +87,7 @@ CardPage::CardPage(QWidget *parent)
     m_ejectDriveButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_ejectDriveButton->setMainPixmap(QPixmap(":/images/eject.png"));
     m_ejectDriveButton->setShadowEnabled(false);
-    m_ejectDriveButton->setToolTip( tr("Eject card")+" ("+QString(tr("Ctrl+j"))+")" );
+    m_ejectDriveButton->setToolTip( tr("Save all changes and eject card")+" ("+QString(tr("Ctrl+j"))+")" );
     m_ejectDriveButton->setShortcut( QKeySequence(tr("Ctrl+j")) );
     m_ejectDriveButton->hide();
 
