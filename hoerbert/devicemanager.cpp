@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QProgressDialog>
+#include <QProgressBar>
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QApplication>
@@ -36,6 +37,8 @@
 #include <shlobj.h>
 #include "helper.h"
 #endif
+
+#include "pleasewaitdialog.h"
 
 struct VolumeInfo{
 
@@ -203,17 +206,16 @@ bool DeviceManager::isValidDevice(const QString &device)
 }
 #endif
 
-RetCode DeviceManager::formatDrive(const QString &driveName, const QString &passwd)
+RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveName, const QString &newLabel, const QString &passwd )
 {
+#ifdef Q_OS_LINUX
     Q_UNUSED( passwd )
-    bool ok;
-    auto driveLabel = QInputDialog::getText(NULL, tr("Format"), tr("Please enter the new name for your card"), QLineEdit::Normal, DEFAULT_DRIVE_LABEL, &ok);
+#endif
 
-    auto new_drive_label = driveLabel;
+    auto new_drive_label = newLabel;
     if (new_drive_label.isEmpty()) {
         new_drive_label = DEFAULT_DRIVE_LABEL;
     }
-
 
     auto ret = _deviceName2Root.find(driveName);
     if (ret == _deviceName2Root.end())
@@ -230,20 +232,36 @@ RetCode DeviceManager::formatDrive(const QString &driveName, const QString &pass
 
 #ifndef Q_OS_LINUX
     QString cmd = getFormatCommand(root, new_drive_label);
+
     if ( !cmd.isEmpty() ){
 
-        QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-        qApp->processEvents();
+        pleaseWait = new PleaseWaitDialog();
+        pleaseWait->setParent( parentWidget );
+        pleaseWait->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+        pleaseWait->setWindowTitle(tr("Formatting memory card..."));
+        pleaseWait->setWindowModality(Qt::ApplicationModal);
+        pleaseWait->show();
 
-        auto output = executeCommand(cmd);
+        formatProcess = new QProcess();
 
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
+        connect( formatProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
+            Q_UNUSED( exitCode )
+            Q_UNUSED( exitStatus )
 
-        if (output.contains("Finished erase", Qt::CaseInsensitive) || output.contains("Format complete", Qt::CaseInsensitive))
-        {
-            return SUCCESS;
-        }
+            QString output = formatProcess->readAllStandardOutput();
+            if (output.contains("Finished erase", Qt::CaseInsensitive) || output.contains("Format complete", Qt::CaseInsensitive))
+            {
+                pleaseWait->setResultString( tr("The memory card has been formatted successfully"));
+            }
+            else
+            {
+                pleaseWait->setResultString( tr("Formatting the memory card failed.") );
+            }
+        });
+
+        formatProcess->start(cmd);
+
+        return SUCCESS;
     }
 #else
     int ret_code = -1;
@@ -262,13 +280,7 @@ RetCode DeviceManager::formatDrive(const QString &driveName, const QString &pass
     ret_code = -1;
     output = "";
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
-    std::tie(ret_code, output) = executeCommandWithSudo(QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(root), passwd);
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
+    std::tie(ret_code, output) = executeCommandWithSudo(QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(root), passwd, true);
 
     qDebug() << "mkfs.vfat:\n" << output;
     if (ret_code == PASSWORD_INCORRECT) {
@@ -336,7 +348,8 @@ RetCode DeviceManager::formatDrive(const QString &driveName, const QString &pass
     return FAILURE;
 }
 
-std::pair<int, QString> DeviceManager::executeCommandWithSudo(const QString &cmd, const QString &passwd)
+
+std::pair<int, QString> DeviceManager::executeCommandWithSudo(const QString &cmd, const QString &passwd, bool showPleaseWaitDialog, QWidget* parentWidget)
 {
     int ret_code = -1;
     QString cmd_ = cmd;
@@ -346,40 +359,69 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo(const QString &cmd
     }
 
     qDebug() << cmd_;
-    QProcess process;
-    process.setProcessChannelMode(QProcess::MergedChannels);
-    connect(&process, &QProcess::readyReadStandardOutput, [&process, &ret_code] () {
-        auto output = process.readAllStandardOutput();
-        if (output.contains("Sorry, try again")) {
-            ret_code = PASSWORD_INCORRECT;
-            process.close();
+
+    if( showPleaseWaitDialog ){
+        pleaseWait = new PleaseWaitDialog();
+        pleaseWait->setParent( parentWidget );
+        pleaseWait->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+        pleaseWait->setWindowTitle(tr("Formatting memory card..."));
+        pleaseWait->setWindowModality(Qt::ApplicationModal);
+        pleaseWait->show();
+    }
+
+    formatProcess = new QProcess();
+    formatProcess->setProcessChannelMode(QProcess::MergedChannels);
+    connect( formatProcess, &QProcess::readyReadStandardOutput, [=] () {
+        QString output = formatProcess->readAllStandardOutput();
+        if (output.contains("Sorry, try again")) {      //@TODO This is debatable... does it work with other system languages at all?
+            if( showPleaseWaitDialog ){
+                pleaseWait->setResultString( tr("Password is incorrect. Please try again.") );
+            }
+            formatProcess->close();
         }
         qDebug() << output;
     });
 
-    process.start(cmd_);
-    if (!process.waitForStarted())
+
+    connect( formatProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
+        Q_UNUSED( exitCode )
+        Q_UNUSED( exitStatus )
+
+        QString output = formatProcess->readAllStandardOutput();
+        if( showPleaseWaitDialog ){
+            if (output.contains("Finished erase", Qt::CaseInsensitive) || output.contains("Format complete", Qt::CaseInsensitive))
+            {
+                pleaseWait->setResultString( tr("The memory card has been formatted successfully"));
+            }
+            else
+            {
+                pleaseWait->setResultString( tr("Formatting the memory card failed.") );
+            }
+        }
+    });
+
+
+    formatProcess->start(cmd_);
+    if (!formatProcess->waitForStarted())
     {
         qDebug() << "Process failed to start!";
         ret_code = FAILURE;
-        return std::pair<int, QString>(ret_code, process.readAll());
+        return std::pair<int, QString>(ret_code, formatProcess->readAll());
     }
 
-    process.write(QString("%1\n").arg(passwd).toUtf8().constData());
+    formatProcess->write(QString("%1\n").arg(passwd).toUtf8().constData());
 
-    if (!process.waitForFinished(60000))
-    {
-        if (ret_code != PASSWORD_INCORRECT)
-            ret_code = FAILURE;
-        return std::pair<int, QString>(ret_code, process.readAll());
-    }
-    else
-    {
-        if (ret_code != PASSWORD_INCORRECT)
-            ret_code = SUCCESS;
+    return std::pair<int, QString>(SUCCESS, "");    // in case we're only starting formatting, there's nothing better we can return (if the process START was successful.
 
-        return std::pair<int, QString>(ret_code, process.readAll());
-    }
+/*
+    case MOUNT_FAILURE:
+        QMessageBox::information(this, tr("Format"), tr("Remounting the memory card failed. You may have to mount it manually."));
+        deselectDrive();
+        updateDriveList();
+        break;
+*/
+
+
 }
 
 RetCode DeviceManager::ejectDrive(const QString &driveName)

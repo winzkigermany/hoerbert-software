@@ -36,9 +36,7 @@
 #include <QApplication>
 #include <QSettings>
 #include <QDebug>
-#ifdef Q_OS_LINUX
 #include <QInputDialog>
-#endif
 
 #include "define.h"
 #include "functions.h"
@@ -46,6 +44,8 @@
 #include "capacitybar.h"
 #include "audioinfothread.h"
 #include "xmlwriter.h"
+#include "pleasewaitdialog.h"
+#include <QFutureSynchronizer>
 
 CardPage::CardPage(QWidget *parent)
     : QWidget(parent)
@@ -355,43 +355,12 @@ void CardPage::formatSelectedDrive(bool retry)
         return;
 #endif
 
-    QProgressDialog *dlg = new QProgressDialog(this);
-    dlg->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    dlg->setWindowTitle(tr("Formatting memory card..."));
-    dlg->setLabelText(tr("Please wait. This might take several minutes."));
-    dlg->setCancelButton(nullptr);
-    dlg->setMaximum(100);
-    dlg->setValue(100);
-    dlg->show();
 
-    auto result = m_deviceManager->formatDrive(selectedDrive, passwd);
+    bool ok;
+    auto driveLabel = QInputDialog::getText(this, tr("Format"), tr("Please enter the new name for your card"), QLineEdit::Normal, DEFAULT_DRIVE_LABEL, &ok);
 
-    dlg->close();
-    dlg->deleteLater();
+    m_deviceManager->formatDrive(this, selectedDrive, driveLabel);
 
-    if (result == SUCCESS)
-    {
-        QMessageBox::information(this, tr("Format"), tr("The memory card has been formatted successfully"));
-        deselectDrive();
-        updateDriveList();
-    }
-    else if (result == PASSWORD_INCORRECT)
-    {
-        QMessageBox::information(this, tr("Format"), tr("Password is incorrect. Please try again."));
-        formatSelectedDrive(true);
-    }
-    else if (result == MOUNT_FAILURE)
-    {
-        QMessageBox::information(this, tr("Format"), tr("Remounting the memory card failed. You may have to mount it manually."));
-        deselectDrive();
-        updateDriveList();
-    }
-    else
-    {
-        QMessageBox::information(this, tr("Format"), tr("Formatting the memory card failed."));
-    }
-
-    setCursor(Qt::ArrowCursor);
 }
 
 void CardPage::ejectDrive()
@@ -571,7 +540,7 @@ void CardPage::selectDrive(const QString &driveName)
     auto fs = m_deviceManager->getVolumeFileSystem(driveName);
     if (fs != "FAT32" && fs != "msdos" && fs != "vfat")
     {
-        auto selected = QMessageBox::question(this, tr("Select drive"), tr("The selected memory card is not FAT32 formatted.")+"\n"+tr("Are you sure you want to format this drive [%1] ?").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
+        auto selected = QMessageBox::question(this, tr("Select drive"), tr("The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.")+"\n\n"+tr("Do you you want to format this drive [%1] now?").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
 
         if (selected == QMessageBox::No)
         {
@@ -579,10 +548,8 @@ void CardPage::selectDrive(const QString &driveName)
             return;
         }
 
-        if (m_deviceManager->formatDrive(driveName) == SUCCESS)
-            QMessageBox::information(this, tr("Format"), tr("The memory card has been formatted successfully."));
-        else
-            QMessageBox::information(this, tr("Format"), tr("Formatting the memory card failed."));
+        formatSelectedDrive( true );
+        selectDrive("");
 
         return;
     }

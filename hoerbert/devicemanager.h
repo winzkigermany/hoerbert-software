@@ -27,8 +27,12 @@
 
 #include <QList>
 #include <QObject>
+#include <QProcess>
+
+#include "pleasewaitdialog.h"
 
 class QStorageInfo;
+class PleaseWaitDialog;
 
 struct VolumeInfo;
 typedef std::shared_ptr<VolumeInfo> VolumeInfo_ptr;
@@ -68,7 +72,7 @@ public:
      * @param passwd current user's password in case permission is required
      * @return result code which indicates success, failure or incorrect password
      */
-    RetCode formatDrive(const QString &driveName, const QString &passwd = QString());
+    RetCode formatDrive( QWidget* parentWidget, const QString &driveName, const QString &newLabel = QString(), const QString &passwd = QString());
 
     /**
      * @brief executeCommandWithSudo execute command with sudo and automatically interact with password input
@@ -76,7 +80,7 @@ public:
      * @param passwd user's password
      * @return result code and output of command execution
      */
-    std::pair<int, QString> executeCommandWithSudo(const QString &cmd, const QString &passwd = QString());
+    std::pair<int, QString> executeCommandWithSudo(const QString &cmd, const QString &passwd = QString(), bool showPleaseWaitDialog=false, QWidget* parentWidget=nullptr );
 
     /**
      * @brief ejectDrive eject given drive(involves unmount and power-off)
@@ -222,6 +226,10 @@ private:
      * @brief the drive name of the currently selected drive
      */
     QString m_currentDriveName;
+
+    PleaseWaitDialog* pleaseWait;
+    QProcess* formatProcess;
+
 };
 
 
