@@ -79,31 +79,31 @@ public:
     /**
      * @brief addEntries
      */
-    void addEntries(const AudioList &);
+    void addEntries(const AudioList &, bool readFromDrive);
 
     /**
      * @brief addEntry
      */
-    void addEntry(const AudioEntry &);
+    void addEntry(const AudioEntry &, bool readFromDrive);
 
     /**
      * @brief append one or more items to this playlist
      * @param list the list to append to this playlist
      */
-    void insertBatch(const AudioList &list);
+    void insertBatch(const AudioList &list, bool readFromDrive);
 
     /**
      * @brief insert one or more items to this playlist at a specific position
      * @param list the list to insert into this playlist
      * @param index the index where to insert the items
      */
-    void insertBatchAt(const AudioList &list, int index);
+    void insertBatchAt(const AudioList &list, int index, bool readFromDrive);
 
     /**
      * @brief insertEntry
      * @return false if memory is full
      */
-    bool insertEntry(AudioEntry , int );
+    bool insertEntry(AudioEntry, int , bool readFromDrive);
 
     /**
      * @brief remove
@@ -336,7 +336,6 @@ private:
     QPixmap *m_backgroundPix;
     int m_maxID;
     quint8 m_dirNum;
-    bool m_readFromDrive;
     QList<quint64> m_additionalsInBytes;
 
     quint64 m_usedSpace;

@@ -62,8 +62,6 @@ PlaylistView::PlaylistView(QWidget *parent)
 
     m_backgroundPix = new QPixmap(":/images/hoerbert.png");
 
-    m_readFromDrive = true;
-
     m_playingEntryID = -1;
 
     m_prevIndicatorRowIndex = -1;
@@ -94,7 +92,7 @@ PlaylistView::PlaylistView(QWidget *parent)
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setDefaultDropAction(Qt::MoveAction);
     setDragDropOverwriteMode(false);
-    setAlternatingRowColors(false);
+    setAlternatingRowColors(true);
     setObjectName("PlaylistTable");
     setTabKeyNavigation(false);
 #ifdef Q_OS_WIN
@@ -155,44 +153,42 @@ void PlaylistView::load(const AudioList &list, quint8 dirNum)
     setRowCount(0);
     m_dirNum = dirNum;
 
-    m_readFromDrive = true;
-    addEntries(list);
-    m_readFromDrive = false;
+    addEntries(list, true);
     resizeColumnsToContents();
 }
 
-void PlaylistView::addEntries(const AudioList &list)
+void PlaylistView::addEntries(const AudioList &list, bool readFromDrive)
 {
     for (const auto& entry : list)
     {
-        addEntry(entry);
+        addEntry(entry, readFromDrive);
     }
 }
 
-void PlaylistView::addEntry(const AudioEntry &entry)
+void PlaylistView::addEntry(const AudioEntry &entry, bool readFromDrive)
 {
     auto index = rowCount();
-    insertEntry(entry, index);
+    insertEntry(entry, index, readFromDrive);
 }
 
-void PlaylistView::insertBatch(const AudioList &list)
+void PlaylistView::insertBatch(const AudioList &list, bool readFromDrive)
 {
     int index = -1;
     if (currentRow() != -1)
         index = currentRow() + 1;
     else
         index = rowCount() + 1;
-    insertBatchAt(list, index);
+    insertBatchAt(list, index, readFromDrive);
 }
 
-void PlaylistView::insertBatchAt(const AudioList &list, int index)
+void PlaylistView::insertBatchAt(const AudioList &list, int index, bool readFromDrive)
 {
     if (index == -1 || index > rowCount())
         index = rowCount();
 
     for (const auto& entry : list)
     {
-        if (!insertEntry(entry, index))
+        if (!insertEntry(entry, index, readFromDrive))
             break;
         index++;
     }
@@ -200,9 +196,9 @@ void PlaylistView::insertBatchAt(const AudioList &list, int index)
     resizeColumnsToContents();
 }
 
-bool PlaylistView::insertEntry(AudioEntry entry, int index)
+bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=false)
 {
-    if (!m_readFromDrive) {
+    if (!readFromDrive) {
         auto expectedFileSizeInBytes = WAV_HEADER_SIZE_IN_BYTES + (entry.duration * 32000 * 16 / 8) + MEMORY_SPARE_SPACE_IN_BYTES;
 
         assert(m_dirNum < 9);
@@ -307,7 +303,7 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index)
 
     this->setText(index, DURATION_COLUMN_INDEX, convertSecToDesired(entry.duration));
 
-    if (!m_readFromDrive) {
+    if (!readFromDrive) {
         entry.metadata.comment = entry.path;
     }
     this->setText(index, METADATA_TITLE_COLUMN_INDEX, entry.metadata.title);
@@ -321,7 +317,7 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index)
 
     m_data.insert(entry.id, entry);
 
-    if (!m_readFromDrive) {
+    if (!readFromDrive) {
         emit durationChanged(entry.duration);
     }
     return true;
@@ -666,7 +662,7 @@ void PlaylistView::readEntries(const QFileInfoList &fileInfoList, int rowIndex)
     m_infoThread->setDeafultFlag(0);
 
     connect(m_infoThread, &AudioInfoThread::taskCompleted, this, [this, rowIndex] (const AudioList &result) {
-        this->insertBatchAt(result, rowIndex);
+        this->insertBatchAt(result, rowIndex, true);
     });
 
     connect(m_infoThread, &QThread::finished, this, [this, file_info_list, metadata_list] () {
