@@ -203,7 +203,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     connect(m_playlistView, &PlaylistView::errorOccurred, this, &PlaylistPage::errorOccurred);
 }
 
-void PlaylistPage::setDirecytory(const QString &dir_path, quint8 dir_num, const AudioList &result)
+void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const AudioList &result)
 {
     m_dir = dir_path;
     m_dirNum = dir_num;

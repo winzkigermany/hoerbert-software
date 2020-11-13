@@ -54,7 +54,7 @@ public:
     /**
      * @brief set the absolute path to selected directory and directory number, list all files in it
      */
-    void setDirecytory(const QString &, quint8 , const AudioList &);
+    void setListData(const QString &, quint8 , const AudioList &);
 
     /**
      * @brief return the directory number
