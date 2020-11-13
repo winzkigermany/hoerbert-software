@@ -317,12 +317,12 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
         {
             if (fileInfo.fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT, 0, 0).section("-", 0, 0).toInt() == file_number)
             {
-                auto suffix_number = fileInfo.fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT, 0, 0).section("-", 1, 1).toInt();
-                auto metadata_title = entry.metadata.title;
-                auto index = QString(" %1").arg(suffix_number + 1);
-                if (metadata_title.toUtf8().size() + index.toUtf8().size() > m_maxMetadataLength)
+                int suffix_number = fileInfo.fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT, 0, 0).section("-", 1, 1).toInt();
+                QString metadata_title = (entry.metadata.title).toUtf8();
+                QString index = (QString(" %1").arg(suffix_number + 1)).toUtf8();
+                if (metadata_title.size() + index.size() > m_maxMetadataLength)
                 {
-                    metadata_title.resize(m_maxMetadataLength - index.toUtf8().size(), ' ');
+                    metadata_title.resize(m_maxMetadataLength - index.size(), ' ');
                 }
                 if (!changeMetaData(fileInfo.absoluteFilePath(), entry.metadata, index))
                 {
