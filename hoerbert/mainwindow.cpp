@@ -254,6 +254,8 @@ MainWindow::~MainWindow()
     QSettings settings;
     settings.beginGroup("Global");
     bool regenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
+    settings.endGroup();
+
     if( m_cardPage->isHoerbertXMLDirty() && regenerateHoerbertXml ){
         m_cardPage->recreateXml();
     }

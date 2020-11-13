@@ -702,30 +702,37 @@ void CardPage::updateButtons()
 {
     QSettings settings;
     settings.beginGroup("Global");
-    auto count = settings.value("buttons").toInt();
+    int buttonCount = settings.value("buttons").toInt();
     settings.endGroup();
+
     for (const auto & btn : m_dirs) {
         auto id_= btn->ID();
 
-        if (count == 3) {
-            btn->setOverlaySize(128, 128);
-            btn->setFixedSize(128, 128);
-            if ( id_ != 1 && id_ != 6 && id_ != 8)
-                btn->hide();
-            else
+        switch( buttonCount ){
+            case 3:
+                btn->setOverlaySize(128, 128);
+                btn->setFixedSize(128, 128);
+                if ( id_ != 1 && id_ != 6 && id_ != 8)
+                    btn->hide();
+                else
+                    btn->show();
+
+                m_horizontalGridSpacer1->changeSize(0,80);
+            break;
+            case 1:
+                btn->setOverlaySize(128, 128);
+                btn->setFixedSize(128, 128);
+                if (id_ != 4)
+                    btn->hide();
+                else
+                    btn->show();
+            break;
+            default:
+                btn->setOverlaySize(96, 96);
+                btn->setFixedSize(96, 96);
                 btn->show();
-        } else if (count == 1) {
-            btn->setOverlaySize(128, 128);
-            btn->setFixedSize(128, 128);
-            if (id_ != 4)
-                btn->hide();
-            else
-                btn->show();
-        } else {
-            btn->setOverlaySize(96, 96);
-            btn->setFixedSize(96, 96);
-            btn->show();
         }
+
     }
 }
 
