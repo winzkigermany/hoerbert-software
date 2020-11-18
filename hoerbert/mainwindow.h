@@ -24,6 +24,7 @@
 
 #include <QMainWindow>
 #include <QProcess>
+#include <QMutex>
 
 #include "define.h"
 

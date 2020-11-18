@@ -37,6 +37,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QInputDialog>
+#include <QVBoxLayout>
 
 #include "define.h"
 #include "functions.h"
@@ -346,20 +347,19 @@ void CardPage::formatSelectedDrive(bool retry)
     }
 
     QString passwd = "";
+    bool ok = false;
 #ifdef Q_OS_LINUX
     auto label = tr("If you do not want to enter your root password here,\nplease format the memory card in terminal with the following command:")
             + "\n\numount [device]\nmkfs.vfat [device]\n";
-    bool ok = false;
+
     passwd = QInputDialog::getText(this, tr("Permission required"), label, QLineEdit::Password, QString(), &ok);
     if (!ok || passwd.isEmpty())
         return;
 #endif
 
-
-    bool ok;
     auto driveLabel = QInputDialog::getText(this, tr("Format"), tr("Please enter the new name for your card"), QLineEdit::Normal, DEFAULT_DRIVE_LABEL, &ok);
 
-    m_deviceManager->formatDrive(this, selectedDrive, driveLabel);
+    m_deviceManager->formatDrive(this, selectedDrive, driveLabel, passwd);
 
 }
 

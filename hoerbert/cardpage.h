@@ -23,6 +23,7 @@
 #define CARDPAGE_H
 
 #include <QWidget>
+#include <QMutex>
 
 #if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
 #include <QFileSystemWatcher>

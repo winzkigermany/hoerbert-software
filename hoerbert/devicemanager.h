@@ -80,14 +80,21 @@ public:
      * @param passwd user's password
      * @return result code and output of command execution
      */
-    std::pair<int, QString> executeCommandWithSudo(const QString &cmd, const QString &passwd = QString(), bool showPleaseWaitDialog=false, QWidget* parentWidget=nullptr );
+    std::pair<int, QString> executeCommandWithSudo( QProcess* theProcess, const QString &cmd, const QString &drivePath, const QString &passwd = QString(), bool showPleaseWaitDialog=false, QWidget* parentWidget=nullptr );
 
     /**
-     * @brief ejectDrive eject given drive(involves unmount and power-off)
+     * @brief ejectDrive eject given drive (involves unmount and NO power-off)
      * @param driveName drive label + root path
      * @return result code
      */
     RetCode ejectDrive(const QString &driveName);
+
+    /**
+     * @brief remountDrive try to ask automount to remount given drive
+     * @param driveName drive label + root path
+     * @return result code
+     */
+    RetCode remountDrive(const QString &driveName);
 
     /**
      * @brief getVolumeSize
@@ -228,8 +235,7 @@ private:
     QString m_currentDriveName;
 
     PleaseWaitDialog* pleaseWait;
-    QProcess* formatProcess;
-
+    QProcess* formatProcess;        // this is a potentially long running process
 };
 
 

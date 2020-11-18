@@ -208,7 +208,7 @@ bool DeviceManager::isValidDevice(const QString &device)
 
 RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveName, const QString &newLabel, const QString &passwd )
 {
-#ifdef Q_OS_LINUX
+#ifndef Q_OS_LINUX
     Q_UNUSED( passwd )
 #endif
 
@@ -223,12 +223,14 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         return DEVICE_NOT_FOUND;
     }
 
-    QProcess formatCmdProcess;
-    QString root = ret->second->name;
+    QString deviceName = ret->second->name;
 
-    if ( !isRemovable( root ) ){
+    if ( !isRemovable( deviceName ) ){
         return FAILURE;
     }
+
+
+    formatProcess = new QProcess();
 
 #ifndef Q_OS_LINUX
     QString cmd = getFormatCommand(root, new_drive_label);
@@ -241,8 +243,6 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         pleaseWait->setWindowTitle(tr("Formatting memory card..."));
         pleaseWait->setWindowModality(Qt::ApplicationModal);
         pleaseWait->show();
-
-        formatProcess = new QProcess();
 
         connect( formatProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
             Q_UNUSED( exitCode )
@@ -264,23 +264,13 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         return SUCCESS;
     }
 #else
+
     int ret_code = -1;
     QString output = "";
-    std::tie(ret_code, output) = executeCommandWithSudo(QString("umount %1").arg(root), passwd);
-    qDebug() << "umount:\n" << output;
-    if (ret_code == PASSWORD_INCORRECT) {
-        return PASSWORD_INCORRECT;
-    }
 
-    if (ret_code == FAILURE || !output.isEmpty()) {
-        executeCommand("sudo -k");
-        return FAILURE;
-    }
+    ejectDrive( driveName );
 
-    ret_code = -1;
-    output = "";
-
-    std::tie(ret_code, output) = executeCommandWithSudo(QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(root), passwd, true);
+    std::tie(ret_code, output) = executeCommandWithSudo( formatProcess, QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(deviceName), deviceName, passwd, true);
 
     qDebug() << "mkfs.vfat:\n" << output;
     if (ret_code == PASSWORD_INCORRECT) {
@@ -291,7 +281,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         executeCommand("sudo -k");
         return FAILURE;
     }
-
+/*
     QString user_name = qgetenv("USER");
     QDir dir(QString("/media/%1").arg(user_name));
     if (dir.exists())
@@ -302,7 +292,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
         qApp->processEvents();
 
-        std::tie(ret_code, output) = executeCommandWithSudo(QString("mkdir \"/media/%1/%2\"").arg(user_name).arg(new_drive_label), passwd);
+        std::tie(ret_code, output) = executeCommandWithSudo(QString("mkdir \"/media/%1/%2\"").arg(user_name).arg(new_drive_label), deviceName, passwd);
 
         QApplication::restoreOverrideCursor();
         qApp->processEvents();
@@ -323,7 +313,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
         qApp->processEvents();
 
-        std::tie(ret_code, output) = executeCommandWithSudo(QString("sudo -S mount %1 \"/media/%2/%3\" -o uid=%2 -o gid=%2").arg(root).arg(user_name).arg(new_drive_label), passwd);
+        std::tie(ret_code, output) = executeCommandWithSudo(QString("sudo -S mount %1 \"/media/%2/%3\" -o uid=%2 -o gid=%2").arg(root).arg(user_name).arg(new_drive_label), deviceName, passwd);
 
         QApplication::restoreOverrideCursor();
         qApp->processEvents();
@@ -339,7 +329,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
             qDebug() << "Failed mounting formatted drive";
         }
     }
-
+*/
     // sudo should forget password, otherwise the commands will work even with incorrect password within 15 minutes
     executeCommand("sudo -k");
 
@@ -349,16 +339,18 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
 }
 
 
-std::pair<int, QString> DeviceManager::executeCommandWithSudo(const QString &cmd, const QString &passwd, bool showPleaseWaitDialog, QWidget* parentWidget)
+std::pair<int, QString> DeviceManager::executeCommandWithSudo( QProcess* theProcess, const QString &newCmd, const QString &devicePath, const QString &passwd, bool showPleaseWaitDialog, QWidget* parentWidget)
 {
     int ret_code = -1;
-    QString cmd_ = cmd;
-    if (!cmd_.startsWith("sudo -S"))
+    QString cmd = newCmd;
+    if (!cmd.startsWith("sudo -S"))
     {
-        cmd_ = "sudo -S " + cmd_;
+        cmd = "sudo -S " + cmd;
     }
 
-    qDebug() << cmd_;
+
+
+    qDebug() << cmd;
 
     if( showPleaseWaitDialog ){
         pleaseWait = new PleaseWaitDialog();
@@ -369,27 +361,13 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo(const QString &cmd
         pleaseWait->show();
     }
 
-    formatProcess = new QProcess();
-    formatProcess->setProcessChannelMode(QProcess::MergedChannels);
-    connect( formatProcess, &QProcess::readyReadStandardOutput, [=] () {
-        QString output = formatProcess->readAllStandardOutput();
-        if (output.contains("Sorry, try again")) {      //@TODO This is debatable... does it work with other system languages at all?
-            if( showPleaseWaitDialog ){
-                pleaseWait->setResultString( tr("Password is incorrect. Please try again.") );
-            }
-            formatProcess->close();
-        }
-        qDebug() << output;
-    });
+    theProcess->setProcessChannelMode(QProcess::MergedChannels);
 
+    if( showPleaseWaitDialog ){
+        connect( theProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
+            Q_UNUSED( exitStatus )
 
-    connect( formatProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
-        Q_UNUSED( exitCode )
-        Q_UNUSED( exitStatus )
-
-        QString output = formatProcess->readAllStandardOutput();
-        if( showPleaseWaitDialog ){
-            if (output.contains("Finished erase", Qt::CaseInsensitive) || output.contains("Format complete", Qt::CaseInsensitive))
+            if( exitCode==0 )
             {
                 pleaseWait->setResultString( tr("The memory card has been formatted successfully"));
             }
@@ -397,31 +375,53 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo(const QString &cmd
             {
                 pleaseWait->setResultString( tr("Formatting the memory card failed.") );
             }
-        }
-    });
 
-
-    formatProcess->start(cmd_);
-    if (!formatProcess->waitForStarted())
-    {
-        qDebug() << "Process failed to start!";
-        ret_code = FAILURE;
-        return std::pair<int, QString>(ret_code, formatProcess->readAll());
+            remountDrive( devicePath );
+        });
     }
 
-    formatProcess->write(QString("%1\n").arg(passwd).toUtf8().constData());
 
-    return std::pair<int, QString>(SUCCESS, "");    // in case we're only starting formatting, there's nothing better we can return (if the process START was successful.
+    connect( theProcess, &QProcess::readyReadStandardOutput, [=] () {
+        QString output = theProcess->readAllStandardOutput();
+        if (output.contains("Sorry, try again")) {      //@TODO This is debatable... does it work with other system languages at all?
+            if( showPleaseWaitDialog ){
+                pleaseWait->setResultString( tr("Password is incorrect. Please try again.") );
+            }
+        }
 
-/*
-    case MOUNT_FAILURE:
-        QMessageBox::information(this, tr("Format"), tr("Remounting the memory card failed. You may have to mount it manually."));
-        deselectDrive();
-        updateDriveList();
-        break;
-*/
+        if( output.contains("[sudo]") ){        // This is the prompt: [sudo] password for xyz
+            // send the password to the process
+            theProcess->write(QString("%1\n").arg(passwd).toUtf8().constData());
+        }
+        qDebug() << output;
+    });
 
+    theProcess->start(cmd);
+    if( !showPleaseWaitDialog ){
+        if (!theProcess->waitForStarted())
+        {
+            qDebug() << "Process failed to start!";
+            ret_code = FAILURE;
+            return std::pair<int, QString>(ret_code, theProcess->readAll());
+        }
+        theProcess->write(QString("%1\n").arg(passwd).toUtf8().constData());
 
+        if (!theProcess->waitForFinished(60000))
+        {
+            if (ret_code != PASSWORD_INCORRECT)
+                ret_code = FAILURE;
+            return std::pair<int, QString>(ret_code, theProcess->readAll());
+        }
+        else
+        {
+            if (ret_code != PASSWORD_INCORRECT)
+                ret_code = SUCCESS;
+
+            return std::pair<int, QString>(ret_code, theProcess->readAll());
+        }
+    }
+
+    return std::pair<int, QString>(SUCCESS, "");    // in case we're only starting formatting, there's nothing better we can return (if the process START was successful.)
 }
 
 RetCode DeviceManager::ejectDrive(const QString &driveName)
@@ -474,12 +474,14 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
     QApplication::restoreOverrideCursor();
     qApp->processEvents();
 
-    if (!output.contains("Unmounted "))
+    if (!output.startsWith("Unmounted ", Qt::CaseInsensitive))
         return FAILURE;
 
-    output = executeCommand("udisksctl power-off -b " + diskName);
-    if (!output.isEmpty())
-        return FAILURE;
+// This also turns off my card reader device, we don't want that.
+//    output = executeCommand("udisksctl power-off -b " + diskName);
+//    if (!output.isEmpty())
+//        return FAILURE;
+
 #endif
 
     m_currentDrive = QString();
@@ -487,6 +489,68 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
     return SUCCESS;
 }
 
+
+RetCode DeviceManager::remountDrive(const QString &driveName)
+{
+
+    QString diskName=driveName;
+
+#ifdef _WIN32
+    //@TODO Is there a way to remount an ejected drive under windows?
+*/
+    auto driveLetter = diskName.at(0);
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
+    if ( 0 != EjectDriveWin(driveLetter.unicode()) ){
+        QApplication::restoreOverrideCursor();
+        qApp->processEvents();
+        return FAILURE;
+    }
+
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+*/
+#elif defined (Q_OS_MACOS)
+    // we use the "mount" command, since it does not ask for admin privileges.
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
+    QString output = executeCommand("diskutil mount " + diskName);               // execute the umount command synchronously.
+
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+
+    if ( !(output.contains("Volume", Qt::CaseInsensitive) && output.contains("unmounted", Qt::CaseInsensitive)) )       // The positive result of "unmount" looks like this: Volume NO NAME on disk2s1 unmounted
+    {
+        return FAILURE;
+    }
+#elif defined (Q_OS_LINUX)
+    // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
+    qApp->processEvents();
+
+    QString output = executeCommand("udisksctl mount -b " + diskName);
+
+    QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+
+    if (!output.startsWith("Mounted "))
+        return FAILURE;
+
+// This also turns off my card reader device, I don't want that.
+//    output = executeCommand("udisksctl power-off -b " + diskName);
+//    if (!output.isEmpty())
+//        return FAILURE;
+
+#endif
+
+    m_currentDrive = QString();
+    m_currentDriveName = QString();
+    return SUCCESS;
+}
 void DeviceManager::setCurrentDrive(const QString &driveName)
 {
     if (driveName.isEmpty())
