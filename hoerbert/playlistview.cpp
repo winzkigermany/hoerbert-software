@@ -95,6 +95,9 @@ PlaylistView::PlaylistView(QWidget *parent)
     setAlternatingRowColors(true);
     setObjectName("PlaylistTable");
     setTabKeyNavigation(false);
+    horizontalHeader()->setStretchLastSection(true);
+
+
 #ifdef Q_OS_WIN
     setStyleSheet("#PlaylistTable {background-color: white; color: black; alternate-background-color: rgba(245, 245, 245, 0);}");
 #else
@@ -320,6 +323,8 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
     if (!readFromDrive) {
         emit durationChanged(entry.duration);
     }
+
+    this->resizeColumnsToContents();
     return true;
 }
 
