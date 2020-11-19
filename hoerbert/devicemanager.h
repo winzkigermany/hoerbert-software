@@ -169,6 +169,12 @@ public:
      */
     void refresh( const QString &driveName=NULL );
 
+    /**
+     * @brief isWorkingOnCustomDirectory
+     * @return true if the user manually selected a path to work on instead of selecting a drive.
+     */
+    bool isWorkingOnCustomDirectory() const;
+
 #if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
     /**
      * @brief check if device is valid(removable drive) or not
@@ -179,6 +185,12 @@ public:
      */
     bool isValidDevice(const QString &device);
 #endif
+
+    /**
+     * @brief addCustomPath adds the user selected path as a possible drive to work on
+     * @param customPath an absolute path
+     */
+    void addCustomPath( const QString &customPath );
 
 protected:
 
@@ -234,8 +246,21 @@ private:
      */
     QString m_currentDriveName;
 
+    /**
+     * @brief a custom path that was selected by the user manually
+     */
+    QString m_custom_destination_path;
+
+    /**
+     * @brief pleaseWait A universal "please wait" dialog
+     */
     PleaseWaitDialog* pleaseWait;
-    QProcess* formatProcess;        // this is a potentially long running process
+
+    /**
+     * @brief formatProcess is a longer running process that shoul not block the main loop
+     */
+    QProcess formatProcess;        // this is a potentially long running process
+
 };
 
 

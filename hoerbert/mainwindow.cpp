@@ -1227,16 +1227,15 @@ void MainWindow::advancedFeatures()
 
 void MainWindow::selectDestinationManually()
 {
-    auto default_path = QString();
+    QString default_path = QString();
 #if defined (Q_OS_MAC)
     default_path = "/Volumes";
 #elif defined (Q_OS_LINUX)
     default_path = "/media";
 #endif
-    auto dest_path = QFileDialog::getExistingDirectory(this, tr("Select destination"), default_path);
+    QString dest_path = QFileDialog::getExistingDirectory(this, tr("Select destination"), default_path);
     if (!dest_path.isEmpty()) {
-        m_cardPage->updateDriveList();
-        m_cardPage->selectDriveByPath(dest_path);
+        m_cardPage->selectDriveByPath( dest_path );
     }
 }
 

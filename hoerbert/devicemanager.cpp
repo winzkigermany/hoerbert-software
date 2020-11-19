@@ -61,6 +61,21 @@ DeviceManager::DeviceManager()
 
 void DeviceManager::refresh( const QString &driveName )
 {
+    if( isWorkingOnCustomDirectory() ){
+        QStorageInfo qsi;
+        if( driveName!=NULL )
+        {
+            qsi.setPath( driveName );
+        }
+        else
+        {
+            qsi.setPath( m_currentDriveName );
+        }
+        qsi.refresh();
+
+        return;
+    }
+
     std::map<QString, VolumeInfo_ptr>::const_iterator ret;
     if( driveName != NULL ){
         ret = _deviceName2Root.find(driveName);
@@ -117,7 +132,7 @@ ListString DeviceManager::getDeviceList()
 
     for(const auto& v: volumeList)
     {
-        auto root = getRoot(v);
+        QString root = getRoot(v);
 
         if(v.isValid() && v.isReady() && isRemovable(root))
         {
@@ -135,6 +150,15 @@ ListString DeviceManager::getDeviceList()
       }
   }
 
+  if( isWorkingOnCustomDirectory() ){
+      QStorageInfo qsi(m_custom_destination_path);
+      QString root = getRoot( qsi );
+      driveList.push_back(m_custom_destination_path);
+
+      VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,qsi);
+      _deviceName2Root.emplace(m_custom_destination_path, vol);
+  }
+
   return driveList;
 }
 
@@ -149,6 +173,10 @@ QString DeviceManager::getRoot(const QStorageInfo &info)
 
 QString DeviceManager::getDrivePath(const QString &driveName) const
 {
+    if( isWorkingOnCustomDirectory() ){
+        return m_custom_destination_path;
+    }
+
     QString path = QString("");
     if (m_currentDriveName.isEmpty())
         return path;
@@ -184,7 +212,11 @@ QString DeviceManager::getDriveName(const QString &drivePath)
         }
     }
 
-    return QString();
+    // if we end up here, no storage volume was found with the given name.
+    // hence, we assume a custom path that the user set.
+    m_custom_destination_path = drivePath;
+
+    return m_custom_destination_path;
 }
 
 #if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
@@ -196,6 +228,11 @@ QString DeviceManager::getDriveName(const QString &drivePath)
  */
 bool DeviceManager::isValidDevice(const QString &device)
 {
+    if( device==m_custom_destination_path )     // the custom directory *must* be valid, because it's what the user mandates.
+    {
+        return true;
+    }
+
     for (const auto& drive : _deviceName2Root)
     {
         auto device_str = drive.second->storageInfo.device();
@@ -230,7 +267,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
     }
 
 
-    formatProcess = new QProcess();
+//    formatProcess = new QProcess();
 
 #ifndef Q_OS_LINUX
     QString cmd = getFormatCommand(root, new_drive_label);
@@ -244,11 +281,11 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         pleaseWait->setWindowModality(Qt::ApplicationModal);
         pleaseWait->show();
 
-        connect( formatProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
+        connect( &formatProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
             Q_UNUSED( exitCode )
             Q_UNUSED( exitStatus )
 
-            QString output = formatProcess->readAllStandardOutput();
+            QString output = formatProcess.readAllStandardOutput();
             if (output.contains("Finished erase", Qt::CaseInsensitive) || output.contains("Format complete", Qt::CaseInsensitive))
             {
                 pleaseWait->setResultString( tr("The memory card has been formatted successfully"));
@@ -259,7 +296,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
             }
         });
 
-        formatProcess->start(cmd);
+        formatProcess.start(cmd);
 
         return SUCCESS;
     }
@@ -270,7 +307,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
 
     ejectDrive( driveName );
 
-    std::tie(ret_code, output) = executeCommandWithSudo( formatProcess, QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(deviceName), deviceName, passwd, true);
+    std::tie(ret_code, output) = executeCommandWithSudo( &formatProcess, QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(deviceName), deviceName, passwd, true);
 
     qDebug() << "mkfs.vfat:\n" << output;
     if (ret_code == PASSWORD_INCORRECT) {
@@ -426,6 +463,11 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo( QProcess* theProc
 
 RetCode DeviceManager::ejectDrive(const QString &driveName)
 {
+    if( isWorkingOnCustomDirectory() ){ // we're working on a custom directory, not a drive that's ejectable.
+        m_custom_destination_path = QString();
+        return SUCCESS;
+    }
+
     auto ret = _deviceName2Root.find(driveName);
     if (ret == _deviceName2Root.end())
     {
@@ -551,8 +593,17 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
     m_currentDriveName = QString();
     return SUCCESS;
 }
+
 void DeviceManager::setCurrentDrive(const QString &driveName)
 {
+    if( driveName==m_custom_destination_path ){
+        // from now on, we will work on the custom folder that the user selected.
+        m_currentDrive = driveName;
+        m_currentDriveName = driveName;
+        qDebug() << "working on custom directory: " << m_custom_destination_path;
+        return;
+    }
+
     if (driveName.isEmpty())
     {
         m_currentDrive = driveName;
@@ -654,7 +705,18 @@ bool DeviceManager::isWriteProtected(const QString &driveName)
     auto ret = _deviceName2Root.find(driveName);
     if (ret == _deviceName2Root.end())
     {
-        return false;
+        return true;    // the device was not found. Let's not allow writing to it.
     }
     return ret->second->storageInfo.isReadOnly();
 }
+
+bool DeviceManager::isWorkingOnCustomDirectory() const {
+    return !m_custom_destination_path.isEmpty();
+}
+
+void DeviceManager::addCustomPath( const QString &customPath )
+{
+    m_custom_destination_path = customPath;
+}
+
+

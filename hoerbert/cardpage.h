@@ -320,6 +320,11 @@ private:
      */
     void deselectDrive();
 
+    /**
+     * @brief hasFat32WarningShown helps to remember whether we've shown the warning once.
+     */
+    bool m_hasFat32WarningShown;
+
     bool m_isProcessing;
     bool m_migrationSuggested;
     bool m_hoerbertXMLIsDirty;

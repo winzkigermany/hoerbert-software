@@ -336,7 +336,15 @@ void CardPage::updateDriveList()
 
 void CardPage::formatSelectedDrive(bool retry)
 {
+    if( m_deviceManager->isWorkingOnCustomDirectory() ){
+        QMessageBox::information(this, tr("Format"), tr("You have selected a custom path to work on. For safety purposes, this app does not format such paths. Please format your memory card manually yourself."));
+        return;
+    }
+
     QString selectedDrive = m_driveList->currentText();
+    if( selectedDrive.isEmpty() ){
+        return;
+    }
 
     if (!retry)
     {
@@ -396,7 +404,11 @@ void CardPage::ejectDrive()
         QMessageBox::information(this, tr("Eject"), tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer."));
     }
     else
+    {
         QMessageBox::information(this, tr("Eject"), tr("Failed to eject the memory card [%1].").arg(currentDevice)+"\n"+tr("Please try again or try to remove it with your operating system"));
+    }
+
+    m_hasFat32WarningShown = false;
 }
 
 void CardPage::recreateXml()
@@ -543,18 +555,27 @@ void CardPage::selectDrive(const QString &driveName)
     auto fs = m_deviceManager->getVolumeFileSystem(driveName);
     if (fs != "FAT32" && fs != "msdos" && fs != "vfat")
     {
-        auto selected = QMessageBox::question(this, tr("Select drive"), tr("The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.")+"\n\n"+tr("Do you you want to format this drive [%1] now?").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
-
-        if (selected == QMessageBox::No)
+        if( m_deviceManager->isWorkingOnCustomDirectory() ){
+            if( !m_hasFat32WarningShown ){
+                // when the user did select a destination path manually, we don't dare to format that drive. Better be safe than sorry.
+                QMessageBox::information(this, tr("Select drive"), tr("The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.")+"\n\n"+tr("Please make sure that your destination has the correct FAT32 format for hörbert.") );
+            }
+            m_hasFat32WarningShown = true;
+        }
+        else
         {
-            updateDriveList();
+            auto selected = QMessageBox::question(this, tr("Select drive"), tr("The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.")+"\n\n"+tr("Do you you want to format this drive [%1] now?").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
+
+            if (selected == QMessageBox::No)
+            {
+                updateDriveList();
+                return;
+            }
+
+            formatSelectedDrive( true );
+            selectDrive("");
             return;
         }
-
-        formatSelectedDrive( true );
-        selectDrive("");
-
-        return;
     }
 
     auto size_in_bytes = m_deviceManager->getVolumeSize(driveName);
@@ -689,8 +710,12 @@ void CardPage::selectDrive(const QString &driveName)
 
 void CardPage::selectDriveByPath(const QString &path)
 {
-    selectDrive(m_deviceManager->getDriveName(path));
-    m_driveList->setCurrentText(m_deviceManager->getDriveName(path));
+    m_deviceManager->addCustomPath( path );
+    m_deviceManager->getDeviceList();
+    QString driveName = m_deviceManager->getDriveName(path);
+    selectDrive(driveName);
+    m_driveList->addItems(m_deviceManager->getDeviceList());
+    m_driveList->setCurrentText(driveName);
 }
 
 void CardPage::update()
