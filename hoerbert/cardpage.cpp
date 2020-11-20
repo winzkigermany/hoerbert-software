@@ -391,6 +391,7 @@ void CardPage::ejectDrive()
     QSettings settings;
     settings.beginGroup("Global");
     bool regenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
+    settings.endGroup();
     if( this->isHoerbertXMLDirty() && regenerateHoerbertXml ){
         recreateXml();
     }
