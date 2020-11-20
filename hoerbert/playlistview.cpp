@@ -47,6 +47,7 @@
 #include "playlistparser.h"
 #include "audiobookconverter.h"
 #include "functions.h"
+#include "scaledsizeprovider.h"
 
 int CDRipper::uniqueID = 0;
 
@@ -242,7 +243,7 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
         QLabel *scissors_pix = new QLabel(scissors_widget);
         scissors_pix->setScaledContents(true);
         scissors_pix->setPixmap(QPixmap(":/images/scissors.png"));
-        scissors_pix->setFixedSize(DEFAULT_ROW_HEIGHT * 0.8, DEFAULT_ROW_HEIGHT * 0.8);
+        scissors_pix->setFixedSize( ScaledSizeProvider::getScaledSize(DEFAULT_ROW_HEIGHT * 0.8, DEFAULT_ROW_HEIGHT * 0.8) );
 
         QHBoxLayout *scissors_layout = new QHBoxLayout(scissors_widget);
         scissors_layout->setAlignment(Qt::AlignCenter);

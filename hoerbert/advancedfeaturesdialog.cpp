@@ -35,12 +35,13 @@
 
 #include "version.h"
 #include "define.h"
+#include "scaledsizeprovider.h"
 
 AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     : QDialog (parent)
 {
     setWindowTitle(tr("Advanced features"));
-    setFixedSize(600, 480);
+    setFixedSize( ScaledSizeProvider::getScaledSize(600, 480) );
 
     m_settings = new QSettings(this);
 

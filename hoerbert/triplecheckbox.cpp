@@ -24,10 +24,12 @@
 #include <QPainter>
 #include <QDebug>
 
+#include "scaledsizeprovider.h"
+
 TripleCheckBox::TripleCheckBox(QWidget *parent)
     : QWidget(parent)
 {
-    setFixedSize(20, 20);
+    setFixedSize(ScaledSizeProvider::getScaledSize(20, 20));
     m_state = 0;
     m_isPressed = false;
 }

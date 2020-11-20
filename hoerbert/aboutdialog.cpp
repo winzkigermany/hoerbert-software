@@ -30,6 +30,7 @@
 #include <QApplication>
 
 #include "version.h"
+#include "scaledsizeprovider.h"
 
 /**
  * Please keep the references to other projects updated.
@@ -95,7 +96,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     m_companysite->setText(tr("www.hoerbert.com"));
 
     m_checkForUpdateButton = new QPushButton(this);
-    m_checkForUpdateButton->setFixedSize(250, 40);
+    m_checkForUpdateButton->setFixedSize( ScaledSizeProvider::getScaledSize(200, 32) );
     m_checkForUpdateButton->setObjectName(QString("check_for_new_version"));
     m_checkForUpdateButton->setLocale(QLocale(QLocale::English, QLocale::UnitedStates));
     m_checkForUpdateButton->setText(tr("Check for newer version"));
