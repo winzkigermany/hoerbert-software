@@ -58,6 +58,8 @@ extern QString HOERBERT_TEMP_PATH;
 PlaylistView::PlaylistView(QWidget *parent)
     : QTableWidget(parent)
 {
+    m_isDirty = false;
+
     m_maxID = 0;
 
     m_backgroundPix = new QPixmap(":/images/hoerbert.png");
@@ -158,6 +160,7 @@ void PlaylistView::load(const AudioList &list, quint8 dirNum)
 
     addEntries(list, true);
     resizeColumnsToContents();
+    currentPlaylistIsUntouched( true );
 }
 
 void PlaylistView::addEntries(const AudioList &list, bool readFromDrive)
@@ -220,6 +223,8 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
             return false;
         }
     }
+
+    currentPlaylistIsUntouched( false );
 
     if (index >= rowCount())
     {
@@ -359,6 +364,7 @@ bool PlaylistView::removeEntryByTableIndex(int index)
     removeRow(index);
 
     emit durationChanged(-(m_data[entry_id].duration));
+    currentPlaylistIsUntouched( false );
     return m_data.remove(entry_id);
 }
 
@@ -370,6 +376,7 @@ bool PlaylistView::removeEntryByEntryID(int id)
         {
             removeRow(i);
             emit durationChanged(-(m_data[id].duration));
+            currentPlaylistIsUntouched( false );
             return m_data.remove(id);
         }
     }
@@ -396,6 +403,8 @@ void PlaylistView::insertSilence(int secs, int index)
         qDebug() << "Invalid number of seconds:" << secs;
         return;
     }
+
+    currentPlaylistIsUntouched( false );
     if (index == -1)
         index = rowCount();
 
@@ -884,6 +893,7 @@ void PlaylistView::dragMoveEvent(QDragMoveEvent *event)
 
     m_prevIndicatorRowIndex = indicator_row;
 
+    currentPlaylistIsUntouched( false );
     QTableWidget::dragMoveEvent(event);
 }
 
@@ -995,6 +1005,7 @@ void PlaylistView::dropEvent(QDropEvent * event)
                 //qDebug() << "Removing row at " << *rit;
             }
 
+            currentPlaylistIsUntouched( false );
             event->accept();
         }
     }
@@ -1046,6 +1057,7 @@ void PlaylistView::dropEvent(QDropEvent * event)
             readEntries(file_info_list, dropped_row);
         }
 
+        currentPlaylistIsUntouched( false );
         QTableView::dropEvent(event);
     }
 }

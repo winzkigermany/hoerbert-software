@@ -228,6 +228,13 @@ signals:
       */
      void errorOccurred(const QString &errorString);
 
+     /**
+      * @brief this signal is emmitted when the playlist is pristine or modified
+      * @param errorString
+      */
+     void currentPlaylistIsUntouched(bool isUntouched);
+
+
 protected:
      virtual void dragEnterEvent(QDragEnterEvent *);
      virtual void dragLeaveEvent(QDragLeaveEvent *);
@@ -333,7 +340,9 @@ private:
     QList<QStringList> m_commands;
     QList<QStringList> m_itemList;
     AudioList m_data;
-    QPixmap *m_backgroundPix;
+
+    QPixmap *m_backgroundPix;   // the translucent background image
+
     int m_maxID;
     quint8 m_dirNum;
     QList<quint64> m_additionalsInBytes;
@@ -346,7 +355,6 @@ private:
     QProcess *m_player;
 
     CDRipper *m_ripperThread;
-
     AudioInfoThread *m_infoThread;
 
     QProgressDialog *m_progress;
@@ -355,6 +363,8 @@ private:
 
     int m_prevIndicatorRowIndex;
     QColor m_indicatorColor;
+
+    bool m_isDirty;     // has anything been modified that needs to be written to the card?
 };
 
 #endif // PLAYLISTVIEW_H

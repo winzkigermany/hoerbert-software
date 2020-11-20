@@ -87,6 +87,12 @@ public:
      */
     void clearDirectoryEstimation(quint8 dirIndex);
 
+    /**
+     * @brief getPlaylistView return a pointer to the playlistView
+     * @return
+     */
+    const PlaylistView *getPlaylistView();
+
 signals:
 
     /**

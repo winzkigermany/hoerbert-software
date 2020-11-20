@@ -552,4 +552,9 @@ bool PlaylistPage::columnVisibleFromSettings(const QString &columnName)
 }
 
 
+const PlaylistView * PlaylistPage::getPlaylistView()
+{
+    return m_playlistView;
+}
+
 

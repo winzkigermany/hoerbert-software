@@ -59,6 +59,7 @@
 #include "audioinfothread.h"
 #include "version.h"
 #include "functions.h"
+#include "playlistview.h"
 
 extern QString SYNC_PATH;
 extern QString HOERBERT_TEMP_PATH;
@@ -131,6 +132,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_featuresDlg, &AdvancedFeaturesDialog::buttonSettingsChanged, this, [this]() {
         m_cardPage->updateButtons();
     });
+
+    connect( m_playlistPage->getPlaylistView(), &PlaylistView::currentPlaylistIsUntouched,  m_moveToPlaylistMenu, &QMenu::setEnabled );
 
     connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
         m_cardPage->enableButtons(true);
