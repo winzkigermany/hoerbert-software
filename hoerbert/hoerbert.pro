@@ -75,7 +75,6 @@ SOURCES += \
         playsymbolbutton.cpp \
         pleasewaitdialog.cpp \
         qprocesspriority.cpp \
-        scaledsizeprovider.cpp \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         xmlmetadatareader.cpp \
@@ -105,7 +104,6 @@ HEADERS += \
         playsymbolbutton.h \
         pleasewaitdialog.h \
         qprocesspriority.h \
-        scaledsizeprovider.h \
         triplecheckbox.h \
         triplecheckboxwidget.h \
         version.h \

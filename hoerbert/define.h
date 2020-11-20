@@ -45,7 +45,7 @@ const QString PIE_STYLE_TEMPLATE =
 
 const QString FLAT_STYLE_TEMPLATE = "#StyleButton {color: white;background: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:1, stop:0 rgba(15, 157, 88, 255), stop:1 rgba(55, 157, 88, 225)); border-radius: 3px; padding: 5px 25px 5px 25px}";
 
-const QString BAR_STYLE_TEMPLATE = "#CardSizeBar {background: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:1, stop:0 rgba(15, 157, 88, 255), stop:1 rgba(55, 157, 88, 225)); border-radius: 3px; padding: 1px;}";
+const QString BAR_STYLE_TEMPLATE = "#CardSizeBar {background: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:1, stop:0 rgba(15, 157, 88, 255), stop:1 rgba(55, 157, 88, 225)); border-radius: 3px; padding: 5px 25px 5px 25px}";
 
 //qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 rgba(255,30,30,255), stop: 0.2 rgba(255,30,30,144), stop: 0.4 rgba(255,30,30,32)
 

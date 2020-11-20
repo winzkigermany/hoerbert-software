@@ -99,11 +99,6 @@ public:
     void setOverlaySize(int, int);
 
     /**
-     * @brief set the graphical overlay pixmap size for this button (glass effect)
-     */
-    void setOverlaySize( const QSize &theSize );
-
-    /**
      * @brief setMainPixmap
      */
     void setMainPixmap(const QPixmap &);
@@ -117,11 +112,6 @@ public:
      * @brief setFixedSize
      */
     void setFixedSize(int, int);
-
-    /**
-     * @brief setFixedSize
-     */
-    void setFixedSize(const QSize &newSize );
 
     /**
      * @brief setShadowBlurRadius

@@ -45,7 +45,6 @@
 #include "playlistview.h"
 #include "audioinfothread.h"
 #include "functions.h"
-#include "scaledsizeprovider.h"
 
 PlaylistPage::PlaylistPage(QWidget *parent)
     : QWidget(parent)
@@ -92,7 +91,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_silenceDuration->addItems(QString("1s,2s,5s,10s,1min,2min").split(","));
 
     m_addSilenceButton = new PieButton(this);
-    m_addSilenceButton->setFixedSize(ScaledSizeProvider::getScaledSize(32, 32));
+    m_addSilenceButton->setFixedSize(32, 32);
     m_addSilenceButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addSilenceButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addSilenceButton->setShadowEnabled(false);
@@ -109,7 +108,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_centerToolLayout->setAlignment(Qt::AlignCenter);
 
     m_addButton = new PieButton(this);
-    m_addButton->setFixedSize(ScaledSizeProvider::getScaledSize(32, 32));
+    m_addButton->setFixedSize(32, 32);
     m_addButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addButton->setShadowEnabled(false);
@@ -117,7 +116,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addButton->setToolTip(tr("Add audio files or tracks from Finder/Explorer") + QString(" (Ctrl+F)"));
 
     m_removeButton = new PieButton(this);
-    m_removeButton->setFixedSize(ScaledSizeProvider::getScaledSize(32, 32));
+    m_removeButton->setFixedSize(32, 32);
     m_removeButton->setBackgroundColor(QColor(255, 55, 55));
     m_removeButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_removeButton->setMainPixmap(QPixmap(":/images/minus.png"));
@@ -132,7 +131,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_rightToolLayout->setAlignment(Qt::AlignRight);
 
     m_commitButton = new PieButton(this);
-    m_commitButton->setFixedSize(ScaledSizeProvider::getScaledSize(32, 32));
+    m_commitButton->setFixedSize(32, 32);
     m_commitButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_commitButton->setMainPixmap(QPixmap(":/images/confirm.png"));
     m_commitButton->setShadowEnabled(false);
@@ -140,7 +139,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_commitButton->setToolTip(tr("Write changes to the card") + QString(" (Ctrl+C)"));
 
     m_cancelButton = new PieButton(this);
-    m_cancelButton->setFixedSize(ScaledSizeProvider::getScaledSize(32, 32));
+    m_cancelButton->setFixedSize(32, 32);
     m_cancelButton->setBackgroundColor(QColor(255, 55, 55));
     m_cancelButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_cancelButton->setMainPixmap(QPixmap(":/images/cancel.png"));
@@ -213,8 +212,8 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
     QPixmap pixmap(QString(":/images/colorblind_hint_0%1.png").arg(dir_num + 1));
     QIcon iconBack( pixmap.copy(100, 100, 400, 400));
     m_viewConfigButton->setIcon(iconBack);
-    m_viewConfigButton->setIconSize(ScaledSizeProvider::getScaledSize(42, 42));
-    m_viewConfigButton->setFixedSize(ScaledSizeProvider::getScaledSize(42, 42));
+    m_viewConfigButton->setIconSize(QSize(42,42));
+    m_viewConfigButton->setFixedSize(QSize(42,42));
 
     m_originalList[dir_num] = result;
     m_playlistView->load(result, dir_num);

@@ -30,12 +30,10 @@
 float getDpiScale()
 {
     return 1.0;
-/*
     HDC screen = GetDC( 0 );
     FLOAT dpiX = static_cast<float>( GetDeviceCaps( screen, LOGPIXELSX ) );
     ReleaseDC( 0, screen );
     return dpiX / DEFAULT_DPI;
-*/
 }
 
 #else

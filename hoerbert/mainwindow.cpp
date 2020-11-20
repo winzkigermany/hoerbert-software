@@ -59,7 +59,6 @@
 #include "audioinfothread.h"
 #include "version.h"
 #include "functions.h"
-#include "scaledsizeprovider.h"
 
 extern QString SYNC_PATH;
 extern QString HOERBERT_TEMP_PATH;
@@ -1598,7 +1597,7 @@ void MainWindow::showVersion(const QString &version)
 {
     QDialog *dlg = new QDialog();
     dlg->setModal(true);
-    dlg->setFixedSize(ScaledSizeProvider::getScaledSize(320, 160));
+    dlg->setFixedSize(320, 160);
 
     QLabel *label = new QLabel(dlg);
     label->setText(tr("This version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version));
@@ -1661,7 +1660,7 @@ void MainWindow::remindBackup()
     {
         QDialog *dlg = new QDialog(this);
         dlg->setWindowTitle(tr("Backup reminder"));
-        dlg->setFixedSize( ScaledSizeProvider::getScaledSize(640, 240));
+        dlg->setFixedSize(640, 240);
 
         QLabel *text = new QLabel(dlg);
         text->setText( tr("Backup reminder: Don't forget to backup your memory card to your computer.")+"\n"+tr("This will keep you from losing files accidently. Do you want to create a backup now?") );

@@ -26,26 +26,21 @@
 
 #include "define.h"
 #include "functions.h"
-#include "scaledsizeprovider.h"
 
 CapacityBar::CapacityBar(QWidget *parent)
     : QLabel(parent)
 {
     setAlignment(Qt::AlignCenter);
-
-    setFont(QFont(HOERBERT_FONTFAMILY, ScaledSizeProvider::getFontSizeFactor()*14));
+    setFont(QFont(HOERBERT_FONTFAMILY, 12));
     setObjectName("CardSizeBar");
     setStyleSheet(BAR_STYLE_TEMPLATE);
-    setFixedSize( ScaledSizeProvider::getScaledSize(300, 25) );
+    setFixedSize(300, 25);
 
     m_totalBytes = 0;
     m_usedBytes = 0;
     m_estimatedSeconds = 0;
+    setText(tr("Please select a device first."));
     setToolTip(tr("Shows used space / total available space on the card in minutes"));
-
-//    QFont f = font();
-//    f.setPointSize(6);
-//    setFont(f);
 }
 
 void CapacityBar::setParams(quint64 usedBytes, quint64 totalBytes)
@@ -89,7 +84,7 @@ void CapacityBar::paintEvent(QPaintEvent *e)
     if (m_totalBytes > 0)
         setText(QString("~ %1 / %2 min").arg((m_estimatedSeconds == 0) ? bytesToSeconds(m_usedBytes) / 60 : m_estimatedSeconds / 60).arg(bytesToSeconds(m_totalBytes)/60));
     else
-        setText(tr("No memory card"));
+        setText(tr("Please select a device first."));
 
     int percentage =  (m_estimatedSeconds == 0) ? int(double(m_usedBytes) / double(m_totalBytes) * 100) : int(double(secondsToBytes(m_estimatedSeconds)) / double(m_totalBytes) * 100);
 

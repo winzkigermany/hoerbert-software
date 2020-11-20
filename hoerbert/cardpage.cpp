@@ -46,7 +46,6 @@
 #include "audioinfothread.h"
 #include "xmlwriter.h"
 #include "pleasewaitdialog.h"
-#include "scaledsizeprovider.h"
 #include <QFutureSynchronizer>
 
 CardPage::CardPage(QWidget *parent)
@@ -85,7 +84,7 @@ CardPage::CardPage(QWidget *parent)
     m_selectDriveButton->setObjectName("BlackLabel");
 
     m_ejectDriveButton = new PieButton(this);
-    m_ejectDriveButton->setFixedSize( ScaledSizeProvider::getScaledSize(32, 32) );
+    m_ejectDriveButton->setFixedSize(32, 32);
     m_ejectDriveButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_ejectDriveButton->setMainPixmap(QPixmap(":/images/eject.png"));
     m_ejectDriveButton->setShadowEnabled(false);
@@ -186,7 +185,7 @@ CardPage::CardPage(QWidget *parent)
 
     m_diagModeHint = new QLabel(m_diagWidget);
     m_diagModeHint->setText(tr("This memory card is in diagnostics mode."));
-    m_diagModeHint->setFont(QFont("Console", ScaledSizeProvider::getFontSizeFactor()*12, 50));
+    m_diagModeHint->setFont(QFont("Console", 12, 50));
     m_diagModeHint->setObjectName("BlackLabel");
 
     m_return2Normal = new QPushButton(m_diagWidget);
@@ -737,8 +736,8 @@ void CardPage::updateButtons()
 
         switch( buttonCount ){
             case 3:
-                btn->setOverlaySize(ScaledSizeProvider::getScaledSize(128, 128));
-                btn->setFixedSize(ScaledSizeProvider::getScaledSize(128, 128));
+                btn->setOverlaySize(128, 128);
+                btn->setFixedSize(128, 128);
                 if ( id_ != 1 && id_ != 6 && id_ != 8)
                     btn->hide();
                 else
@@ -747,16 +746,16 @@ void CardPage::updateButtons()
                 m_horizontalGridSpacer1->changeSize(0,80);
             break;
             case 1:
-                btn->setOverlaySize(ScaledSizeProvider::getScaledSize(128, 128));
-                btn->setFixedSize(ScaledSizeProvider::getScaledSize(128, 128));
+                btn->setOverlaySize(128, 128);
+                btn->setFixedSize(128, 128);
                 if (id_ != 4)
                     btn->hide();
                 else
                     btn->show();
             break;
             default:
-                btn->setOverlaySize(ScaledSizeProvider::getScaledSize(96, 96));
-                btn->setFixedSize(ScaledSizeProvider::getScaledSize(96, 96));
+                btn->setOverlaySize(96, 96);
+                btn->setFixedSize(96, 96);
                 btn->show();
         }
 

@@ -27,16 +27,17 @@
 #include <QLabel>
 
 #include "define.h"
-#include "scaledsizeprovider.h"
 
 PieButton::PieButton(QWidget *parent, int id) : QPushButton(parent)
 {
     setObjectName("PieButton");
 
-#if defined (Q_OS_LINUX)
-    setFont(QFont(HOERBERT_FONTFAMILY, ScaledSizeProvider::getFontSizeFactor()*21, QFont::Normal));
-#else
-    setFont(QFont(HOERBERT_FONTFAMILY, ScaledSizeProvider::getFontSizeFactor()*21, QFont::DemiBold));
+#ifdef Q_OS_MACOS
+    setFont(QFont(HOERBERT_FONTFAMILY, 21, QFont::DemiBold));
+#elif defined (Q_OS_LINUX)
+    setFont(QFont(HOERBERT_FONTFAMILY, 21, QFont::Normal));
+#elif defined(Q_OS_WIN)
+    setFont(QFont(HOERBERT_FONTFAMILY, 18, QFont::DemiBold));
 #endif
 
     m_id = id;
@@ -64,7 +65,7 @@ PieButton::PieButton(QWidget *parent, int id) : QPushButton(parent)
     m_mainPixmap->setVisible(false);
 
     updateStyleSheet();
-    setFixedSize(ScaledSizeProvider::getScaledSize(96, 96));
+    setFixedSize(96, 96);
     setOverlaySize(96, 96);
 }
 
@@ -185,11 +186,6 @@ void PieButton::setFixedSize(int w, int h)
     updateStyleSheet();
 }
 
-void PieButton::setFixedSize(const QSize &newSize)
-{
-    setFixedSize( newSize.width(), newSize.height() );
-}
-
 void PieButton::setOverlayPixmap(const QPixmap &pix)
 {
     m_overlay->setPixmap(pix);
@@ -199,11 +195,6 @@ void PieButton::setOverlayPixmap(const QPixmap &pix)
 void PieButton::setOverlaySize(int w, int h)
 {
     m_overlay->setFixedSize(w, h);
-}
-
-void PieButton::setOverlaySize( const QSize &theSize )
-{
-    setOverlaySize( theSize.width(), theSize.height() );
 }
 
 void PieButton::setMainPixmap(const QPixmap &pix)

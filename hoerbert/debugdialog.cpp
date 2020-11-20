@@ -30,12 +30,10 @@
 #include <QMutexLocker>
 #include <QDebug>
 
-#include "scaledsizeprovider.h"
-
 DebugDialog::DebugDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setFixedSize(ScaledSizeProvider::getScaledSize(480, 320));
+    setFixedSize(480, 320);
     setWindowTitle(tr("An error has occurred"));
     setModal(true);
 

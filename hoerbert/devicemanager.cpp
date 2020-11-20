@@ -537,7 +537,7 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 
 #ifdef _WIN32
     //@TODO Is there a way to remount an ejected drive under windows?
-/*
+*/
     auto driveLetter = diskName.at(0);
 
     QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
