@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_migrationPath = QString("");
 
     QDesktopWidget dw;
-    setGeometry((dw.width() - 800) / 2, (dw.height() - 600) / 2, 800, 600);
+    setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
     setWindowTitle("hörbert");
     setWindowIcon(QIcon(":/images/hoerbert.ico"));
     setObjectName("MainWindow");
@@ -1597,7 +1597,7 @@ void MainWindow::showVersion(const QString &version)
 {
     QDialog *dlg = new QDialog();
     dlg->setModal(true);
-    dlg->setFixedSize(320, 160);
+    dlg->setFixedSize(320, 198);
 
     QLabel *label = new QLabel(dlg);
     label->setText(tr("This version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version));

@@ -40,7 +40,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     if (objectName().isEmpty())
         setObjectName(QString("AboutDialog"));
 
-    resize(640, 580);
+    resize(640, 396);
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setSizePolicy(sizePolicy);
     setWindowTitle(tr("About this software"));
@@ -49,7 +49,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     m_disclaimer = new QTextBrowser(this);
     m_disclaimer->setObjectName("disclaimer");
     m_disclaimer->setAlignment(Qt::AlignHCenter);
-    m_disclaimer->setGeometry(QRect(20, 270, 591, 281));
+    m_disclaimer->resize( 620, 160 );
     m_disclaimer->setLocale(QLocale(QLocale::English, QLocale::UnitedStates));
     m_disclaimer->setReadOnly(true);
     m_disclaimer->setStyleSheet("#disclaimer {background: white; color: black}");
@@ -101,16 +101,15 @@ AboutDialog::AboutDialog(QWidget* parent)
     m_checkForUpdateButton->setText(tr("Check for newer version"));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setMargin(50);
+    layout->setMargin(30);
     layout->setSpacing(10);
-
     layout->addWidget(m_company);
     layout->addWidget(m_copyright);
     layout->addWidget(m_companysite);
-    layout->addSpacing(50);
+    layout->addSpacing(30);
     layout->addWidget(m_version);
     layout->addWidget(m_checkForUpdateButton, 0, Qt::AlignCenter);
-    layout->addSpacing(50);
+    layout->addSpacing(30);
     layout->addWidget(m_disclaimer);
 
     connect(m_checkForUpdateButton, &QPushButton::clicked, this, [this] () {

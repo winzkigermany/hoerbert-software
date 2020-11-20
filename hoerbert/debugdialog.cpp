@@ -33,7 +33,7 @@
 DebugDialog::DebugDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setFixedSize(480, 320);
+    setFixedSize(480, 297);
     setWindowTitle(tr("An error has occurred"));
     setModal(true);
 

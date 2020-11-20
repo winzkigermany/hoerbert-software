@@ -40,7 +40,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     : QDialog (parent)
 {
     setWindowTitle(tr("Advanced features"));
-    setFixedSize(600, 480);
+    setFixedSize(600, 396);
 
     m_settings = new QSettings(this);
 

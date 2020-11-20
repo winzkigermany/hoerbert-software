@@ -71,25 +71,7 @@ int main(int argc, char *argv[])
     signal(SIGFPE, signalHandler);
     signal(SIGILL, signalHandler);
 
-#ifdef CALCULATE_SCALING_FACTOR
-
-    //QString scalingFactor;
-    //scalingFactor.setNum(getDpiScale(), 'g', 2);
-    //qputenv("QT_SCREEN_SCALE_FACTORS", "1" ); // scalingFactor.toUtf8() );
-    qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "true" );
-
-#else
-
-    // Fallback: The first and simple fix for HiDPI Screens. However, this blurs the pixels.
-    static const char ENV_VAR_QT_DEVICE_PIXEL_RATIO[] = "QT_DEVICE_PIXEL_RATIO";
-    if (!qEnvironmentVariableIsSet(ENV_VAR_QT_DEVICE_PIXEL_RATIO)
-            && !qEnvironmentVariableIsSet("QT_AUTO_SCREEN_SCALE_FACTOR")
-            && !qEnvironmentVariableIsSet("QT_SCALE_FACTOR")
-            && !qEnvironmentVariableIsSet("QT_SCREEN_SCALE_FACTORS")) {
-        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    }
-
-#endif
+    QCoreApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication a(argc, argv);
 
     QTranslator qtTranslator;
