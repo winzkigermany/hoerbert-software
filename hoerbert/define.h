@@ -132,6 +132,8 @@ const QString CONTENT_HTML                   = "contents.html";
 const QString DIAGMODE_FILE                  = "diag.txt";
 const QString DIAGMODE_ORIGINALS_DIR         = "originals";
 
+const QString COLLECT_FILE_NAME              = "winzki_service";
+
 
 const int METADATA_MAX_LENGTH                = 80; // in bytes
 const int WAV_HEADER_SIZE_IN_BYTES           = 44;

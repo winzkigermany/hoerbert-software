@@ -267,10 +267,8 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
     }
 
 
-//    formatProcess = new QProcess();
-
 #ifndef Q_OS_LINUX
-    QString cmd = getFormatCommand(root, new_drive_label);
+    QString cmd = getFormatCommand(deviceName, new_drive_label);
 
     if ( !cmd.isEmpty() ){
 

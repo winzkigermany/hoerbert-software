@@ -45,6 +45,7 @@
 #include <QDebug>
 #include <QMutex>
 #include <QSettings>
+#include <QLocale>
 
 #include "aboutdialog.h"
 #include "advancedfeaturesdialog.h"
@@ -859,15 +860,58 @@ void MainWindow::sync()
 
 void MainWindow::collectInformationForSupport()
 {
+
+    QString output_file_path = QFileDialog::getExistingDirectory(this, tr("Select destination directory"), QString());
+    if (output_file_path.isEmpty())
+    {
+        return;
+    }
+
+    QString collect_path = tailPath(HOERBERT_TEMP_PATH) + COLLECT_FILE_NAME;
+    QString destination_path = tailPath(output_file_path) + COLLECT_FILE_NAME;
+    bool doOverwrite = false;
+
+    QDir tmp_dir(collect_path);
+    if (tmp_dir.exists())
+    {
+        // remove the temp dir and its contents to work on a clean slate
+        tmp_dir.removeRecursively();
+    }
+
+    QString tmpDirString = tmp_dir.absolutePath();
+    if (!tmp_dir.mkpath(tmpDirString))
+    {
+        QMessageBox::information(this, tr("Collecting support information"), tr("Failed to create the temporary folder [%1] for collecting information.").arg( tmpDirString ) );
+        return;
+    }
+
+
+    if (QFile::exists(destination_path+".zip"))
+    {
+        auto overwriteAnswer = QMessageBox::question(this, tr("Collecting support information"), tr("The file [%1] already exists in that destination. Overwrite the file?").arg( destination_path ), QMessageBox::Yes|QMessageBox::Cancel, QMessageBox::Cancel );
+        if (overwriteAnswer == QMessageBox::Yes)
+        {
+            doOverwrite = true;
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    qDebug() << "tmp dir: " << tmp_dir.absolutePath();
+
     QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
     qApp->processEvents();
 
     QStringList info_list;
-    info_list << "[Operating System]" << QSysInfo::prettyProductName() << "";
+    info_list << "[Operating System]" << QSysInfo::prettyProductName() << QLocale::languageToString(QLocale::system().language()) << "";
 
     qint64 free_space_of_installation_drive = 0;
-    for (auto info : QStorageInfo::mountedVolumes()) {
-        if (info.rootPath() == "/") {
+    for (auto info : QStorageInfo::mountedVolumes())
+    {
+        if (info.rootPath() == "/")
+        {
             free_space_of_installation_drive = info.bytesFree();
             break;
         }
@@ -875,145 +919,161 @@ void MainWindow::collectInformationForSupport()
 
     info_list << "[Free space of installed drive]" << QString("%1 bytes free").arg(free_space_of_installation_drive) << "";
 
-    auto volume_size = m_cardPage->getCurrentVolumeSize();
-    auto available_size = m_cardPage->getCurrentAvailableSpace();
-    info_list << "[Memory card]" << QString("%1 bytes, %2 bytes used, %3 bytes free.").arg(volume_size).arg(volume_size - available_size).arg(available_size);
-    info_list << QString("Filesystem(%1)").arg(m_cardPage->getCardFileSystemType().replace("msdos", "FAT32")) << "";
-
-    auto dir_path = m_cardPage->currentDrivePath();
-    info_list <<  "[Path]" << dir_path << "";
-
-    info_list << "[Content]";
-
-    QDir dir(dir_path);
-    if (dir.exists())
+    if( m_cardPage->currentDriveName().isEmpty() )
     {
-        dir.setFilter(QDir::Dirs | QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-        dir.setSorting(QDir::Name);
+        info_list << "[Memory card]" << QString("not selected");
+    }
+    else
+    {
+        auto volume_size = m_cardPage->getCurrentVolumeSize();
+        auto available_size = m_cardPage->getCurrentAvailableSpace();
+        info_list << "[Memory card]" << QString("%1 bytes, %2 bytes used, %3 bytes free.").arg(volume_size).arg(volume_size - available_size).arg(available_size);
+        info_list << QString("Filesystem(%1)").arg(m_cardPage->getCardFileSystemType().replace("msdos", "FAT32")) << "";
 
-        QFileInfoList list = dir.entryInfoList();
-        for (auto fileInfo : list) {
-            auto path = fileInfo.absoluteFilePath();
-            if (fileInfo.fileName().startsWith("."))
-                continue;
+        QString dir_path = m_cardPage->currentDrivePath();
+        info_list <<  "[Path]" << dir_path << "";
 
-            if (path.startsWith(dir_path)) { // simply wipe out wrong entries which is in upper layer
-                if (fileInfo.isDir()) {
-                    QStringList sub_info_list;
-                    info_list << QString("|+%1").arg(fileInfo.fileName());
-                    recursivelyGetDirectoryContent(&sub_info_list, fileInfo.absoluteFilePath(), 1);
-                    info_list << sub_info_list << "";
-                } else {
-                    info_list << QString("|%1 [%2]").arg(fileInfo.fileName()).arg(fileInfo.size());
+        info_list << "[Content]";
+
+        QDir dir(dir_path);
+        if (dir.exists())
+        {
+            dir.setFilter(QDir::Dirs | QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+            dir.setSorting(QDir::Name);
+
+            QFileInfoList list = dir.entryInfoList();
+            for (auto fileInfo : list) {
+                auto path = fileInfo.absoluteFilePath();
+                if (fileInfo.fileName().startsWith("."))
+                    continue;
+
+                if (path.startsWith(dir_path)) { // simply wipe out wrong entries which is in upper layer
+                    if (fileInfo.isDir())
+                    {
+                        QStringList sub_info_list;
+                        info_list << QString("|+%1").arg(fileInfo.fileName());
+                        recursivelyGetDirectoryContent(&sub_info_list, fileInfo.absoluteFilePath(), 1);
+                        info_list << sub_info_list << "";
+                    } else {
+                        info_list << QString("|%1 [%2]").arg(fileInfo.fileName()).arg(fileInfo.size());
+                    }
                 }
             }
         }
-    }
 
-    auto output_file_path = QFileDialog::getExistingDirectory(this, tr("Select destination directory"), QString());
+        info_list << "";
+        info_list << "[notes]";
 
-    if (output_file_path.isEmpty()) {
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
-        return;
-    }
-
-    auto collect_path = tailPath(HOERBERT_TEMP_PATH) + "collect";
-
-    QDir tmp_dir(collect_path);
-    if (!tmp_dir.exists()) {
-        if (!tmp_dir.mkpath(tmp_dir.absolutePath())) {
-            qDebug() << "Failed creating temp directory for collected information";
-            return;
+        QString current_card_path = m_cardPage->currentDrivePath();
+        QDir card_dir(current_card_path);
+        if (card_dir.exists(HOERBERT_XML))
+        {
+            if (!QFile::copy(tailPath(current_card_path) + HOERBERT_XML, tailPath(collect_path) + HOERBERT_XML))
+            {
+                info_list << QString("Failed to copy [%1] from").arg(HOERBERT_XML) << current_card_path << "to" << collect_path;
+            }
         }
-    }
-//    qDebug() << info_list.join("\n");
-    qDebug() << tmp_dir.absolutePath();
-
-    if (!output_file_path.isEmpty()) {
-        QFile file(tailPath(collect_path) + "dir.txt");
-        if (file.open(QFile::WriteOnly)) {
-            QTextStream stream(&file);
-            stream << info_list.join("\n");
-            file.close();
+        else
+        {
+            info_list << "No hoerbert.xml was found. That's ok as long as this card will never be used with app versions 1.x";
         }
-    }
 
-    auto current_card_path = m_cardPage->currentDrivePath();
-    QDir card_dir(current_card_path);
-    if (card_dir.exists(HOERBERT_XML)) {
-        if (!QFile::copy(tailPath(current_card_path) + HOERBERT_XML, tailPath(collect_path) + HOERBERT_XML)) {
-            qDebug() << "Failed copying xml file from" << current_card_path << "to" << collect_path;
+        if (card_dir.exists(HOERBERT_XML_BACKUP))
+        {
+            if (!QFile::copy(tailPath(current_card_path) + HOERBERT_XML_BACKUP, tailPath(collect_path) + HOERBERT_XML_BACKUP))
+            {
+                info_list << QString("Failed to copy [%1] from").arg(HOERBERT_XML_BACKUP) << current_card_path << "to" << collect_path;
+            }
         }
-    }
-
-    if (card_dir.exists(HOERBERT_XML_BACKUP)) {
-        if (!QFile::copy(tailPath(current_card_path) + HOERBERT_XML_BACKUP, tailPath(collect_path) + HOERBERT_XML_BACKUP)) {
-            qDebug() << "Failed copying xml backup file from" << current_card_path << "to" << collect_path;
+        else
+        {
+            info_list << "No hoerbert.bak was found. That's ok as long as this card will never be used with app versions 1.x";
         }
-    }
 
-    if (card_dir.exists("info.xml")) {
-        if (!QFile::copy(tailPath(current_card_path) + "info.xml", tailPath(collect_path) + "info.xml")) {
-            qDebug() << "Failed copying card info file from" << current_card_path << "to" << collect_path;
+        if (card_dir.exists("info.xml"))
+        {
+            if (!QFile::copy(tailPath(current_card_path) + "info.xml", tailPath(collect_path) + "info.xml"))
+            {
+                info_list << "Failed to copy info.xml from" << current_card_path << "to" << collect_path;
+            }
         }
+        else
+        {
+            info_list << "No info.xml was found. That means that this card has never been backed up using hoerbert.app 2.x";
+        }
+
+        printTableOfContent(collect_path);
     }
 
-    printTableOfContent(collect_path);
+    // write collected information to our file
+    QFile file(tailPath(collect_path) + "dir.txt");
+    if (file.open(QFile::WriteOnly)) {
+        QTextStream stream(&file);
+        stream << info_list.join("\n");
+        file.close();
+    }
+
+    QProcess process;
+    QStringList arguments;
+    bool processSuccess = true;
 
 #if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
-    QProcess process;
     process.setWorkingDirectory(HOERBERT_TEMP_PATH);
-    QStringList arguments;
-    arguments << "-r" << tailPath(HOERBERT_TEMP_PATH) + "collect.zip" << "collect/";
+
+    arguments << "-r" << collect_path + ".zip" << COLLECT_FILE_NAME+"/";
     qDebug() << "zip" << arguments.join(" ");
+
     process.start("/usr/bin/zip", arguments);
-    if (!process.waitForFinished()) {
-        qDebug() << "Failed creating zip file for support information";
+    if (!process.waitForFinished())
+    {
+        QMessageBox::information(this, tr("Collecting support information"), tr("Failed to create the zip file for support information") );
+        processSuccess = false;
     }
 
-    process.close();
-
-    if (!QFile::copy(tailPath(HOERBERT_TEMP_PATH) + "collect.zip", tailPath(output_file_path) + "collect.zip")) {
-        perror("File copy");
-        qDebug() << "Failed copying zip file to destination folder";
-        qDebug() << tailPath(HOERBERT_TEMP_PATH) + "collect.zip" << tailPath(output_file_path) + "collect.zip";
-    }
 #else
-    QProcess process;
 
-    QStringList arguments;
-    arguments << "a" << tailPath(HOERBERT_TEMP_PATH) + "collect.zip" << tailPath(HOERBERT_TEMP_PATH) + "collect";
+    arguments << "a" << collect_path + ".zip" << tailPath(HOERBERT_TEMP_PATH) + COLLECT_FILE_NAME;
     qDebug() << "7zr.exe" << arguments.join(" ");
 
     process.start(ZIP_PATH, arguments);
 
     if (!process.waitForStarted())
     {
+        processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to start.");
-        process.close();
         m_isWritingToDisk = false;
-        return;
     }
 
-    if (!process.waitForFinished(60000))
+    if ( processSuccess && !process.waitForFinished(60000))
     {
+        processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to complete.");
-        process.close();
         m_isWritingToDisk = false;
-        return;
     }
-    process.close();
 
-    if (!QFile::copy(tailPath(HOERBERT_TEMP_PATH) + "collect.zip", tailPath(output_file_path) + "collect.zip")) {
-        perror("File copy");
-        qDebug() << "Failed copying zip file to destination folder";
-        qDebug() << tailPath(HOERBERT_TEMP_PATH) + "collect.zip" << tailPath(output_file_path) + "collect.zip";
-    }
 #endif
+
+    process.close();
+    if( doOverwrite ){
+        QFile::remove( destination_path+".zip" );
+    }
+
+    if ( processSuccess && !QFile::copy( collect_path + ".zip", destination_path + ".zip"))
+    {
+        perror("File copy");
+        QMessageBox::information(this, tr("Collecting support information"), tr("Failed to copy the zip file from [%1] to: [%2]").arg( collect_path+".zip" ).arg( destination_path+".zip" ) );
+    }
+
+    // clean up
+    if (tmp_dir.exists())
+    {
+        tmp_dir.removeRecursively();
+    }
+
     QApplication::restoreOverrideCursor();
     qApp->processEvents();
 }
+
 void MainWindow::backupCard()
 {
     QString sourcePath = m_cardPage->currentDrivePath();
