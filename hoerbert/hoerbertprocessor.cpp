@@ -104,7 +104,7 @@ void HoerbertProcessor::run()
         return;
     }
 
-    emit processUpdated(0);
+    emit processUpdated(1);
 
     HoerbertProcessor::m_processingMutex.lock();
 

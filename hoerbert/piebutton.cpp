@@ -243,7 +243,6 @@ void PieButton::disable()
     m_enabled = false;
     setText(QString());
 
-//    // keep the button from "hanging" with a half-colour in progress mode?
     m_percentage = 0;
     m_count = -1;
 }
