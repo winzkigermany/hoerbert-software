@@ -71,8 +71,10 @@ int main(int argc, char *argv[])
     signal(SIGFPE, signalHandler);
     signal(SIGILL, signalHandler);
 
+
     QCoreApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication a(argc, argv);
+
 
     QTranslator qtTranslator;
     QString localeName = QLocale::system().name();
@@ -211,6 +213,7 @@ int main(int argc, char *argv[])
     // default settings of the app
     QSettings settings;
     settings.beginGroup("Global");
+
     QString audio_volume = settings.value("volume").toString();
     if (audio_volume.isEmpty())
         settings.setValue("volume", "-1.5");
@@ -223,7 +226,40 @@ int main(int argc, char *argv[])
     if (generateXml.isEmpty())
         settings.setValue("regenerateHoerbertXml", true);
 
+    QString darkMode = settings.value("darkMode").toString();
+    if (darkMode.isEmpty())
+        settings.setValue("darkMode", false);
+
     settings.endGroup();
+
+    if( darkMode == "true" ){
+        QApplication::setStyle("Fusion");
+
+        QPalette palette;
+        // Now use a palette to switch to dark colors:
+        palette.setColor(QPalette::Window, QColor(53, 53, 53));
+        palette.setColor(QPalette::WindowText, Qt::white);
+        palette.setColor(QPalette::Base, QColor(25, 25, 25));
+        palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+        palette.setColor(QPalette::ToolTipBase, QColor(53, 53, 53));
+        palette.setColor(QPalette::ToolTipText, Qt::white);
+        palette.setColor(QPalette::Text, Qt::white);
+        palette.setColor(QPalette::Button, QColor(53, 53, 53));
+        palette.setColor(QPalette::ButtonText, Qt::white);
+        palette.setColor(QPalette::BrightText, Qt::red);
+        palette.setColor(QPalette::Link, QColor(42, 130, 218));
+        palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+        palette.setColor(QPalette::HighlightedText, Qt::black);
+        QApplication::setPalette(palette);
+
+        a.setStyle( "#ColorblindHint { background-color:#353535; }" );
+        a.setStyle( "#PlaylistTable {background-color:#353535; color:white; alternate-background-color: rgba(48, 48, 48, 0);}" );
+        a.setStyle( "QLineEdit {background-color: #404040; color: white;}" );
+    } else {
+        a.setStyle( "#ColorblindHint { background-color:#ffffff; }" );
+        a.setStyle( "#PlaylistTable {background-color: white; color: black; alternate-background-color: rgba(245, 245, 245, 0);}" );
+        a.setStyle( "QLineEdit {background-color: white; color: black;}" );
+    }
 
     qRegisterMetaType <AudioList> ("AudioList");
 

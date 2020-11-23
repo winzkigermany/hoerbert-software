@@ -100,13 +100,6 @@ PlaylistView::PlaylistView(QWidget *parent)
     horizontalHeader()->setStretchLastSection(true);
 
 
-#ifdef Q_OS_WIN
-    setStyleSheet("#PlaylistTable {background-color: white; color: black; alternate-background-color: rgba(245, 245, 245, 0);}");
-#else
-    setStyleSheet("#PlaylistTable {background-color: white; color: black;}"
-                  "QLineEdit {background-color: white; color: black;}");//alternate-background-color: rgba(245, 245, 245, 255);
-#endif
-
     setColumnCount(8);
     hideColumn(ID_COLUMN_INDEX);
 
@@ -238,16 +231,27 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
 
     if (entry.duration > SPLITABLE_AUDIO_LENGTH_LIMIT * 60)
     {
-        /*QTableWidgetItem *icon_item = new QTableWidgetItem();
-        icon_item->setIcon(QIcon(QPixmap(":/images/scissors.png")));
-        icon_item->setFlags(icon_item->flags() & ~Qt::ItemIsEditable);*/
-
         QWidget *scissors_widget = new QWidget(this->viewport());
 
         QLabel *scissors_pix = new QLabel(scissors_widget);
         scissors_pix->setScaledContents(true);
-        scissors_pix->setPixmap(QPixmap(":/images/scissors.png"));
+
+        QSettings settings;
+        settings.beginGroup("Global");
+        bool darkMode = settings.value("darkMode").toBool();
+        settings.endGroup();
+
+        if( darkMode )
+        {
+            scissors_pix->setPixmap(QPixmap(":/images/scissors_dark.png"));
+        }
+        else
+        {
+            scissors_pix->setPixmap(QPixmap(":/images/scissors.png"));
+        }
+
         scissors_pix->setFixedSize(DEFAULT_ROW_HEIGHT * 0.8, DEFAULT_ROW_HEIGHT * 0.8);
+
 
         QHBoxLayout *scissors_layout = new QHBoxLayout(scissors_widget);
         scissors_layout->setAlignment(Qt::AlignCenter);
@@ -1064,6 +1068,7 @@ void PlaylistView::dropEvent(QDropEvent * event)
 
 void PlaylistView::paintEvent(QPaintEvent *e)
 {
+/*
     if(!m_backgroundPix->isNull())
     {
         QPainter painter(viewport());
@@ -1074,6 +1079,7 @@ void PlaylistView::paintEvent(QPaintEvent *e)
         painter.drawPixmap((viewport()->width() - w) / 2, (viewport()->height() - h) / 2, w, h, *m_backgroundPix);
         painter.end();
     }
+*/
     QTableWidget::paintEvent(e);
 }
 

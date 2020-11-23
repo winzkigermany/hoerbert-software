@@ -70,10 +70,7 @@ CardPage::CardPage(QWidget *parent)
 
     m_driveList = new QComboBox(this);
     m_driveList->setObjectName("DriveComboBox");
-    m_driveList->setStyleSheet("#DriveComboBox QList {}");
     m_driveList->setEditable(false);
-//    m_driveList->lineEdit()->setReadOnly(true);
-//    m_driveList->lineEdit()->setAlignment(Qt::AlignCenter);
     m_driveList->setToolTip(tr("Shows available memory cards or drives of this computer"));
 //    m_driveList->setMinimumSize(100, 42);   // minimum height - this looks better because of the eject button making the whole row jump when it appears otherwise.
 
@@ -81,7 +78,6 @@ CardPage::CardPage(QWidget *parent)
     m_selectDriveButton->setText(tr("Read Card"));
     m_selectDriveButton->setToolTip(tr("Read the selected card to edit it")+" ("+QString(tr("Ctrl+r"))+")" );
     m_selectDriveButton->setShortcut(QKeySequence(tr("Ctrl+r")) );
-    m_selectDriveButton->setObjectName("BlackLabel");
 
     m_ejectDriveButton = new PieButton(this);
     m_ejectDriveButton->setFixedSize(32, 32);
@@ -96,7 +92,6 @@ CardPage::CardPage(QWidget *parent)
     m_ejectButtonLabel->setFixedHeight(32);
     m_ejectButtonLabel->setAlignment(Qt::AlignCenter);
     m_ejectButtonLabel->setText(tr("Eject card"));
-    m_ejectButtonLabel->setObjectName("BlackLabel");
     m_ejectButtonLabel->hide();
 
     m_cardMngLayout->addWidget(m_driveList, 5);
@@ -186,7 +181,6 @@ CardPage::CardPage(QWidget *parent)
     m_diagModeHint = new QLabel(m_diagWidget);
     m_diagModeHint->setText(tr("This memory card is in diagnostics mode."));
     m_diagModeHint->setFont(QFont("Console", 12, 50));
-    m_diagModeHint->setObjectName("BlackLabel");
 
     m_return2Normal = new QPushButton(m_diagWidget);
     m_return2Normal->setText(tr("Return to normal mode"));

@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QDebug>
+#include <QSettings>
 
 PlaySymbolButton::PlaySymbolButton(QWidget *parent, int id) : QWidget(parent)
 {
@@ -36,7 +37,21 @@ PlaySymbolButton::PlaySymbolButton(QWidget *parent, int id) : QWidget(parent)
     }
 
     m_pic = new QLabel(this);
-    m_pic->setPixmap(QPixmap(":/images/play.png"));
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool darkMode = settings.value("darkMode").toBool();
+    settings.endGroup();
+
+    if( darkMode )
+    {
+        m_pic->setPixmap(QPixmap(":/images/play_dark.png"));
+    }
+    else
+    {
+        m_pic->setPixmap(QPixmap(":/images/play.png"));
+    }
+
     m_pic->setScaledContents(true);
 
     m_layout = new QHBoxLayout(this);
@@ -68,10 +83,25 @@ bool PlaySymbolButton::isPlaying()
 
 void PlaySymbolButton::updateState()
 {
-    if (m_isPlaying)
-        m_pic->setPixmap(QPixmap(":/images/stop.png"));
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool darkMode = settings.value("darkMode").toBool();
+    settings.endGroup();
+
+    if( darkMode )
+    {
+        if (m_isPlaying)
+            m_pic->setPixmap(QPixmap(":/images/stop_dark.png"));
+        else
+            m_pic->setPixmap(QPixmap(":/images/play_dark.png"));
+    }
     else
-        m_pic->setPixmap(QPixmap(":/images/play.png"));
+    {
+        if (m_isPlaying)
+            m_pic->setPixmap(QPixmap(":/images/stop.png"));
+        else
+            m_pic->setPixmap(QPixmap(":/images/play.png"));
+    }
 
     emit stateChanged(m_ID, m_isPlaying);
 }

@@ -26,5 +26,17 @@
         <file>images/colorblind_hint_07.png</file>
         <file>images/colorblind_hint_08.png</file>
         <file>images/colorblind_hint_09.png</file>
+        <file>images/scissors_dark.png</file>
+        <file>images/play_dark.png</file>
+        <file>images/stop_dark.png</file>
+        <file>images/colorblind_hint_01_dark.png</file>
+        <file>images/colorblind_hint_02_dark.png</file>
+        <file>images/colorblind_hint_03_dark.png</file>
+        <file>images/colorblind_hint_04_dark.png</file>
+        <file>images/colorblind_hint_05_dark.png</file>
+        <file>images/colorblind_hint_06_dark.png</file>
+        <file>images/colorblind_hint_07_dark.png</file>
+        <file>images/colorblind_hint_08_dark.png</file>
+        <file>images/colorblind_hint_09_dark.png</file>
     </qresource>
 </RCC>

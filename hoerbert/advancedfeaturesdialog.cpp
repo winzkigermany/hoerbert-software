@@ -32,6 +32,7 @@
 #include <QCheckBox>
 #include <QButtonGroup>
 #include <QDebug>
+#include <QMessageBox>
 
 #include "version.h"
 #include "define.h"
@@ -120,6 +121,9 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_optionLayout->addWidget(m_normalVolumeOption);
     m_optionLayout->addWidget(m_maxVolumeOption);
 
+    m_darkModeOption = new QCheckBox(this);
+    m_darkModeOption->setText(tr("Dark mode"));
+
     m_reminderOption = new QCheckBox(this);
     m_reminderOption->setText(tr("Restore backup reminder"));
 
@@ -132,6 +136,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_checkLayout = new QVBoxLayout;
     m_checkLayout->setAlignment(Qt::AlignCenter);
 
+    m_checkLayout->addWidget(m_darkModeOption);
     m_checkLayout->addWidget(m_reminderOption);
     m_checkLayout->addWidget(m_showLargeDriveCheck);
     m_checkLayout->addWidget(m_regenerateXmlCheck);
@@ -175,18 +180,26 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     });
 
     connect(m_lowVolumeOption, &QRadioButton::clicked, [this] () {
-        this->writeVolumeSettings("-6");
+        writeVolumeSettings("-6");
     });
 
     connect(m_normalVolumeOption, &QRadioButton::clicked, [this] () {
-        this->writeVolumeSettings("-1.5");
+        writeVolumeSettings("-1.5");
     });
 
     connect(m_maxVolumeOption, &QRadioButton::clicked, [this] () {
-        this->writeVolumeSettings("0");
+        writeVolumeSettings("0");
     });
 
-    connect(m_reminderOption, &QCheckBox::stateChanged, this, [this] (int state) {
+    connect(m_darkModeOption, &QCheckBox::clicked, this, [this] () {
+        m_settings->beginGroup("Global");
+        m_settings->setValue("darkMode", m_darkModeOption->isChecked());
+        m_settings->endGroup();
+
+        QMessageBox::information(this, tr("Dark mode switch"), tr("Please restart this app to see the change."));
+    });
+
+    connect(m_reminderOption, &QCheckBox::clicked, this, [this] (int state) {
         Q_UNUSED(state);
         m_settings->beginGroup("Global");
         m_settings->setValue("showBackupReminder", m_reminderOption->isChecked());
@@ -194,7 +207,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     });
 
     connect(m_diagnosticsButton, &QPushButton::clicked, this, [this] () {
-        emit this->diagnosticsModeSwitched(true);
+        emit diagnosticsModeSwitched(true);
     });
 
     connect(m_showLargeDriveCheck, &QCheckBox::stateChanged, this, [this] (int state) {
@@ -243,6 +256,9 @@ void AdvancedFeaturesDialog::readSettings()
         m_maxVolumeOption->setChecked(true);
     else
         m_normalVolumeOption->setChecked(true);
+
+    bool darkMode = m_settings->value("darkMode").toBool();
+    m_darkModeOption->setChecked(darkMode);
 
     bool showReminder = m_settings->value("showBackupReminder").toBool();
     m_reminderOption->setChecked(showReminder);

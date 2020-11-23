@@ -73,8 +73,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
 
     m_viewConfigButton = new QPushButton(this);
     m_viewConfigButton->setFlat(true);
-    m_viewConfigButton->setObjectName("BlindHint");
-    m_viewConfigButton->setStyleSheet("#BlindHint { background-color: white }");
+    m_viewConfigButton->setObjectName("ColorblindHint");
     m_viewConfigButton->setGeometry(QRect(QPoint(0, 0), QSize(42, 42)));
     connect( m_viewConfigButton, SIGNAL (released()), this, SLOT (setTableColumns()) );
 
@@ -209,7 +208,22 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
     m_dirNum = dir_num;
     assert(m_dirNum < 9);
 
-    QPixmap pixmap(QString(":/images/colorblind_hint_0%1.png").arg(dir_num + 1));
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool darkMode = settings.value("darkMode").toBool();
+    settings.endGroup();
+
+    QPixmap pixmap;
+    if( darkMode )
+    {
+        pixmap.load( QString(":/images/colorblind_hint_0%1_dark.png").arg(dir_num + 1) );
+    }
+    else
+    {
+        pixmap.load( QString(":/images/colorblind_hint_0%1.png").arg(dir_num + 1) );
+    }
+
+
     QIcon iconBack( pixmap.copy(100, 100, 400, 400));
     m_viewConfigButton->setIcon(iconBack);
     m_viewConfigButton->setIconSize(QSize(42,42));

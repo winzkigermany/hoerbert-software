@@ -78,9 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("hörbert");
     setWindowIcon(QIcon(":/images/hoerbert.ico"));
     setObjectName("MainWindow");
-    setStyleSheet("#MainWindow {background: url(:/images/pappelholz.jpg)}"
-                      "#BlackLabel {color: black}");
-//                      "QLabel {color: black}");
+    setStyleSheet("#MainWindow {background: url(:/images/pappelholz.jpg)}");
 
     m_centralWidget = new QWidget(this);
     setCentralWidget(m_centralWidget);
