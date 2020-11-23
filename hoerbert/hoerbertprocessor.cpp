@@ -678,14 +678,33 @@ bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
     dir.setSorting(QDir::Name);
 
     QFileInfoList file_info_list = dir.entryInfoList();
+
     std::sort(file_info_list.begin(), file_info_list.end(), sortByNumber);
     for (int i = file_info_list.count() - 1; i >= 0 ; i--)
     {
-        qDebug() << file_info_list[i].absoluteFilePath();
-        if (file_info_list[i].fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT.toUpper(), 0, 0).toInt() != i)
-        {
-            auto destPath = tailPath(file_info_list[i].absolutePath()) + QString("%1%2").arg(i).arg(DEFAULT_DESTINATION_FORMAT);
+        QString fileNameBeforeSeparator = file_info_list[i].fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT.toUpper(), 0, 0);
+        qDebug() << "file name before separator: " << fileNameBeforeSeparator;
 
+        QString destPath = tailPath(file_info_list[i].absolutePath()) + QString("%1%2").arg(i).arg(DEFAULT_DESTINATION_FORMAT);
+
+        QRegExp re("\\d*");  // a digit (\d), zero or more times (*)
+        bool needsRename = false;
+
+        if (! re.exactMatch(fileNameBeforeSeparator))
+        {   // the file contains non-digit characters -> rename it.
+            needsRename = true;
+        }
+        else
+        {   // the file contains only digits -> check if we need to rename it
+            if( fileNameBeforeSeparator.toInt() != i )
+            {
+                needsRename = true;
+            }
+        }
+
+        if( needsRename )
+        {
+            qDebug() << "moving from " << file_info_list[i].absoluteFilePath() << " to " << destPath;
             if (!moveFile(file_info_list[i].absoluteFilePath(), destPath))
             {
                 qDebug() << "Failed to move split file" << file_info_list[i].absoluteFilePath() << "to" << destPath;
