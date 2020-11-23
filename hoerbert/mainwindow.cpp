@@ -489,7 +489,7 @@ void MainWindow::migrate(const QString &dirPath)
 
         connect(processor, &HoerbertProcessor::processUpdated, this, [this] (int percent) {
            m_progress->setValue(percent);
-           m_progress->setLabelText(tr("Migrating files to the new hoerbert.app. Please wait.")+QString(".. (%1%)").arg(percent));
+           m_progress->setLabelText(tr("Migrating files to the new hoerbert.app. Please wait."));
            QCoreApplication::processEvents();
         });
 
@@ -591,7 +591,7 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
     AudioInfoThread *thread = new AudioInfoThread(file_info_list);
     connect(thread, &AudioInfoThread::processUpdated, this, [this] (int percent) {
         m_progress->setValue(percent);
-        m_progress->setLabelText(tr("Generating table...(%1%)").arg(percent));
+        m_progress->setLabelText(tr("Generating table..."));
         QCoreApplication::processEvents();
     });
     connect(thread, &AudioInfoThread::taskCompleted, this, [this, outputPath, showOnBrowser] (const AudioList &result) {
@@ -1134,7 +1134,7 @@ void MainWindow::backupCard()
 
     connect(m_backupManager, &BackupManager::processUpdated, this, [this] (int percent) {
        m_progress->setValue(percent);
-       m_progress->setLabelText(tr("Copying files... (%1%)").arg(percent));
+       m_progress->setLabelText(tr("Copying files..."));
        QCoreApplication::processEvents();
     });
 
@@ -1247,7 +1247,7 @@ void MainWindow::restoreBackup()
 
     connect(m_backupManager, &BackupManager::processUpdated, this, [this] (int percent) {
         m_progress->setValue(percent);
-        m_progress->setLabelText(tr("Restoring files... (%1%)").arg(percent));
+        m_progress->setLabelText(tr("Restoring files..."));
         QCoreApplication::processEvents();
     });
 

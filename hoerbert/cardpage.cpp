@@ -432,7 +432,7 @@ void CardPage::recreateXml()
     AudioInfoThread *thread = new AudioInfoThread(file_info_list);
     connect(thread, &AudioInfoThread::processUpdated, this, [m_progress] (int percent) {
         m_progress->setValue(percent);
-        m_progress->setLabelText(tr("Getting audio information...(%1%)").arg(percent));
+        m_progress->setLabelText(tr("Getting audio information..."));
         QCoreApplication::processEvents();
     });
     connect(thread, &AudioInfoThread::taskCompleted, this, [this, m_progress] (const AudioList &result) {
