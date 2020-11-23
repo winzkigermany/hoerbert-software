@@ -406,7 +406,8 @@ void PlaylistPage::setDriveSpaceDetails(quint64 used, quint64 total, quint64 est
 
 void PlaylistPage::contextMenuEvent(QContextMenuEvent *e)
 {
-    ;       // no context menu (yet?)
+    Q_UNUSED(e);
+    ; // there is no context menu, since we don't need it (yet?)
 }
 
 void PlaylistPage::setTableColumns()
@@ -414,7 +415,7 @@ void PlaylistPage::setTableColumns()
       m_configViewMenu->exec(QCursor::pos());
 }
 
-void PlaylistPage::onClosePage(bool commitChanges)
+void PlaylistPage::onClosePage(bool doCommitChanges)
 {
     m_playlistView->stopPlayer();
     auto original_list = m_originalList[m_dirNum];
@@ -492,7 +493,7 @@ void PlaylistPage::onClosePage(bool commitChanges)
      * sometimes the app has automatic implicit changes, need to deal with them on cancel click
      * i.e. 0.WAV, 1.WAV, 3.WAV will automatically be ->> 0.WAV, 1.WAV, 2.WAV
      * */
-    if (!commitChanges)
+    if (!doCommitChanges)
     {
         if (has_explicit_changes || !has_implicit_changes)
         {
@@ -528,7 +529,7 @@ void PlaylistPage::onClosePage(bool commitChanges)
     if (metadata_entries.count() > 0)
         commit_list.insert(METADATA_CHANGED_ENTRIES, metadata_entries);
 
-    emit this->commitChanges(commit_list);
+    emit commitChanges(commit_list, m_dirNum);
 }
 
 int PlaylistPage::getSelectedSilenceDurationInSeconds()

@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     signal(SIGFPE, signalHandler);
     signal(SIGILL, signalHandler);
 
+    qRegisterMetaType<QMap<ENTRY_LIST_TYPE,AudioList> >("QMap<ENTRY_LIST_TYPE, AudioList>");
 
     QCoreApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication a(argc, argv);

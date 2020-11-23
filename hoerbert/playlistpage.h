@@ -104,7 +104,7 @@ signals:
      * @brief commitChanges
      * @param list
      */
-    void commitChanges(const QMap<ENTRY_LIST_TYPE, AudioList> & list);
+    void commitChanges(const QMap<ENTRY_LIST_TYPE, AudioList>&, const quint8);
 
     /**
      * @brief emitted when an entry is added or removed
@@ -152,9 +152,9 @@ private slots:
 
     /**
      * @brief this signal is emitted when the page is about to close(commit/cancel)
-     * @param commitChanges indicates whether the closing is due to commit or cancel
+     * @param doCommitChanges indicates whether the closing is due to commit or cancel
      */
-    void onClosePage(bool commitChanges);
+    void onClosePage(bool doCommitChanges);
 
     /**
      * @brief this signal must open the configuration menu for the view configuration

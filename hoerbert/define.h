@@ -25,6 +25,7 @@
 #include <QString>
 #include <QColor>
 #include <QMap>
+#include <QMetaType>
 
 // fonts, styles and colors
 #if defined (Q_OS_MACOS)
@@ -94,6 +95,8 @@ struct AudioEntry {
 };
 
 typedef QMap<int, AudioEntry> AudioList;
+Q_DECLARE_METATYPE(AudioList);
+
 typedef QMapIterator<int, AudioEntry> AudioListIterator;
 
 enum ENTRY_LIST_TYPE {
@@ -103,6 +106,7 @@ enum ENTRY_LIST_TYPE {
     SPLIT_ENTRIES,
     METADATA_CHANGED_ENTRIES
 };
+Q_DECLARE_METATYPE(ENTRY_LIST_TYPE);
 
 
 /*!

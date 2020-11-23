@@ -37,6 +37,8 @@ extern QString FFMPEG_PATH;
 extern QString HOERBERT_TEMP_PATH;
 extern QStringList PROCESS_ERROR;
 
+QMutex HoerbertProcessor::m_processingMutex;
+
 HoerbertProcessor::HoerbertProcessor(const QString &dirPath, int dirNum)
 {
     m_dirPath = dirPath;
@@ -101,7 +103,10 @@ void HoerbertProcessor::run()
         qDebug() << "Nothing to process!";
         return;
     }
+
     emit processUpdated(0);
+
+    HoerbertProcessor::m_processingMutex.lock();
 
     m_process = new QProcessPriority();
     m_process->setPriority(QProcessPriority::NormalPriority);
@@ -222,6 +227,8 @@ void HoerbertProcessor::run()
         renameSplitFiles(m_dirPath);
     if (m_failCounter > 0)
         emit taskCompleted(m_failCounter, m_totalEntryCount);
+
+    HoerbertProcessor::m_processingMutex.unlock();
 }
 
 void HoerbertProcessor::abort()

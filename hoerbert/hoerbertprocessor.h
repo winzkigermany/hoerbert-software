@@ -229,6 +229,8 @@ private:
 
     int m_splitOffset; // this offset is used to get correct split files while dealing with split files.
 
+    static QMutex m_processingMutex;
+
 };
 
 #endif // HOERBERTPROCESSOR_H

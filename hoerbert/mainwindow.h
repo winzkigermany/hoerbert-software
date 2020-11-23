@@ -90,7 +90,7 @@ private slots:
     void findMusicAndAudioBooks();
     void checkForUpdates();
 
-    void processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list);
+    void processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index);
     void processorErrorOccurred(const QString &errorString);
     void taskCompleted(int failCount, int totalCount);
 

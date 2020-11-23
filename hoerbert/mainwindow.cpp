@@ -240,7 +240,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_cardPage, &CardPage::plausibilityFixNeeded, this, &MainWindow::makePlausible);
 
-    connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit);
+    connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
 
     connect(m_playlistPage, &PlaylistPage::durationChanged, m_capBar, &CapacityBar::addSpaceInSeconds);
 
@@ -330,14 +330,12 @@ void MainWindow::makePlausible(std::list <int> fixList)
     m_plausibilityCheckMutex.unlock();
 }
 
-void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list)
+void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index)
 {
     m_cardPage->enableButtons(true);
 
     this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
     qApp->processEvents();
-
-    quint8 dir_index = m_playlistPage->directory();
 
     if (list.count() == 0) {
         m_cardPage->update();
@@ -376,28 +374,25 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list)
 
     HoerbertProcessor *processor = new HoerbertProcessor(dir_path, dir_index);
     processor->setEntryList(list);
-    connect(processor, &HoerbertProcessor::processUpdated, m_cardPage, [this, processor] (int percentage) {
+
+    connect(processor, &HoerbertProcessor::processUpdated, m_cardPage, [=] (int percentage) {
        m_cardPage->setPercent(processor->directoryNumber(), percentage);
-       QCoreApplication::processEvents();
-    });
+    }, Qt::UniqueConnection);
 
-    connect(processor, &HoerbertProcessor::taskCompleted, m_cardPage, [this] (int failCounter, int totalEntryCount) {
+    connect(processor, &HoerbertProcessor::taskCompleted, m_cardPage, [=] (int failCounter, int totalEntryCount) {
         Q_UNUSED(failCounter)
-        Q_UNUSED(totalEntryCount)
-        m_cardPage->updateUsedSpace();
+        Q_UNUSED(totalEntryCount);
+    }, Qt::UniqueConnection);
 
-        QCoreApplication::processEvents();
-    });
-
-    connect(processor, &HoerbertProcessor::noSilenceDetected, this, [no_silence_counter] () {
+    connect(processor, &HoerbertProcessor::noSilenceDetected, this, [=] () {
        (*no_silence_counter)++;
-    });
+    }, Qt::UniqueConnection);
 
-    connect(processor, &HoerbertProcessor::failed, this, [this] (const QString &errorString) {
+    connect(processor, &HoerbertProcessor::failed, this, [=] (const QString &errorString) {
         this->processorErrorOccurred("On Commit\n" + errorString);
-    });
+    }, Qt::UniqueConnection);
 
-    connect(processor, &QThread::finished, this, [this, processor, dir_index, no_silence_counter] () {
+    connect(processor, &QThread::finished, this, [=] () {
        // enable the button back
         m_cardPage->setButtonEnabled(dir_index, true);
         m_cardPage->setPercent(dir_index, 0);
@@ -424,7 +419,9 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list)
 
             m_cardPage->setCardManageButtonsEnabled(true);
         }
-    });
+
+    }, Qt::UniqueConnection);
+
     processor->start();
     m_isWritingToDisk = true;
 }
