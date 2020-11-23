@@ -92,6 +92,8 @@ CardPage::CardPage(QWidget *parent)
     m_ejectButtonLabel->setFixedHeight(32);
     m_ejectButtonLabel->setAlignment(Qt::AlignCenter);
     m_ejectButtonLabel->setText(tr("Eject card"));
+    m_ejectButtonLabel->setObjectName("ejectLabel");
+    m_ejectButtonLabel->setStyleSheet("#ejectLabel {color:#353535;}");
     m_ejectButtonLabel->hide();
 
     m_cardMngLayout->addWidget(m_driveList, 5);
