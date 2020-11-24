@@ -286,6 +286,11 @@ signals:
      */
     void plausibilityFixNeeded(std::list <int> fixList);
 
+    /**
+     * @brief enable or disable menu->edit buttons
+     */
+    void enableEditMenuItems( bool );
+
 public slots:
 
     /**

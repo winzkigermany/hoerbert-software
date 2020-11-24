@@ -101,6 +101,7 @@ private slots:
     void sync();
 
     void collectInformationForSupport();
+    void showHideEditMenuEntries( bool );
 
 private:
 
@@ -138,6 +139,9 @@ private:
     QMenu *m_moveToPlaylistMenu;
     QMenu *m_subMenuBegin;
     QMenu *m_subMenuEnd;
+    QMenu *m_extrasMenu;
+    QMenu *m_helpMenu;
+    QMenu *m_editMenu;
     QAction *m_addTitleAction;
     QAction *m_removeTitleAction;
     QAction *m_printAction;
@@ -146,6 +150,30 @@ private:
     QAction *m_formatAction;
     QAction *m_advancedFeaturesAction;
     QAction *m_selectManually;
+
+    QAction *m_moveToB1;
+    QAction *m_moveToB2;
+    QAction *m_moveToB3;
+    QAction *m_moveToB4;
+    QAction *m_moveToB5;
+    QAction *m_moveToB6;
+    QAction *m_moveToB7;
+    QAction *m_moveToB8;
+    QAction *m_moveToB9;
+
+    QAction *m_moveToE1;
+    QAction *m_moveToE2;
+    QAction *m_moveToE3;
+    QAction *m_moveToE4;
+    QAction *m_moveToE5;
+    QAction *m_moveToE6;
+    QAction *m_moveToE7;
+    QAction *m_moveToE8;
+    QAction *m_moveToE9;
+
+    QAction *aboutAction;
+    QAction *findBooksAction;
+    QAction *checkUpdatesAction;
 
     QMutex m_plausibilityCheckMutex;
 

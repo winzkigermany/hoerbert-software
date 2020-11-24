@@ -846,7 +846,7 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
         return;
 
     enableButtons(false);
-
+    enableEditMenuItems( true );
 
     QString drive_path = currentDrivePath();
     QString sub_dir = QString();
@@ -902,5 +902,4 @@ void CardPage::enableButtons( bool onOff )
     {
         dir_button->setEnabled(onOff);
     }
-
 }

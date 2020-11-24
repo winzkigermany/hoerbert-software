@@ -135,24 +135,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
         m_cardPage->enableButtons(true);
+        showHideEditMenuEntries(false);
 
         m_stackWidget->setCurrentIndex(0);
         m_cardPage->update();
         m_capBar->resetEstimation();
-        m_moveToPlaylistMenu->setEnabled(false);
-#if defined(Q_OS_MAC)
-        m_subMenuBegin->setEnabled(false);
-        m_subMenuEnd->setEnabled(false);
-        m_subMenuBegin->menuAction()->setVisible(false);
-        m_subMenuEnd->menuAction()->setVisible(false);
-        m_moveToPlaylistMenu->menuAction()->setVisible(false);
-#endif
-        m_addTitleAction->setEnabled(false);
-        m_removeTitleAction->setEnabled(false);
-        m_printAction->setEnabled(true);
-        m_backupAction->setEnabled(true);
-        m_restoreAction->setEnabled(true);
-        m_formatAction->setEnabled(true);
 
         this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
         qApp->processEvents();
@@ -210,6 +197,9 @@ MainWindow::MainWindow(QWidget *parent)
         m_playlistPage->setListData(dir_path, dir_num, result);
         m_playlistPage->setBackgroundColor(m_cardPage->getPlaylistColor(dir_num));
         m_shadow->setColor(m_cardPage->getPlaylistColor(dir_num));
+
+        showHideEditMenuEntries( true );
+/*
 #if defined(Q_OS_MAC)
         m_subMenuBegin->setEnabled(true);
         m_subMenuEnd->setEnabled(true);
@@ -218,12 +208,7 @@ MainWindow::MainWindow(QWidget *parent)
         m_moveToPlaylistMenu->menuAction()->setVisible(true);
 #endif
         m_moveToPlaylistMenu->setEnabled(true);
-        m_addTitleAction->setEnabled(true);
-        m_removeTitleAction->setEnabled(true);
-        m_printAction->setEnabled(false);
-        m_backupAction->setEnabled(false);
-        m_restoreAction->setEnabled(false);
-        m_formatAction->setEnabled(false);
+*/
     });
 
     connect(m_cardPage, &CardPage::driveSelected, this, [this](const QString &dirPath) {
@@ -239,6 +224,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_cardPage, &CardPage::diagnosticsModeSwitched, this, &MainWindow::switchDiagnosticsMode);
 
     connect(m_cardPage, &CardPage::plausibilityFixNeeded, this, &MainWindow::makePlausible);
+
+    connect(m_cardPage, &CardPage::enableEditMenuItems, this, &MainWindow::showHideEditMenuEntries);
 
     connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
 
@@ -357,14 +344,7 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
         qDebug() << "Created sub-directory" << dir_path;
     }
 
-    {
-        m_printAction->setEnabled(false);
-        m_backupAction->setEnabled(false);
-        m_restoreAction->setEnabled(false);
-        m_formatAction->setEnabled(false);
-
-        m_cardPage->setCardManageButtonsEnabled(false);
-    }
+    m_cardPage->setCardManageButtonsEnabled(false);
 
     // disable button while processing
     m_cardPage->setButtonEnabled(dir_index, false);
@@ -1727,153 +1707,159 @@ void MainWindow::remindBackup()
 
 void MainWindow::createActions()
 {
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
+    m_editMenu = new QMenu( tr("&Edit"), this );
+    menuBar()->addMenu( m_editMenu );
 
     m_addTitleAction = new QAction(tr("&Add title"), this);
     m_addTitleAction->setStatusTip(tr("Add title"));
     m_addTitleAction->setEnabled(false);
     connect(m_addTitleAction, &QAction::triggered, this, &MainWindow::addTitle);
-    editMenu->addAction(m_addTitleAction);
+    m_editMenu->addAction(m_addTitleAction);
 
     m_removeTitleAction = new QAction(tr("&Remove title"), this);
     m_removeTitleAction->setStatusTip(tr("Remove title"));
     m_removeTitleAction->setEnabled(false);
     connect(m_removeTitleAction, &QAction::triggered, this, &MainWindow::removeTitle);
-    editMenu->addAction(m_removeTitleAction);
+    m_editMenu->addAction(m_removeTitleAction);
 
-    m_moveToPlaylistMenu = new QMenu(editMenu);
-    m_moveToPlaylistMenu = editMenu->addMenu(tr("&Move to playlist..."));
+    m_moveToPlaylistMenu = new QMenu(tr("&Move to playlist..."), this);
+    m_moveToPlaylistMenu->setEnabled(false);
+    m_editMenu->addMenu( m_moveToPlaylistMenu );
 
-    m_subMenuBegin = m_moveToPlaylistMenu->addMenu(tr("Beginning of..."));
+    m_subMenuBegin = new QMenu(tr("Beginning of..."), this);
+    m_moveToPlaylistMenu->addMenu(m_subMenuBegin);
 
-    QAction *moveToB1 = new QAction("1", this);
-    moveToB1->setStatusTip(tr("Move to beginning of playlist %1").arg(1));
-    connect(moveToB1, &QAction::triggered, [this] () {
+    m_moveToB1 = new QAction("1", this);
+    m_moveToB1->setStatusTip(tr("Move to beginning of playlist %1").arg(1));
+    connect(m_moveToB1, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(0, true);
     });
-    m_subMenuBegin->addAction(moveToB1);
+    m_subMenuBegin->addAction(m_moveToB1);
 
-    QAction *moveToB2 = new QAction("2", this);
-    moveToB2->setStatusTip(tr("Move to beginning of playlist %1").arg(2));
-    connect(moveToB2, &QAction::triggered, [this] () {
+    m_moveToB2 = new QAction("2", this);
+    m_moveToB2->setStatusTip(tr("Move to beginning of playlist %1").arg(2));
+    connect(m_moveToB2, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(1, true);
     });
-    m_subMenuBegin->addAction(moveToB2);
+    m_subMenuBegin->addAction(m_moveToB2);
 
-    QAction *moveToB3 = new QAction("3", this);
-    moveToB3->setStatusTip(tr("Move to beginning of playlist %1").arg(3));
-    connect(moveToB3, &QAction::triggered, [this] () {
+    m_moveToB3 = new QAction("3", this);
+    m_moveToB3->setStatusTip(tr("Move to beginning of playlist %1").arg(3));
+    connect(m_moveToB3, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(2, true);
     });
-    m_subMenuBegin->addAction(moveToB3);
+    m_subMenuBegin->addAction(m_moveToB3);
 
-    QAction *moveToB4 = new QAction("4", this);
-    moveToB4->setStatusTip(tr("Move to beginning of playlist %1").arg(4));
-    connect(moveToB4, &QAction::triggered, [this] () {
+    m_moveToB4 = new QAction("4", this);
+    m_moveToB4->setStatusTip(tr("Move to beginning of playlist %1").arg(4));
+    connect(m_moveToB4, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(3, true);
     });
-    m_subMenuBegin->addAction(moveToB4);
+    m_subMenuBegin->addAction(m_moveToB4);
 
-    QAction *moveToB5 = new QAction("5", this);
-    moveToB5->setStatusTip(tr("Move to beginning of playlist %1").arg(5));
-    connect(moveToB5, &QAction::triggered, [this] () {
+    m_moveToB5 = new QAction("5", this);
+    m_moveToB5->setStatusTip(tr("Move to beginning of playlist %1").arg(5));
+    connect(m_moveToB5, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(4, true);
     });
-    m_subMenuBegin->addAction(moveToB5);
+    m_subMenuBegin->addAction(m_moveToB5);
 
-    QAction *moveToB6 = new QAction("6", this);
-    moveToB6->setStatusTip(tr("Move to beginning of playlist %1").arg(6));
-    connect(moveToB6, &QAction::triggered, [this] () {
+    m_moveToB6 = new QAction("6", this);
+    m_moveToB6->setStatusTip(tr("Move to beginning of playlist %1").arg(6));
+    connect(m_moveToB6, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(5, true);
     });
-    m_subMenuBegin->addAction(moveToB6);
+    m_subMenuBegin->addAction(m_moveToB6);
 
-    QAction *moveToB7 = new QAction("7", this);
-    moveToB7->setStatusTip(tr("Move to beginning of playlist %1").arg(7));
-    connect(moveToB7, &QAction::triggered, [this] () {
+    m_moveToB7 = new QAction("7", this);
+    m_moveToB7->setStatusTip(tr("Move to beginning of playlist %1").arg(7));
+    connect(m_moveToB7, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(6, true);
     });
-    m_subMenuBegin->addAction(moveToB7);
+    m_subMenuBegin->addAction(m_moveToB7);
 
-    QAction *moveToB8 = new QAction("8", this);
-    moveToB8->setStatusTip(tr("Move to beginning of playlist %1").arg(8));
-    connect(moveToB8, &QAction::triggered, [this] () {
+    m_moveToB8 = new QAction("8", this);
+    m_moveToB8->setStatusTip(tr("Move to beginning of playlist %1").arg(8));
+    connect(m_moveToB8, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(7, true);
     });
-    m_subMenuBegin->addAction(moveToB8);
+    m_subMenuBegin->addAction(m_moveToB8);
 
-    QAction *moveToB9 = new QAction("9", this);
-    moveToB9->setStatusTip(tr("Move to beginning of playlist %1").arg(9));
-    connect(moveToB9, &QAction::triggered, [this] () {
+    m_moveToB9 = new QAction("9", this);
+    m_moveToB9->setStatusTip(tr("Move to beginning of playlist %1").arg(9));
+    connect(m_moveToB9, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(8, true);
     });
-    m_subMenuBegin->addAction(moveToB9);
+    m_subMenuBegin->addAction(m_moveToB9);
 
-    m_subMenuEnd = m_moveToPlaylistMenu->addMenu(tr("End of..."));
 
-    QAction *moveToE1 = new QAction("1", this);
-    moveToE1->setStatusTip(tr("Move to end of playlist %1").arg(1));
-    connect(moveToE1, &QAction::triggered, [this] () {
+    m_subMenuEnd = new QMenu(tr("End of..."), this);
+    m_moveToPlaylistMenu->addMenu(m_subMenuEnd);
+
+    m_moveToE1 = new QAction("1", this);
+    m_moveToE1->setStatusTip(tr("Move to end of playlist %1").arg(1));
+    connect(m_moveToE1, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(0, false);
     });
-    m_subMenuEnd->addAction(moveToE1);
+    m_subMenuEnd->addAction(m_moveToE1);
 
-    QAction *moveToE2 = new QAction("2", this);
-    moveToE2->setStatusTip(tr("Move to end of playlist %1").arg(2));
-    connect(moveToE2, &QAction::triggered, [this] () {
+    m_moveToE2 = new QAction("2", this);
+    m_moveToE2->setStatusTip(tr("Move to end of playlist %1").arg(2));
+    connect(m_moveToE2, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(1, false);
     });
-    m_subMenuEnd->addAction(moveToE2);
+    m_subMenuEnd->addAction(m_moveToE2);
 
-    QAction *moveToE3 = new QAction("3", this);
-    moveToE3->setStatusTip(tr("Move to end of playlist %1").arg(3));
-    connect(moveToE3, &QAction::triggered, [this] () {
+    m_moveToE3 = new QAction("3", this);
+    m_moveToE3->setStatusTip(tr("Move to end of playlist %1").arg(3));
+    connect(m_moveToE3, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(2, false);
     });
-    m_subMenuEnd->addAction(moveToE3);
+    m_subMenuEnd->addAction(m_moveToE3);
 
-    QAction *moveToE4 = new QAction("4", this);
-    moveToE4->setStatusTip(tr("Move to end of playlist %1").arg(4));
-    connect(moveToE4, &QAction::triggered, [this] () {
+    m_moveToE4 = new QAction("4", this);
+    m_moveToE4->setStatusTip(tr("Move to end of playlist %1").arg(4));
+    connect(m_moveToE4, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(3, false);
     });
-    m_subMenuEnd->addAction(moveToE4);
+    m_subMenuEnd->addAction(m_moveToE4);
 
-    QAction *moveToE5 = new QAction("5", this);
-    moveToE5->setStatusTip(tr("Move to end of playlist %1").arg(5));
-    connect(moveToE5, &QAction::triggered, [this] () {
+    m_moveToE5 = new QAction("5", this);
+    m_moveToE5->setStatusTip(tr("Move to end of playlist %1").arg(5));
+    connect(m_moveToE5, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(4, false);
     });
-    m_subMenuEnd->addAction(moveToE5);
+    m_subMenuEnd->addAction(m_moveToE5);
 
-    QAction *moveToE6 = new QAction("6", this);
-    moveToE6->setStatusTip(tr("Move to end of playlist %1").arg(6));
-    connect(moveToE6, &QAction::triggered, [this] () {
+    m_moveToE6 = new QAction("6", this);
+    m_moveToE6->setStatusTip(tr("Move to end of playlist %1").arg(6));
+    connect(m_moveToE6, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(5, false);
     });
-    m_subMenuEnd->addAction(moveToE6);
+    m_subMenuEnd->addAction(m_moveToE6);
 
-    QAction *moveToE7 = new QAction("7", this);
-    moveToE7->setStatusTip(tr("Move to end of playlist %1").arg(7));
-    connect(moveToE7, &QAction::triggered, [this] () {
+    m_moveToE7 = new QAction("7", this);
+    m_moveToE7->setStatusTip(tr("Move to end of playlist %1").arg(7));
+    connect(m_moveToE7, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(6, false);
     });
-    m_subMenuEnd->addAction(moveToE7);
+    m_subMenuEnd->addAction(m_moveToE7);
 
-    QAction *moveToE8 = new QAction("8", this);
-    moveToE8->setStatusTip(tr("Move to end of playlist %1").arg(8));
-    connect(moveToE8, &QAction::triggered, [this] () {
+    m_moveToE8 = new QAction("8", this);
+    m_moveToE8->setStatusTip(tr("Move to end of playlist %1").arg(8));
+    connect(m_moveToE8, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(7, false);
     });
-    m_subMenuEnd->addAction(moveToE8);
+    m_subMenuEnd->addAction(m_moveToE8);
 
-    QAction *moveToE9 = new QAction("9", this);
-    moveToE9->setStatusTip(tr("Move to end of playlist %1").arg(9));
-    connect(moveToE9, &QAction::triggered, [this] () {
+    m_moveToE9 = new QAction("9", this);
+    m_moveToE9->setStatusTip(tr("Move to end of playlist %1").arg(9));
+    connect(m_moveToE9, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(8, false);
     });
-    m_subMenuEnd->addAction(moveToE9);
+    m_subMenuEnd->addAction(m_moveToE9);
 
+/*
 #if defined(Q_OS_MAC)
     m_subMenuBegin->setEnabled(false);
     m_subMenuEnd->setEnabled(false);
@@ -1881,9 +1867,10 @@ void MainWindow::createActions()
     m_subMenuEnd->menuAction()->setVisible(false);
     m_moveToPlaylistMenu->menuAction()->setVisible(false);
 #endif
-    m_moveToPlaylistMenu->setDisabled(true);
+*/
 
-    QMenu *extrasMenu = menuBar()->addMenu(tr("E&xtras"));
+    m_extrasMenu = new QMenu(tr("E&xtras"), this);
+    menuBar()->addMenu(m_extrasMenu);
 
     m_printAction = new QAction(tr("&Print table of contents"), this);
     m_printAction->setStatusTip(tr("Print table of contents"));
@@ -1891,34 +1878,34 @@ void MainWindow::createActions()
     connect(m_printAction, &QAction::triggered, this, [this] () {
         printTableOfContent();
     });
-    extrasMenu->addAction(m_printAction);
+    m_extrasMenu->addAction(m_printAction);
 
     m_backupAction = new QAction(tr("&Backup memory card"), this);
     m_backupAction->setStatusTip(tr("Backup memory card"));
     m_backupAction->setEnabled(false);
     connect(m_backupAction, &QAction::triggered, this, &MainWindow::backupCard);
-    extrasMenu->addAction(m_backupAction);
+    m_extrasMenu->addAction(m_backupAction);
 
     m_restoreAction = new QAction(tr("&Restore a backup"), this);
     m_restoreAction->setStatusTip(tr("Restore a backup"));
     m_restoreAction->setEnabled(false);
     connect(m_restoreAction, &QAction::triggered, this, &MainWindow::restoreBackup);
-    extrasMenu->addAction(m_restoreAction);
+    m_extrasMenu->addAction(m_restoreAction);
 
-    extrasMenu->addSeparator();
+    m_extrasMenu->addSeparator();
 
     m_formatAction = new QAction(tr("&Format memory card"), this);
     m_formatAction->setStatusTip(tr("Format memory card"));
     m_formatAction->setEnabled(true);
     connect(m_formatAction, &QAction::triggered, this, &MainWindow::formatCard);
-    extrasMenu->addAction(m_formatAction);
+    m_extrasMenu->addAction(m_formatAction);
 
     m_advancedFeaturesAction = new QAction(tr("&Advanced features"), this);
     m_advancedFeaturesAction->setStatusTip(tr("Advanced features"));
     connect(m_advancedFeaturesAction, &QAction::triggered, this, &MainWindow::advancedFeatures);
-    extrasMenu->addAction(m_advancedFeaturesAction);
+    m_extrasMenu->addAction(m_advancedFeaturesAction);
 
-    extrasMenu->addSeparator();
+    m_extrasMenu->addSeparator();
 
     m_selectManually = new QAction(tr("Select destination &manually"), this);
     m_selectManually->setStatusTip(tr("Select mount point of memory card manually"));
@@ -1927,24 +1914,25 @@ void MainWindow::createActions()
     m_selectManually->setVisible(false);
 #endif
     connect(m_selectManually, &QAction::triggered, this, &MainWindow::selectDestinationManually);
-    extrasMenu->addAction(m_selectManually);
+    m_extrasMenu->addAction(m_selectManually);
 
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    m_helpMenu = new QMenu(tr("&Help"), this);
+    menuBar()->addMenu(m_helpMenu);
 
-    QAction *aboutAction = new QAction(tr("&About"), this);
+    aboutAction = new QAction(tr("&About"), this);
     aboutAction->setStatusTip(tr("About"));
     connect(aboutAction, &QAction::triggered, this, &MainWindow::about);
-    helpMenu->addAction(aboutAction);
+    m_helpMenu->addAction(aboutAction);
 
-    QAction *findBooksAction = new QAction(tr("&Find music and audio books"), this);
+    findBooksAction = new QAction(tr("&Find music and audio books"), this);
     findBooksAction->setStatusTip(tr("Find music and audio books"));
     connect(findBooksAction, &QAction::triggered, this, &MainWindow::findMusicAndAudioBooks);
-    helpMenu->addAction(findBooksAction);
+    m_helpMenu->addAction(findBooksAction);
 
-    QAction *checkUpdatesAction = new QAction(tr("&Check for updates"), this);
+    checkUpdatesAction = new QAction(tr("&Check for updates"), this);
     checkUpdatesAction->setStatusTip(tr("Check for updates"));
     connect(checkUpdatesAction, &QAction::triggered, this, &MainWindow::checkForUpdates);
-    helpMenu->addAction(checkUpdatesAction);
+    m_helpMenu->addAction(checkUpdatesAction);
 }
 
 bool MainWindow::copyRecursively(const QString &sourceFolder, const QString &destFolder)
@@ -1980,4 +1968,56 @@ bool MainWindow::copyRecursively(const QString &sourceFolder, const QString &des
     }
 
     return true;
+}
+
+void MainWindow::showHideEditMenuEntries( bool showHide )
+{
+    if( showHide )
+    {
+        m_addTitleAction->setEnabled(true);
+        m_removeTitleAction->setEnabled(true);
+
+#if defined(Q_OS_MAC)
+        m_subMenuBegin->setEnabled(true);
+        m_subMenuEnd->setEnabled(true);
+
+        m_subMenuBegin->menuAction()->setEnabled(true);
+        m_subMenuEnd->menuAction()->setEnabled(true);
+//        m_moveToPlaylistMenu->menuAction()->setVisible(true);
+#endif
+        m_moveToPlaylistMenu->menuAction()->setEnabled(true);
+        m_moveToPlaylistMenu->menuAction()->setDisabled(false);
+        m_moveToPlaylistMenu->setEnabled(true);
+        m_moveToPlaylistMenu->setDisabled( false );
+
+        m_printAction->setEnabled(false);
+        m_backupAction->setEnabled(false);
+        m_restoreAction->setEnabled(false);
+        m_formatAction->setEnabled(false);
+        m_advancedFeaturesAction->setEnabled(false);
+
+    }
+    else
+    {
+        m_addTitleAction->setEnabled(false);
+        m_removeTitleAction->setEnabled(false);
+
+#if defined(Q_OS_MAC)
+        m_subMenuBegin->setEnabled(false);
+        m_subMenuEnd->setEnabled(false);
+        m_subMenuBegin->menuAction()->setEnabled(false);
+        m_subMenuEnd->menuAction()->setEnabled(false);
+//        m_moveToPlaylistMenu->menuAction()->setVisible(false);
+#endif
+        m_moveToPlaylistMenu->menuAction()->setEnabled(false);
+        m_moveToPlaylistMenu->menuAction()->setDisabled(true);
+        m_moveToPlaylistMenu->setEnabled(false);
+        m_moveToPlaylistMenu->setDisabled( true );
+
+        m_printAction->setEnabled(true);
+        m_backupAction->setEnabled(true);
+        m_restoreAction->setEnabled(true);
+        m_formatAction->setEnabled(true);
+        m_advancedFeaturesAction->setEnabled(false);
+    }
 }
