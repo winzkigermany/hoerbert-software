@@ -192,9 +192,11 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     connect(m_addButton, &QPushButton::clicked, this, &PlaylistPage::add);
     connect(m_removeButton, &QPushButton::clicked, this, &PlaylistPage::remove);
     connect(m_commitButton, &QPushButton::clicked, this, [this] () {
+        m_commitButton->setEnabled(false);  // make sure the user can't click more than once.
         emit onClosePage(true);
     });
     connect(m_cancelButton, &QPushButton::clicked, this, [this] () {
+        m_cancelButton->setEnabled(false); // make sure the user can't click more than once.
         emit onClosePage(false);
     });
     connect(m_playlistView, &PlaylistView::durationChanged, this, &PlaylistPage::durationChanged);
@@ -250,6 +252,9 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
     }
 
     m_implicitlyMovedList[dir_num] = implicit_list;
+
+    m_commitButton->setEnabled(true);
+    m_cancelButton->setEnabled(true);
 }
 
 quint8 PlaylistPage::directory()
