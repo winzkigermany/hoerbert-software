@@ -21,12 +21,6 @@
 
 #include "piebutton.h"
 
-#include <QPainter>
-#include <QGraphicsDropShadowEffect>
-#include <QApplication>
-#include <QLabel>
-
-#include "define.h"
 
 PieButton::PieButton(QWidget *parent, int id) : QPushButton(parent)
 {
@@ -64,6 +58,18 @@ PieButton::PieButton(QWidget *parent, int id) : QPushButton(parent)
     m_mainPixmap->setScaledContents(true);
     m_mainPixmap->setVisible(false);
 
+    m_spinner = new WaitingSpinnerWidget( m_overlay, true, false );
+    m_spinner->setRoundness(100.0);
+    m_spinner->setMinimumTrailOpacity(0.0);
+    m_spinner->setTrailFadePercentage(70.0);
+    m_spinner->setNumberOfLines(12);
+    m_spinner->setLineLength(5);
+    m_spinner->setLineWidth(5);
+    m_spinner->setInnerRadius(35);
+    m_spinner->setRevolutionsPerSecond(0.25);
+    m_spinner->setColor(QColor(255, 255, 255));
+    m_spinner->stop();
+
     updateStyleSheet();
     setFixedSize(96, 96);
     setOverlaySize(96, 96);
@@ -89,7 +95,10 @@ void PieButton::setPercentage(int value)
     updateStyleSheet();
 
     if (m_enabled)
+    {
         m_enabled = false;
+        m_spinner->start();
+    }
 
     if (value == 0)
         setText("0%");
@@ -98,12 +107,15 @@ void PieButton::setPercentage(int value)
         m_percentage = value;
         assert(m_percentage >=0 && m_percentage <= 100);
         setText(QString("%1%").arg(value));
+        m_spinner->start();
+
         update();
         QApplication::processEvents();
 
         if (m_percentage == 100) {
             emit processCompleted();
             m_percentage = 0;
+            m_spinner->stop();
         }
     }
 }
@@ -290,6 +302,11 @@ void PieButton::paintEvent(QPaintEvent *e)
         painter.setBrush(QBrush(m_fillColor));
         painter.setPen(Qt::NoPen);
         painter.drawPie(QRect(0, 0, width(), height()), 90 * 16, -static_cast<int>(360 * static_cast<qreal>(m_percentage) / static_cast<qreal>(100) * 16));
+        m_spinner->setVisible(true);
+    }
+    else
+    {
+        m_spinner->stop();
     }
 
     QPushButton::paintEvent(e);

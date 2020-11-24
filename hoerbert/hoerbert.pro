@@ -77,6 +77,7 @@ SOURCES += \
         qprocesspriority.cpp \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
+        waitingspinnerwidget.cpp \
         xmlmetadatareader.cpp \
         xmlwriter.cpp
 
@@ -107,6 +108,7 @@ HEADERS += \
         triplecheckbox.h \
         triplecheckboxwidget.h \
         version.h \
+        waitingspinnerwidget.h \
         xmlmetadatareader.h \
         xmlwriter.h
 

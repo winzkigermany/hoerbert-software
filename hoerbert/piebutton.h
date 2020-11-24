@@ -23,10 +23,14 @@
 #define PIEBUTTON_H
 
 #include <QPushButton>
+#include <QPainter>
+#include <QGraphicsDropShadowEffect>
+#include <QApplication>
+#include <QLabel>
 
-class QWidget;
-class QGraphicsDropShadowEffect;
-class QLabel;
+#include "define.h"
+#include "waitingspinnerwidget.h"
+
 
 /**
  * @brief Custom styled button with pie progress
@@ -172,6 +176,7 @@ private:
     QColor m_backColor;
     QColor m_color;
     QGraphicsDropShadowEffect *m_shadow;
+    WaitingSpinnerWidget *m_spinner;
 
     QLabel *m_overlay;
     QLabel *m_mainPixmap;
