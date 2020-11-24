@@ -155,6 +155,8 @@ CardPage::CardPage(QWidget *parent)
     m_diagLayout->setAlignment(Qt::AlignCenter);
 
     m_diagModeHint = new QLabel(m_diagWidget);
+    m_diagModeHint->setObjectName("diagModeHintLabel");
+    m_diagModeHint->setStyleSheet("#diagModeHintLabel {color:#353535;}");   // always: dark text on wooden background
     m_diagModeHint->setText(tr("This memory card is in diagnostics mode."));
     m_diagModeHint->setFont(QFont("Console", 12, 50));
 
@@ -163,7 +165,6 @@ CardPage::CardPage(QWidget *parent)
     m_return2Normal->setToolTip(tr("Return to normal mode from diagnostics mode"));
     m_return2Normal->setFixedHeight(50);
     m_return2Normal->setObjectName("BigButton");
-    m_return2Normal->setStyleSheet("#BigButton {background: white; border: 1px solid #d3d3d3; border-radius: 5px; color: black}");
 
     m_diagLayout->addWidget(m_diagModeHint);
     m_diagLayout->addWidget(m_return2Normal);

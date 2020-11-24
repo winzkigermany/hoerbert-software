@@ -256,10 +256,12 @@ int main(int argc, char *argv[])
         a.setStyle( "#ColorblindHint { background-color:#353535; }" );
         a.setStyle( "#PlaylistTable {background-color:#353535; color:white; alternate-background-color: rgba(48, 48, 48, 0);}" );
         a.setStyle( "QLineEdit {background-color: #404040; color: white;}" );
+        a.setStyle( "#BigButton {background-color:#353535; color:white; border: 1px solid #d3d3d3; border-radius: 5px;}" );
     } else {
         a.setStyle( "#ColorblindHint { background-color:#ffffff; }" );
         a.setStyle( "#PlaylistTable {background-color: white; color: black; alternate-background-color: rgba(245, 245, 245, 0);}" );
         a.setStyle( "QLineEdit {background-color: white; color: black;}" );
+        a.setStyle( "#BigButton {background-color:#dddddd; color: black; border: 1px solid #d3d3d3; border-radius: 5px;}" );
     }
 
     qRegisterMetaType <AudioList> ("AudioList");
