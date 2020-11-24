@@ -374,6 +374,7 @@ void CardPage::ejectDrive()
         updateDriveList();
         deselectDrive();
         QMessageBox::information(this, tr("Eject"), tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer."));
+        switchDiagnosticsMode( false );
     }
     else
     {
