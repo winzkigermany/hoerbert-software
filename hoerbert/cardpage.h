@@ -22,15 +22,39 @@
 #ifndef CARDPAGE_H
 #define CARDPAGE_H
 
-#include <QWidget>
-#include <QMutex>
 
 #if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
 #include <QFileSystemWatcher>
 #endif
 
 #include <list>
+#include <QWidget>
+#include <QMutex>
+#include <QDir>
+#include <QStackedWidget>
+#include <QPushButton>
+#include <QComboBox>
+#include <QLayout>
+#include <QMessageBox>
+#include <QLineEdit>
+#include <QTimer>
+#include <cmath>
+#include <QFileSystemWatcher>
+#include <QShortcut>
+#include <QProgressDialog>
+#include <QApplication>
+#include <QSettings>
+#include <QDebug>
+#include <QInputDialog>
+#include <QVBoxLayout>
 
+#include "define.h"
+#include "functions.h"
+#include "piebutton.h"
+#include "capacitybar.h"
+#include "audioinfothread.h"
+#include "xmlwriter.h"
+#include "pleasewaitdialog.h"
 #include "devicemanager.h"
 #include "define.h"
 
@@ -40,21 +64,6 @@
 
 const int GRID_SPACING              = 16;
 const int MOUNT_VOLUME_DELAY        = 2; // in seconds
-
-class QPushButton;
-class PieButton;
-class QComboBox;
-class QVBoxLayout;
-class QHBoxLayout;
-class QGridLayout;
-class QSpacerItem;
-class QLabel;
-class QStackedWidget;
-class QMutex;
-
-class DeviceManager;
-class PieButton;
-class CapacityBar;
 
 typedef std::shared_ptr<DeviceManager> DeviceManager_ptr;
 

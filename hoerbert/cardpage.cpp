@@ -21,32 +21,6 @@
 
 #include "cardpage.h"
 
-#include <QDir>
-#include <QStackedWidget>
-#include <QPushButton>
-#include <QComboBox>
-#include <QLayout>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QTimer>
-#include <cmath>
-#include <QFileSystemWatcher>
-#include <QShortcut>
-#include <QProgressDialog>
-#include <QApplication>
-#include <QSettings>
-#include <QDebug>
-#include <QInputDialog>
-#include <QVBoxLayout>
-
-#include "define.h"
-#include "functions.h"
-#include "piebutton.h"
-#include "capacitybar.h"
-#include "audioinfothread.h"
-#include "xmlwriter.h"
-#include "pleasewaitdialog.h"
-#include <QFutureSynchronizer>
 
 CardPage::CardPage(QWidget *parent)
     : QWidget(parent)
