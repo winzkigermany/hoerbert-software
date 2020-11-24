@@ -953,7 +953,7 @@ void MainWindow::collectInformationForSupport()
         }
         else
         {
-            info_list << "No hoerbert.xml was found. That's ok as long as this card will never be used with app versions 1.x";
+            info_list << "No hoerbert.xml was found in the card root directory. That's ok as long as this card will never be used with app versions 1.x";
         }
 
         if (card_dir.exists(HOERBERT_XML_BACKUP))
@@ -965,7 +965,7 @@ void MainWindow::collectInformationForSupport()
         }
         else
         {
-            info_list << "No hoerbert.bak was found. That's ok as long as this card will never be used with app versions 1.x";
+            info_list << "No hoerbert.bak was found in the card root directory. That's ok as long as this card will never be used with app versions 1.x";
         }
 
         if (card_dir.exists("info.xml"))
@@ -977,11 +977,28 @@ void MainWindow::collectInformationForSupport()
         }
         else
         {
-            info_list << "No info.xml was found. That means that this card has never been backed up using hoerbert.app 2.x";
+            info_list << "No info.xml was found in the card root directory. That means that this card has never been backed up using hoerbert.app 2.x";
         }
 
         printTableOfContent(collect_path);
     }
+
+    info_list << "";
+    info_list << "[settings]";
+
+    QSettings s;
+    s.beginGroup("Global");
+
+    QStringList keys = s.allKeys();
+    QStringListIterator it(keys);
+    while ( it.hasNext() )
+    {
+        QString currentKey = it.next();
+        QString newString = currentKey + "=" + s.value(currentKey).toString();
+        info_list << newString;
+    }
+    s.endGroup();
+
 
     // write collected information to our file
     QFile file(tailPath(collect_path) + "dir.txt");
