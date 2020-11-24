@@ -644,14 +644,21 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
     QString block_end = "</div>";
 
     // %1: order number(filename + 1), %2: metadata of audio
-    QString item = "<div class='item'>"
-                   "<span class='track' style='padding:0.2em;margin-right:1em;font-weight:bold;'>"
+    QString tableStart = "<table class='item'>";
+    QString tableEnd = "</table>";
+    QString item = "<tr><td class='track' style='font-weight:bold;'>"
                    "%1"
-                   "</span>"
-                   "<span class='name'>"
+                   "</td>"
+                   "<td class='title' style=''>"
                    "%2"
-                   "</span>"
-                   "</div>";
+                   "</td>"
+                   "<td class='artist' style=''>"
+                   "%3"
+                   "</td>"
+                   "<td class='file' style=''>"
+                   "%4"
+                   "</td></tr>";
+
 
     QString contents = QString("");
     int prev_dir_num = -1;
@@ -661,6 +668,7 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
         int new_dir_num = entry.path.section("/", -2).section("/", 0, 0).toInt();
         if (new_dir_num != prev_dir_num) {
             if (prev_dir_num != -1) {
+                contents += tableEnd;
                 contents += block_end;
                 id = 1;
             }
@@ -708,8 +716,11 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
             }
             contents += "</table>";
             prev_dir_num = new_dir_num;
+
+            contents += tableStart;
         }
-        contents += item.arg(id).arg(entry.metadata.title);
+
+        contents += item.arg(id).arg(entry.metadata.title).arg(entry.metadata.album).arg(entry.metadata.comment);
         id++;
     }
 
