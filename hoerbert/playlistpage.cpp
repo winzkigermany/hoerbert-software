@@ -75,7 +75,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_viewConfigButton->setFlat(true);
     m_viewConfigButton->setObjectName("ColorblindHint");
     m_viewConfigButton->setGeometry(QRect(QPoint(0, 0), QSize(42, 42)));
-    connect( m_viewConfigButton, SIGNAL (released()), this, SLOT (setTableColumns()) );
+    connect( m_viewConfigButton, &QPushButton::released, this, &PlaylistPage::setTableColumns );
 
     m_silenceLabel = new QLabel(this);
     m_silenceLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
