@@ -92,7 +92,7 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
 <context>
     <name>AdvancedFeaturesDialog</name>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="41"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="43"/>
         <source>Advanced features</source>
         <translation>Extras</translation>
     </message>
@@ -101,12 +101,12 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
         <translation type="vanished">Softwareversion: 1.4.15</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="52"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="54"/>
         <source>Software version: </source>
         <translation>Softwareversion:</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="56"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="58"/>
         <source>(c) WINZKI GmbH &amp; Co. KG</source>
         <translation>(c) WINZKI GmbH &amp; Co. KG</translation>
     </message>
@@ -115,39 +115,74 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
         <translation type="vanished">&lt;a href=&quot;http://www.hoerbert.com/&quot;&gt;http://www.hoerbert.com&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="60"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="62"/>
         <source>&lt;a href=&quot;https://en.hoerbert.com/&quot;&gt;&lt;span style=&apos;color: #5599ee&apos;&gt;https://www.hoerbert.com&lt;/span&gt;&lt;/a&gt;</source>
         <translation>&lt;a href=&quot;https://www.hoerbert.com/&quot;&gt;&lt;span style=&apos;color: #5599ee&apos;&gt;https://www.hoerbert.com&lt;/span&gt;&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="72"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="74"/>
         <source>Maximum volume:</source>
         <translation>Maximale Lautstärke:</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="75"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="78"/>
+        <source>Show buttons:</source>
+        <translation>Anzahl Tasten:</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="81"/>
+        <source>9(default)</source>
+        <translation>9 (Standard)</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="103"/>
         <source>-6dB (very low)</source>
         <translation>-6dB (sehr leise)</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="78"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="106"/>
         <source>-1.5dB (normal)</source>
         <translation>-1.5dB (normal)</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="81"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="109"/>
         <source>0dB (maximum)</source>
         <translation>0dB (maximal)</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="92"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="125"/>
+        <source>Dark mode</source>
+        <translation>Dunkler Modus</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="128"/>
         <source>Restore backup reminder</source>
         <translation>Backup-Erinnerungen wieder einschalten</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="107"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="131"/>
+        <source>Show drives &gt;= %1GB</source>
+        <translation>Zeige Laufwerke =&gt; %1GB</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="134"/>
+        <source>Regenerate hoerbert.xml when closing the app</source>
+        <translation>Beim beenden hoerbert.xml erzeugen</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="148"/>
         <source>Switch to diagnostics mode</source>
         <translation>In den Diagnosemodus wechseln</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="199"/>
+        <source>Dark mode switch</source>
+        <translation>Umschalten in den Dunkelmodus</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="199"/>
+        <source>Please restart this app to see the change.</source>
+        <translation>Bitte die App neu starten, um die Änderung zu sehen.</translation>
     </message>
     <message>
         <source>Restore backup reminder:</source>
@@ -162,26 +197,25 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
         <translation type="vanished">In Diagnosemodus wechseln:</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="110"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="151"/>
         <source>Switch</source>
         <translation>Wechseln</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="95"/>
         <source>Show drives &gt;= %1GB:</source>
-        <translation>Laufwerke &gt;= %1GB anzeigen:</translation>
+        <translation type="vanished">Laufwerke &gt;= %1GB anzeigen:</translation>
     </message>
     <message>
         <source>&lt;a href=&quot;https://www.hoerbert.com/&quot;&gt;&lt;span style=&apos;color: #5599ee&apos;&gt;https://www.hoerbert.com&lt;/span&gt;&lt;/a&gt;</source>
         <translation type="obsolete">&lt;a href=&quot;https://www.hoerbert.com/&quot;&gt;&lt;span style=&apos;color: #5599ee&apos;&gt;https://www.hoerbert.com&lt;/span&gt;&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="116"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="157"/>
         <source>Collect information for support</source>
         <translation>Daten für den Support sammeln</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="120"/>
+        <location filename="../advancedfeaturesdialog.cpp" line="161"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
@@ -189,7 +223,7 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
 <context>
     <name>CDRipper</name>
     <message>
-        <location filename="../cdripper.cpp" line="111"/>
+        <location filename="../cdripper.cpp" line="113"/>
         <source>Track does not exist in the path:</source>
         <translation>Unter diesem Pfad liegt kein Track:</translation>
     </message>
@@ -231,58 +265,51 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
         <translation type="vanished">Karte auswerfen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="148"/>
         <source>Edit directory</source>
-        <translation>Verzeichnis bearbeiten</translation>
+        <translation type="vanished">Verzeichnis bearbeiten</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="187"/>
+        <location filename="../cardpage.cpp" line="160"/>
         <source>This memory card is in diagnostics mode.</source>
         <translation>Diese Speicherkarte befindet sich im Diagnosemodus.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="192"/>
+        <location filename="../cardpage.cpp" line="164"/>
         <source>Return to normal mode</source>
         <translation>Diagnosemodus verlassen</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="193"/>
+        <location filename="../cardpage.cpp" line="165"/>
         <source>Return to normal mode from diagnostics mode</source>
         <translation>Rückkehr aus dem Diagnosemodus in den Normalmodus</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="341"/>
-        <location filename="../cardpage.cpp" line="568"/>
+        <location filename="../cardpage.cpp" line="322"/>
         <source>Are you sure you want to format this drive [%1] ?</source>
         <translation>Bist Du sicher, dass Du das Laufwerk [%1] formatieren willst?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="341"/>
-        <location filename="../cardpage.cpp" line="373"/>
-        <location filename="../cardpage.cpp" line="379"/>
-        <location filename="../cardpage.cpp" line="384"/>
-        <location filename="../cardpage.cpp" line="390"/>
-        <location filename="../cardpage.cpp" line="577"/>
-        <location filename="../cardpage.cpp" line="579"/>
+        <location filename="../cardpage.cpp" line="311"/>
+        <location filename="../cardpage.cpp" line="322"/>
+        <location filename="../cardpage.cpp" line="339"/>
         <source>Format</source>
         <translation>Formatieren</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="349"/>
+        <location filename="../cardpage.cpp" line="331"/>
         <source>If you do not want to enter your root password here,
 please format the memory card in terminal with the following command:</source>
-        <translation>Wenn Sie hier nicht Ihr root-Passwort eingeben wollen,
-formatieren Sie die Speicherkarte im Terminal bitte mit folgendem Befehl:</translation>
+        <translation>Wenn Du hier nicht Dein root-Passwort eingeben willst,
+formatiere die Speicherkarte im Terminal bitte mit folgendem Befehl:</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="352"/>
+        <location filename="../cardpage.cpp" line="334"/>
         <source>Permission required</source>
         <translation>Erlaubnis erforderlich</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="359"/>
         <source>Formatting memory card...</source>
-        <translation>Speicherkarte wird formatiert...</translation>
+        <translation type="vanished">Speicherkarte wird formatiert...</translation>
     </message>
     <message>
         <source>Shows available memory cards for hoerbert player</source>
@@ -293,17 +320,17 @@ formatieren Sie die Speicherkarte im Terminal bitte mit folgendem Befehl:</trans
         <translation type="vanished">Die Speicherkarte aus der linken Dropdown-Liste auswählen, um sie zu bearbeiten</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="76"/>
+        <location filename="../cardpage.cpp" line="48"/>
         <source>Shows available memory cards or drives of this computer</source>
         <translation>Zeigt verfügbare Speicherkarten oder Laufwerke dieses Computers</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="80"/>
+        <location filename="../cardpage.cpp" line="52"/>
         <source>Read Card</source>
         <translation>Karte einlesen</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="81"/>
+        <location filename="../cardpage.cpp" line="53"/>
         <source>Read the selected card to edit it</source>
         <translation>Die ausgewählte Karte einlesen, um sie zu bearbeiten</translation>
     </message>
@@ -312,8 +339,7 @@ formatieren Sie die Speicherkarte im Terminal bitte mit folgendem Befehl:</trans
         <translation type="vanished">Ctrl-L</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="90"/>
-        <location filename="../cardpage.cpp" line="97"/>
+        <location filename="../cardpage.cpp" line="68"/>
         <source>Eject card</source>
         <translation>Karte auswerfen</translation>
     </message>
@@ -322,130 +348,168 @@ formatieren Sie die Speicherkarte im Terminal bitte mit folgendem Befehl:</trans
         <translation type="vanished">Ctrl+w</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="81"/>
-        <location filename="../cardpage.cpp" line="82"/>
+        <location filename="../cardpage.cpp" line="53"/>
+        <location filename="../cardpage.cpp" line="54"/>
         <source>Ctrl+r</source>
         <translation>Ctrl+l</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="90"/>
-        <location filename="../cardpage.cpp" line="91"/>
+        <location filename="../cardpage.cpp" line="61"/>
+        <location filename="../cardpage.cpp" line="62"/>
         <source>Ctrl+j</source>
         <translation>Ctrl+w</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="360"/>
         <source>Please wait. This might take several minutes.</source>
-        <translation>Bitte warten Sie. Dies kann einige Minuten dauern.</translation>
+        <translation type="vanished">Bitte warten Sie. Dies kann einige Minuten dauern.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="384"/>
         <source>Remounting the memory card failed. You may have to mount it    manually.</source>
-        <translation>Das Mounten der Speicherkarte schlug fehl. Möglicherweise muss sie manuell gemountet werden.</translation>
+        <translation type="vanished">Das Mounten der Speicherkarte schlug fehl. Möglicherweise muss sie manuell gemountet werden.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="400"/>
+        <location filename="../cardpage.cpp" line="349"/>
         <source>Current drive [%1] is being processed.</source>
         <translation>Auf dem Laufwerk [%1] wird gerade gearbeitet.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="400"/>
+        <location filename="../cardpage.cpp" line="349"/>
         <source>Are you sure you want to eject the drive?</source>
         <translation>Bist Du sicher, dass Du dieses Laufwerk auswerfen willst?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="400"/>
-        <location filename="../cardpage.cpp" line="409"/>
-        <location filename="../cardpage.cpp" line="423"/>
-        <location filename="../cardpage.cpp" line="426"/>
+        <location filename="../cardpage.cpp" line="349"/>
+        <location filename="../cardpage.cpp" line="358"/>
+        <location filename="../cardpage.cpp" line="376"/>
+        <location filename="../cardpage.cpp" line="381"/>
         <source>Eject</source>
         <translation>Auswerfen</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="409"/>
+        <location filename="../cardpage.cpp" line="358"/>
         <source>No memory card is selected.</source>
         <translation>Es wurde keine Speicherkarte ausgewählt.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="409"/>
+        <location filename="../cardpage.cpp" line="358"/>
         <source>Please select the device you want to eject.</source>
         <translation>Bitte die Speicherkarte auswählen, die ausgeworfen werden soll.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="423"/>
+        <location filename="../cardpage.cpp" line="376"/>
         <source>[%1] has been ejected.</source>
         <translation>[%1] wurde ausgeworfen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="423"/>
+        <location filename="../cardpage.cpp" line="376"/>
         <source>It is now safe to remove it from your computer.</source>
         <translation>Jetzt darf die Karte vom Computer getrennt werden.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="426"/>
+        <location filename="../cardpage.cpp" line="381"/>
         <source>Failed to eject the memory card [%1].</source>
         <translation>Die Speicherkarte [%1] konnte nicht ausgeworfen werden.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="426"/>
+        <location filename="../cardpage.cpp" line="381"/>
         <source>Please try again or try to remove it with your operating system</source>
         <translation>Bitte noch einmal versuchen - oder die Karte mit den Funktionen des Betriebssystems auswerfen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="455"/>
-        <source>Getting audio information...(%1%)</source>
-        <translation>Lese Dateiinformationen... (%1%)</translation>
+        <location filename="../cardpage.cpp" line="534"/>
+        <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
+        <translation>Das gewählte Ziel ist nicht FAT32 formatiert. Es muss FAT32-formatiert sein, damit hörbert die Daten lesen kann.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="479"/>
+        <location filename="../cardpage.cpp" line="534"/>
+        <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
+        <translation>Bitte stelle sicher, dass das Ziel FAT32-formatiert ist.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="540"/>
+        <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
+        <translation>Die gewählte Speicherkarte ist nicht im FAT32-Format formatiert. Sie muss richtig formatiert werden, dadurch werden alle Daten auf der Karte gelöscht.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="540"/>
+        <source>Do you you want to format this drive [%1] now?</source>
+        <translation>Soll das Laufwerk [%1] jetzt formatiert werden?</translation>
+    </message>
+    <message>
+        <source>Getting audio information...(%1%)</source>
+        <translation type="vanished">Lese Dateiinformationen... (%1%)</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="437"/>
         <source>Recreating xml</source>
         <translation>Erzeuge xml neu</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="481"/>
+        <location filename="../cardpage.cpp" line="413"/>
+        <location filename="../cardpage.cpp" line="439"/>
         <source>Getting audio information...</source>
         <translation>Dateiinformationen einlesen...</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="486"/>
+        <location filename="../cardpage.cpp" line="61"/>
+        <source>Save all changes and eject card</source>
+        <translation>Änderungen speichern und Karte auswerfen</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="119"/>
+        <source>Edit playlist</source>
+        <translation>Playlist bearbeiten</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="311"/>
+        <source>You have selected a custom path to work on. For safety purposes, this app does not format such paths. Please format your memory card manually yourself.</source>
+        <translation>Du hast einen eignen Pfad ausgewählt. Aus Sicherheitsgründen formatiert diese App solche Pfade nicht. Bitte formatiere Deine Karte selbst manuell.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="339"/>
+        <source>Please enter the new name for your card</source>
+        <translation>Bitte gib den neuen Namen für Deine Karte ein</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="444"/>
         <source>Abort</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="495"/>
+        <location filename="../cardpage.cpp" line="453"/>
         <source>Aborting...</source>
         <translation>Wird abgebrochen...</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="561"/>
-        <location filename="../cardpage.cpp" line="568"/>
-        <location filename="../cardpage.cpp" line="587"/>
-        <location filename="../cardpage.cpp" line="626"/>
+        <location filename="../cardpage.cpp" line="524"/>
+        <location filename="../cardpage.cpp" line="534"/>
+        <location filename="../cardpage.cpp" line="540"/>
+        <location filename="../cardpage.cpp" line="557"/>
+        <location filename="../cardpage.cpp" line="596"/>
         <source>Select drive</source>
         <translation>Laufwerk auswählen</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="568"/>
         <source>The selected memory card is not FAT32 formatted.</source>
-        <translation>Die ausgewählte Speicherkarte wurde nicht im Format FAT32 formatiert.</translation>
+        <translation type="vanished">Die ausgewählte Speicherkarte wurde nicht im Format FAT32 formatiert.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="587"/>
+        <location filename="../cardpage.cpp" line="557"/>
         <source>Volume size is bigger than 32GB. This may not be a memory card at all.</source>
         <translation>Die Größe der Speicherkarte is größer als 32GB. Ist das überhaupt eine Speicherkarte?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="587"/>
+        <location filename="../cardpage.cpp" line="557"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation>Soll wirklich auf diesem Laufwerk [%1] gearbeitet werden?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="626"/>
+        <location filename="../cardpage.cpp" line="596"/>
         <source>This card has never been used with hörbert.</source>
         <translation>Diese Karte wurde noch nie mit hörbert verwendet.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="626"/>
+        <location filename="../cardpage.cpp" line="596"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation>Möchtest Du sie für die Verwendung mit hörbert vorbereiten?</translation>
     </message>
@@ -454,24 +518,20 @@ formatieren Sie die Speicherkarte im Terminal bitte mit folgendem Befehl:</trans
         <translation type="vanished">Bist Du sicher, dass Du %1 formatieren willst?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="373"/>
         <source>The memory card has been formatted successfully</source>
-        <translation>Die Speicherkarte wurde erfolgreich formatiert</translation>
+        <translation type="vanished">Die Speicherkarte wurde erfolgreich formatiert</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="379"/>
         <source>Password is incorrect. Please try again.</source>
-        <translation>Das Passwort ist falsch. Bitte erneut versuchen.</translation>
+        <translation type="vanished">Das Passwort ist falsch. Bitte erneut versuchen.</translation>
     </message>
     <message>
         <source>Remounting the memory card failed. You may have to mount it manually.</source>
         <translation type="vanished">Das Mounten der Speicherkarte schlug fehl. Möglicherweise müssen Sie sie manuell mounten.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="390"/>
-        <location filename="../cardpage.cpp" line="579"/>
         <source>Formatting the memory card failed.</source>
-        <translation>Das Formatieren der Speicherkarte ist fehlgeschlagen.</translation>
+        <translation type="vanished">Das Formatieren der Speicherkarte ist fehlgeschlagen.</translation>
     </message>
     <message>
         <source>Current drive(%1) is being processed.
@@ -495,7 +555,7 @@ Please select the device you want to eject.</source>
         <translation type="vanished">Die Speicherkarte %1 konnte nicht ausgeworfen werden. Bitte noch einmal versuchen - oder die Karte mit den Funktionen des Betriebssystems auswerfen</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="561"/>
+        <location filename="../cardpage.cpp" line="524"/>
         <source>The selected device is write-protected. Please eject the device and remove the write protection, if you want to modify any playlists on it.</source>
         <translation>Das gewählte Laufwerk ist schreibgeschützt. Bitte wirf das Laufwerk aus und entferne den Schreibschutz, wenn Du Playlists darauf bearbeiten willst.</translation>
     </message>
@@ -511,9 +571,8 @@ Are you sure you want to format this drive (%1)?</source>
 Willst Du dieses Laufwerk wirklich formatieren? (%1)</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="577"/>
         <source>The memory card has been formatted successfully.</source>
-        <translation>Das Formatieren der Speicherkarte war erfolgreich.</translation>
+        <translation type="vanished">Das Formatieren der Speicherkarte war erfolgreich.</translation>
     </message>
     <message>
         <source>Volume size is bigger than 32GB. This may not be a memory card at all.
@@ -567,45 +626,66 @@ Soll wirklich auf diesem Laufwerk gearbeitet werden? (%1)</translation>
         <translation type="vanished">USB Laufwerk</translation>
     </message>
     <message>
-        <location filename="../devicemanager.cpp" line="205"/>
         <source>Format</source>
-        <translation>Formatieren</translation>
+        <translation type="vanished">Formatieren</translation>
     </message>
     <message>
-        <location filename="../devicemanager.cpp" line="205"/>
         <source>Please enter the new name for your card</source>
-        <translation>Bitte gib den neuen Namen für Deine Karte ein</translation>
+        <translation type="vanished">Bitte gib den neuen Namen für Deine Karte ein</translation>
+    </message>
+    <message>
+        <location filename="../devicemanager.cpp" line="278"/>
+        <location filename="../devicemanager.cpp" line="394"/>
+        <source>Formatting memory card...</source>
+        <translation>Speicherkarte wird formatiert...</translation>
+    </message>
+    <message>
+        <location filename="../devicemanager.cpp" line="289"/>
+        <location filename="../devicemanager.cpp" line="407"/>
+        <source>The memory card has been formatted successfully</source>
+        <translation>Die Speicherkarte wurde erfolgreich formatiert</translation>
+    </message>
+    <message>
+        <location filename="../devicemanager.cpp" line="293"/>
+        <location filename="../devicemanager.cpp" line="411"/>
+        <source>Formatting the memory card failed.</source>
+        <translation>Das Formatieren der Speicherkarte ist fehlgeschlagen.</translation>
+    </message>
+    <message>
+        <location filename="../devicemanager.cpp" line="423"/>
+        <source>Password is incorrect. Please try again.</source>
+        <translation>Das Passwort ist falsch. Bitte erneut versuchen.</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="1614"/>
+        <location filename="../mainwindow.cpp" line="1738"/>
         <source>&amp;Edit</source>
         <translation>B&amp;earbeiten</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1616"/>
+        <location filename="../mainwindow.cpp" line="1741"/>
         <source>&amp;Add title</source>
         <translation>Titel hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1617"/>
+        <location filename="../mainwindow.cpp" line="1742"/>
         <source>Add title</source>
         <translation>Titel hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1622"/>
+        <location filename="../mainwindow.cpp" line="1747"/>
         <source>&amp;Remove title</source>
         <translation>Titel entfe&amp;rnen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1623"/>
+        <location filename="../mainwindow.cpp" line="1748"/>
         <source>Remove title</source>
         <translation>Titel entfernen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1629"/>
+        <location filename="../mainwindow.cpp" line="1753"/>
         <source>&amp;Move to playlist...</source>
         <translation>Verschieben in Playlist...</translation>
     </message>
@@ -622,7 +702,8 @@ Soll wirklich auf diesem Laufwerk gearbeitet werden? (%1)</translation>
         <translation type="vanished">durch wen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1007"/>
+        <location filename="../mainwindow.cpp" line="1120"/>
+        <location filename="../mainwindow.cpp" line="1145"/>
         <source>Copying files...</source>
         <translation>Kopiere Dateien...</translation>
     </message>
@@ -637,7 +718,7 @@ Please click Yes to continue restore. No to cancel.</source>
         <translation type="obsolete">Klicke Ja, um fortzufahren. Nein um abzubrechen.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1086"/>
+        <location filename="../mainwindow.cpp" line="1200"/>
         <source>Backup Information</source>
         <translation>Backup Information</translation>
     </message>
@@ -678,17 +759,17 @@ Please click Yes to continue restore. No to cancel.</source>
         <translation type="obsolete">9</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="978"/>
+        <location filename="../mainwindow.cpp" line="1090"/>
         <source>Please select the destination directory for this backup</source>
         <translation>Bitte wähle das Zielverzeichnis für dieses Backup</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1058"/>
+        <location filename="../mainwindow.cpp" line="1172"/>
         <source>Please select the backup directory you want to restore</source>
         <translation>Bitte wähle das Backupverzeichnis, das Du wiederherstellen möchtest</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1084"/>
+        <location filename="../mainwindow.cpp" line="1198"/>
         <source>Please click Yes to continue restore. No to cancel.</source>
         <translation>Klicke Ja zum Wiederherstellen oder Nein, um abzubrechen.</translation>
     </message>
@@ -711,12 +792,12 @@ Do you want to update the memory card for using it with this new app in the futu
 Willst Du die Speicherkarte in Zukunft mit dieser neuen App verwenden?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="387"/>
+        <location filename="../mainwindow.cpp" line="390"/>
         <source>Split Information</source>
         <translation>Schnitt-Information</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="387"/>
+        <location filename="../mainwindow.cpp" line="390"/>
         <source>%1 file(s) were not split, because there was no silent part to split at.
 You may want to split the file(s) in fixed 3-minute chunks</source>
         <translation>%1 Datei(en) wurden nicht zerschnitten, weil es keine geeignete Stille gab, in der man schneiden könnte.
@@ -735,7 +816,7 @@ Verwende diese Speicherkarte NICHT MEHR mit der alten hörbert-Software, wenn Du
 Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Programm aktualisieren?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="438"/>
+        <location filename="../mainwindow.cpp" line="443"/>
         <source>Migration</source>
         <translation>Migration</translation>
     </message>
@@ -744,19 +825,19 @@ Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Program
         <translation type="vanished">Migriere...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="444"/>
-        <location filename="../mainwindow.cpp" line="585"/>
-        <location filename="../mainwindow.cpp" line="1012"/>
-        <location filename="../mainwindow.cpp" line="1123"/>
+        <location filename="../mainwindow.cpp" line="449"/>
+        <location filename="../mainwindow.cpp" line="592"/>
+        <location filename="../mainwindow.cpp" line="1125"/>
+        <location filename="../mainwindow.cpp" line="1238"/>
         <source>Abort</source>
         <translatorcomment>Migrationsdialog</translatorcomment>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="453"/>
-        <location filename="../mainwindow.cpp" line="594"/>
-        <location filename="../mainwindow.cpp" line="1021"/>
-        <location filename="../mainwindow.cpp" line="1132"/>
+        <location filename="../mainwindow.cpp" line="458"/>
+        <location filename="../mainwindow.cpp" line="601"/>
+        <location filename="../mainwindow.cpp" line="1134"/>
+        <location filename="../mainwindow.cpp" line="1247"/>
         <source>Aborting...</source>
         <translation>Wird abgebrochen...</translation>
     </message>
@@ -765,32 +846,32 @@ Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Program
         <translation type="vanished">Migriere ... (%1%)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="567"/>
         <source>Generating table...(%1%)</source>
-        <translation>Erzeuge Tabelle... (%1%)</translation>
+        <translation type="vanished">Erzeuge Tabelle... (%1%)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="578"/>
+        <location filename="../mainwindow.cpp" line="585"/>
         <source>Printing table of contents</source>
         <translation>Drucke das Inhaltsverzeichnis</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="580"/>
+        <location filename="../mainwindow.cpp" line="574"/>
+        <location filename="../mainwindow.cpp" line="587"/>
         <source>Generating table...</source>
         <translation>Erzeuge Tabelle...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="626"/>
+        <location filename="../mainwindow.cpp" line="633"/>
         <source>hoerbert table of contents</source>
         <translation>hörbert Inhaltsverzeichnis</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="736"/>
+        <location filename="../mainwindow.cpp" line="754"/>
         <source>hörbert table of contents</source>
         <translation>hörbert Inhaltsverzeichnis</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="738"/>
+        <location filename="../mainwindow.cpp" line="756"/>
         <source>Date: %1</source>
         <translation>Datum: %1</translation>
     </message>
@@ -799,13 +880,13 @@ Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Program
         <translation type="vanished">Durch</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1001"/>
+        <location filename="../mainwindow.cpp" line="1114"/>
         <source>hörbert Software</source>
         <translation>hörbert Software</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
-        <location filename="../mainwindow.cpp" line="1005"/>
+        <location filename="../mainwindow.cpp" line="268"/>
+        <location filename="../mainwindow.cpp" line="1118"/>
         <source>Backup</source>
         <translation>Sicherungskopie</translation>
     </message>
@@ -814,24 +895,25 @@ Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Program
         <translation type="vanished">Kopiere Dateien... (%1%)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1092"/>
+        <location filename="../mainwindow.cpp" line="1206"/>
         <source>Restore backup to memory card</source>
         <translation>Sicherungskopie auf die Speicherkarte zurückspielen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1092"/>
+        <location filename="../mainwindow.cpp" line="1206"/>
         <source>Click &apos;Yes&apos; to merge backup contents with the memory card 
 or &apos;No&apos; to restore only the backup</source>
         <translation>Klicke &apos;Ja&apos;, um die Sicherungskopie mit der Speicherkarte zu vermischen,
 und &apos;Nein&apos;, um nur die Sicherungskopie alleine auf die Speicherkarte zu spielen.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1116"/>
+        <location filename="../mainwindow.cpp" line="1231"/>
         <source>Restore</source>
         <translation>Wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1118"/>
+        <location filename="../mainwindow.cpp" line="1233"/>
+        <location filename="../mainwindow.cpp" line="1258"/>
         <source>Restoring files...</source>
         <translation>Stelle Dateien wieder her...</translation>
     </message>
@@ -840,12 +922,12 @@ und &apos;Nein&apos;, um nur die Sicherungskopie alleine auf die Speicherkarte z
         <translation type="vanished">Stelle Dateien wieder her... (%1%)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1440"/>
+        <location filename="../mainwindow.cpp" line="1558"/>
         <source>https://en.hoerbert.com/contents/</source>
         <translation>https://www.hoerbert.com/inhalte/</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1495"/>
+        <location filename="../mainwindow.cpp" line="1619"/>
         <source>https://en.hoerbert.com/customer-service/downloads-and-questions-about-transferring-contents/</source>
         <translation>https://www.hoerbert.com/service/downloads-und-bespielen/</translation>
     </message>
@@ -862,12 +944,12 @@ Are you sure you want to close the app?</source>
 Willst Du dieses Programm wirklich schließen?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1485"/>
+        <location filename="../mainwindow.cpp" line="1609"/>
         <source>This version:</source>
         <translation>Diese Version:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1485"/>
+        <location filename="../mainwindow.cpp" line="1609"/>
         <source>Latest available version online: %1</source>
         <translation>Neueste Version im Netz: %1</translation>
     </message>
@@ -884,7 +966,7 @@ Willst Du wirklich diese App schließen und Daten verlieren?</translation>
         <translation type="vanished">Aktuelle Version: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1489"/>
+        <location filename="../mainwindow.cpp" line="1613"/>
         <source>Download</source>
         <translation>Herunterladen</translation>
     </message>
@@ -897,12 +979,12 @@ Willst Du wirklich diese App schließen und Daten verlieren?</translation>
         <translation type="vanished">hörbert</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="982"/>
+        <location filename="../mainwindow.cpp" line="1094"/>
         <source>hoerbert_Backup_</source>
         <translation>hoerbert_Backup_</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="987"/>
+        <location filename="../mainwindow.cpp" line="1099"/>
         <source>Cannot create subdirectory for backup</source>
         <translation>Unterverzeichnis für Backup kann nicht erstellt werden</translation>
     </message>
@@ -923,34 +1005,34 @@ Willst Du wirklich diese App schließen und Daten verlieren?</translation>
         <translation type="vanished">byWho</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1499"/>
+        <location filename="../mainwindow.cpp" line="1623"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1204"/>
-        <location filename="../mainwindow.cpp" line="1544"/>
+        <location filename="../mainwindow.cpp" line="1319"/>
+        <location filename="../mainwindow.cpp" line="1668"/>
         <source>Backup reminder</source>
         <translation>Backup-Erinnerung</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="439"/>
-        <location filename="../mainwindow.cpp" line="467"/>
+        <location filename="../mainwindow.cpp" line="444"/>
+        <location filename="../mainwindow.cpp" line="472"/>
         <source>Migrating files to the new hoerbert.app. Please wait.</source>
         <translation>Dateien auf die neue hoerbert.app migrieren - bitte warten.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1551"/>
+        <location filename="../mainwindow.cpp" line="1675"/>
         <source>Never remind me again</source>
         <translation>Nicht mehr daran erinnern</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1555"/>
+        <location filename="../mainwindow.cpp" line="1679"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1559"/>
+        <location filename="../mainwindow.cpp" line="1683"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
@@ -983,22 +1065,20 @@ Willst Du wirklich diese App schließen und Daten verlieren?</translation>
         <translation type="vanished">Durch wen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1032"/>
         <source>Copying files... (%1%)</source>
-        <translation>Kopiere Dateien... (%1%)</translation>
+        <translation type="vanished">Kopiere Dateien... (%1%)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1143"/>
         <source>Restoring files... (%1%)</source>
-        <translation>Stelle Dateien wieder her... (%1%)</translation>
+        <translation type="vanished">Stelle Dateien wieder her... (%1%)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1470"/>
+        <location filename="../mainwindow.cpp" line="1594"/>
         <source>Current drive [%1] is being processed.</source>
         <translation>Das Laufwerk [%1] wird gerade bearbeitet.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1470"/>
+        <location filename="../mainwindow.cpp" line="1594"/>
         <source>Are you sure you want to close this app?</source>
         <translation>Willst Du dieses Programm wirklich schließen?</translation>
     </message>
@@ -1013,79 +1093,79 @@ This will keep you from losing files accidently. Do you want to create a backup 
 Dies verhindert versehentlichen Datenverlust. Mächtest Du jetzt ein Backup anlegen?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1548"/>
+        <location filename="../mainwindow.cpp" line="1672"/>
         <source>This will keep you from losing files accidently. Do you want to create a backup now?</source>
         <translation>Dies verhindert versehentlichen Datenverlust. Möchtest Du jetzt ein Backup anlegen?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1548"/>
+        <location filename="../mainwindow.cpp" line="1672"/>
         <source>Backup reminder: Don&apos;t forget to backup your memory card to your computer.</source>
         <translation>Backup-Erinnerung: Denke daran, Deine Speicherkarte auf Deinen Computer zu sichern.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1631"/>
+        <location filename="../mainwindow.cpp" line="1757"/>
         <source>Beginning of...</source>
         <translation>Anfang von...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1634"/>
-        <location filename="../mainwindow.cpp" line="1641"/>
-        <location filename="../mainwindow.cpp" line="1648"/>
-        <location filename="../mainwindow.cpp" line="1655"/>
-        <location filename="../mainwindow.cpp" line="1662"/>
-        <location filename="../mainwindow.cpp" line="1669"/>
-        <location filename="../mainwindow.cpp" line="1676"/>
-        <location filename="../mainwindow.cpp" line="1683"/>
-        <location filename="../mainwindow.cpp" line="1690"/>
+        <location filename="../mainwindow.cpp" line="1766"/>
+        <location filename="../mainwindow.cpp" line="1781"/>
+        <location filename="../mainwindow.cpp" line="1796"/>
+        <location filename="../mainwindow.cpp" line="1811"/>
+        <location filename="../mainwindow.cpp" line="1826"/>
+        <location filename="../mainwindow.cpp" line="1841"/>
+        <location filename="../mainwindow.cpp" line="1856"/>
+        <location filename="../mainwindow.cpp" line="1871"/>
+        <location filename="../mainwindow.cpp" line="1886"/>
         <source>Move to beginning of playlist %1</source>
         <translation>An den Anfang von Playlist %1 verschieben</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1696"/>
+        <location filename="../mainwindow.cpp" line="1901"/>
         <source>End of...</source>
         <translation>Ende von...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1699"/>
-        <location filename="../mainwindow.cpp" line="1706"/>
-        <location filename="../mainwindow.cpp" line="1713"/>
-        <location filename="../mainwindow.cpp" line="1720"/>
-        <location filename="../mainwindow.cpp" line="1727"/>
-        <location filename="../mainwindow.cpp" line="1734"/>
-        <location filename="../mainwindow.cpp" line="1741"/>
-        <location filename="../mainwindow.cpp" line="1748"/>
-        <location filename="../mainwindow.cpp" line="1755"/>
+        <location filename="../mainwindow.cpp" line="1905"/>
+        <location filename="../mainwindow.cpp" line="1920"/>
+        <location filename="../mainwindow.cpp" line="1935"/>
+        <location filename="../mainwindow.cpp" line="1950"/>
+        <location filename="../mainwindow.cpp" line="1965"/>
+        <location filename="../mainwindow.cpp" line="1980"/>
+        <location filename="../mainwindow.cpp" line="1995"/>
+        <location filename="../mainwindow.cpp" line="2010"/>
+        <location filename="../mainwindow.cpp" line="2025"/>
         <source>Move to end of playlist %1</source>
         <translation>An das Ende von Playlist %1 verschieben</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1770"/>
+        <location filename="../mainwindow.cpp" line="2049"/>
         <source>E&amp;xtras</source>
         <translation>E&amp;xtras</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1772"/>
+        <location filename="../mainwindow.cpp" line="2052"/>
         <source>&amp;Print table of contents</source>
         <translation>Inhaltsverzeichnis drucken</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="557"/>
-        <location filename="../mainwindow.cpp" line="1773"/>
+        <location filename="../mainwindow.cpp" line="564"/>
+        <location filename="../mainwindow.cpp" line="2053"/>
         <source>Print table of contents</source>
         <translation>Inhaltsverzeichnis drucken</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="255"/>
+        <location filename="../mainwindow.cpp" line="261"/>
         <source>Plausibility check</source>
         <translation>Plausibilitätsprüfung</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="255"/>
+        <location filename="../mainwindow.cpp" line="261"/>
         <source>The files on the memory card need some cleanup. Should this app do some clean up?</source>
         <translation>Die Dateien auf der Speicherkarte müssen bereinigt werden. Soll diese App die Aufräumarbeiten durchführen?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
+        <location filename="../mainwindow.cpp" line="268"/>
         <source>It is recommended to backup memory card before cleaning up. Do you want to backup now?</source>
         <translation>Es wird empfohlen, vor dem Aufräumen eine Sicherungskopie der Speicherkarte anzufertigen. Möchtest Du die Daten jetzt sichern?</translation>
     </message>
@@ -1096,129 +1176,157 @@ Do you want to update the memory card&apos;s files for using it with this new ap
 Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Programm aktualisieren?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="557"/>
+        <location filename="../mainwindow.cpp" line="564"/>
         <source>No audio file detected on the drive.</source>
         <translation>Es wurde keine Audiodatei auf dem Laufwerk erkannt.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="869"/>
+        <location filename="../mainwindow.cpp" line="853"/>
         <source>Select destination directory</source>
         <translation>Zielverzeichnis auswählen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1186"/>
+        <location filename="../mainwindow.cpp" line="873"/>
+        <location filename="../mainwindow.cpp" line="880"/>
+        <location filename="../mainwindow.cpp" line="1035"/>
+        <location filename="../mainwindow.cpp" line="1070"/>
+        <source>Collecting support information</source>
+        <translation>Sammle Informationen für den Support</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="873"/>
+        <source>Failed to create the temporary folder [%1] for collecting information.</source>
+        <translation>Der temporäre Ordner [%1] zum Sammeln der Informationen konnte nicht angelegt werden.</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="880"/>
+        <source>The file [%1] already exists in that destination. Overwrite the file?</source>
+        <translation>Die Datei [%1] existiert bereits. Soll sie überschrieben werden?</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1035"/>
+        <source>Failed to create the zip file for support information</source>
+        <translation>Das Speichern der Zip-Datei mit den Support-Informationen ist gescheitert.</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1070"/>
+        <source>Failed to copy the zip file from [%1] to: [%2]</source>
+        <translation>Die Zip-Datei konnte nicht von [%1] nach [%2] kopiert werden</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1302"/>
         <source>Select destination</source>
         <translation>Ziel wählen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1204"/>
+        <location filename="../mainwindow.cpp" line="1319"/>
         <source>We recommend to back up your memory card to your computer before switching to diagnostics mode.
 Create a backup now?</source>
-        <translation>Wir empfehlen Ihnen, eine Sicherungskopie Ihrer Speicherkarte auf Ihrem Computer zu erstellen, bevor Sie in den Diagnosemodus wechseln.
+        <translation>Wir empfehlen, eine Sicherungskopie der Speicherkarte auf Ihrem Computer zu erstellen, bevor Du sie in den Diagnosemodus schaltest.
 Jetzt ein Backup erstellen?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1215"/>
+        <location filename="../mainwindow.cpp" line="1330"/>
         <source>Switching...</source>
         <translation>Schalte um...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1227"/>
+        <location filename="../mainwindow.cpp" line="1344"/>
         <source>Switching to diagnostics mode</source>
         <translation>Schalte in den Diagnosemodus</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1319"/>
+        <location filename="../mainwindow.cpp" line="1436"/>
         <source>Returning to normal mode</source>
-        <translation>Retour au mode normal</translation>
+        <translation type="unfinished">Rückkehr in den Normalmodus</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1348"/>
+        <location filename="../mainwindow.cpp" line="1465"/>
         <source>Cannot find original directories!</source>
         <translation>Die Originalverzeichnisse sind unauffindbar.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1780"/>
+        <location filename="../mainwindow.cpp" line="2060"/>
         <source>&amp;Backup memory card</source>
         <translation>&amp;Backup anlegen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1781"/>
+        <location filename="../mainwindow.cpp" line="2061"/>
         <source>Backup memory card</source>
         <translation>Backup anlegen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1786"/>
+        <location filename="../mainwindow.cpp" line="2066"/>
         <source>&amp;Restore a backup</source>
         <translation>Backup wiede&amp;rherstellen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1787"/>
+        <location filename="../mainwindow.cpp" line="2067"/>
         <source>Restore a backup</source>
         <translation>Backup wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1794"/>
+        <location filename="../mainwindow.cpp" line="2074"/>
         <source>&amp;Format memory card</source>
         <translation>Speicherkarte &amp;formatieren</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1795"/>
+        <location filename="../mainwindow.cpp" line="2075"/>
         <source>Format memory card</source>
         <translation>Speicherkarte formatieren</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1800"/>
+        <location filename="../mainwindow.cpp" line="2080"/>
         <source>&amp;Advanced features</source>
         <translation>Erweiterte Funktionen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1801"/>
+        <location filename="../mainwindow.cpp" line="2081"/>
         <source>Advanced features</source>
         <translation>Erweiterte Funktionen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1807"/>
+        <location filename="../mainwindow.cpp" line="2087"/>
         <source>Select destination &amp;manually</source>
         <translation>Zielordner &amp;manuell wählen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1808"/>
+        <location filename="../mainwindow.cpp" line="2088"/>
         <source>Select mount point of memory card manually</source>
-        <translation>Einhängepunkt der Speicherkarte manuell auswählen</translation>
+        <translation type="unfinished">Einhängepunkt der Speicherkarte manuell auswählen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1816"/>
+        <location filename="../mainwindow.cpp" line="2096"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1818"/>
+        <location filename="../mainwindow.cpp" line="2099"/>
         <source>&amp;About</source>
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1819"/>
+        <location filename="../mainwindow.cpp" line="2100"/>
         <source>About</source>
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1823"/>
+        <location filename="../mainwindow.cpp" line="2104"/>
         <source>&amp;Find music and audio books</source>
         <translation>Musik und Hörspiele &amp;finden</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1824"/>
+        <location filename="../mainwindow.cpp" line="2105"/>
         <source>Find music and audio books</source>
         <translation>Musik und Hörspiele finden</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1828"/>
+        <location filename="../mainwindow.cpp" line="2109"/>
         <source>&amp;Check for updates</source>
         <translation>Nach Updates su&amp;chen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1829"/>
+        <location filename="../mainwindow.cpp" line="2110"/>
         <source>Check for updates</source>
         <translation>Nach Updates suchen</translation>
     </message>
@@ -1254,7 +1362,7 @@ Jetzt ein Backup erstellen?</translation>
     <message>
         <location filename="../playlistpage.cpp" line="115"/>
         <source>Add audio files or tracks from Finder/Explorer</source>
-        <translation>Fügen Sie Audiodateien oder Tracks aus dem Finder/Explorer hinzu</translation>
+        <translation>Füge Audiodateien oder Tracks aus dem Finder/Explorer hinzu</translation>
     </message>
     <message>
         <location filename="../playlistpage.cpp" line="124"/>
@@ -1286,40 +1394,39 @@ Jetzt ein Backup erstellen?</translation>
         <translation>Pfade anzeigen</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="182"/>
         <source>Show/Hide columns</source>
-        <translation>Spalten anzeigen/verbergen</translation>
+        <translation type="vanished">Spalten anzeigen/verbergen</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="262"/>
+        <location filename="../playlistpage.cpp" line="283"/>
         <source>Please select the files you want to move.</source>
         <translation>Bitte wähle die Dateien aus, die Du verschieben möchtest.</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="262"/>
+        <location filename="../playlistpage.cpp" line="283"/>
         <source>Move</source>
         <translation>Verschieben</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="373"/>
+        <location filename="../playlistpage.cpp" line="395"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="373"/>
+        <location filename="../playlistpage.cpp" line="395"/>
         <source>Please select the files you want to remove.</source>
-        <translation>Bitte die Dateien auswählen, die Sie entfernt werden sollen.</translation>
+        <translation>Bitte die Dateien auswählen, die entfernt werden sollen.</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="477"/>
+        <location filename="../playlistpage.cpp" line="505"/>
         <source>Playlist</source>
         <translation>Playlist</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="477"/>
+        <location filename="../playlistpage.cpp" line="505"/>
         <source>You have unsaved changes.
  Do you want to cancel all changes?</source>
-        <translation>Du hast ungespeicherte Änderungen gemacht.
+        <translation>Du hast ungespeicherte Änderungen durchgeführt.
 Möchtest Du alle Änderungen verwerfen?</translation>
     </message>
     <message>
@@ -1327,7 +1434,7 @@ Möchtest Du alle Änderungen verwerfen?</translation>
         <translation type="vanished">Bitte wähle die Dateien aus, die verschoben werden sollen.</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="347"/>
+        <location filename="../playlistpage.cpp" line="369"/>
         <source>Audio Files (%1)</source>
         <translation>Audiodateien (%1)</translation>
     </message>
@@ -1335,49 +1442,49 @@ Möchtest Du alle Änderungen verwerfen?</translation>
 <context>
     <name>PlaylistView</name>
     <message>
-        <location filename="../playlistview.cpp" line="220"/>
+        <location filename="../playlistview.cpp" line="215"/>
         <source>Memory card is full</source>
         <translation>Die Speicherkarte ist voll</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="220"/>
+        <location filename="../playlistview.cpp" line="215"/>
         <source>The card is already full, you can&apos;t add more files to it.</source>
         <translation>Die Speicherkarte ist bereits voll und kann keine weiteren Dateien mehr aufnehmen.</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="575"/>
+        <location filename="../playlistview.cpp" line="589"/>
         <source>Ripping Audio CD</source>
         <translation>Audio-CD wird eingelesen</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="576"/>
+        <location filename="../playlistview.cpp" line="590"/>
         <source>Ripping audio tracks...</source>
         <translation>Audiospuren werden eingelesen...</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="585"/>
-        <location filename="../playlistview.cpp" line="782"/>
+        <location filename="../playlistview.cpp" line="599"/>
+        <location filename="../playlistview.cpp" line="796"/>
         <source>Abort</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="594"/>
-        <location filename="../playlistview.cpp" line="791"/>
+        <location filename="../playlistview.cpp" line="608"/>
+        <location filename="../playlistview.cpp" line="805"/>
         <source>Aborting...</source>
         <translation>Wird abgebrochen...</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="616"/>
+        <location filename="../playlistview.cpp" line="630"/>
         <source>Ripping audio tracks... (%1%)</source>
         <translation>Lese Audiospuren ein... (%1%)</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="772"/>
+        <location filename="../playlistview.cpp" line="786"/>
         <source>Converting Audio Book</source>
         <translation>Hörbuch wird umgewandelt</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="773"/>
+        <location filename="../playlistview.cpp" line="787"/>
         <source>Converting...</source>
         <translation>Konvertierung...</translation>
     </message>
@@ -1387,40 +1494,58 @@ Möchtest Du alle Änderungen verwerfen?</translation>
     </message>
 </context>
 <context>
+    <name>PleaseWaitDialog</name>
+    <message>
+        <location filename="../pleasewaitdialog.cpp" line="10"/>
+        <source>Please wait</source>
+        <translation>Bitte warten</translation>
+    </message>
+    <message>
+        <location filename="../pleasewaitdialog.cpp" line="17"/>
+        <source>This might take several minutes.</source>
+        <translation>Das kann ein paar Minuten dauern.</translation>
+    </message>
+    <message>
+        <location filename="../pleasewaitdialog.cpp" line="21"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
-        <location filename="../devicemanager.cpp" line="116"/>
-        <location filename="../devicemanager.cpp" line="168"/>
+        <location filename="../devicemanager.cpp" line="139"/>
+        <location filename="../devicemanager.cpp" line="204"/>
         <source>USB Drive</source>
         <translation>USB Laufwerk</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="179"/>
+        <location filename="../main.cpp" line="164"/>
         <source>Cannot find ffmpeg binary. Please reinstall this app.</source>
         <translation>Kann das ffmpeg Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="187"/>
+        <location filename="../main.cpp" line="172"/>
         <source>Cannot find ffprobe binary. Please reinstall this app.</source>
         <translation>Kann das ffprobe Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="195"/>
+        <location filename="../main.cpp" line="180"/>
         <source>Cannot find ffplay binary. Please reinstall this app.</source>
         <translation>Kann das ffplay Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="203"/>
+        <location filename="../main.cpp" line="188"/>
         <source>Cannot find freac binary. Please reinstall this app.</source>
         <translation>Kann das freac Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="211"/>
+        <location filename="../main.cpp" line="196"/>
         <source>Cannot find sync binary. Please reinstall this app.</source>
         <translation>Kann das sync Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="220"/>
+        <location filename="../main.cpp" line="205"/>
         <source>Cannot find 7zip binary. Please reinstall this app.</source>
         <translation>Kann das 7zip Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
