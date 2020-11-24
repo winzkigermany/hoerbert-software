@@ -102,8 +102,7 @@ int EjectDriveWin(TCHAR DriveLetter){
         //res = CM_Query_And_Remove_SubTreeW(DevInstParent, &VetoType, VetoNameW, MAX_PATH, CM_REMOVE_NO_RESTART); // CM_Query_And_Remove_SubTreeA is not implemented under W2K!
         //res = CM_Query_And_Remove_SubTreeW(DevInstParent, NULL, NULL, 0, CM_REMOVE_NO_RESTART);  // with messagebox (W2K, Vista) or balloon (XP)
 
-        res = CM_Request_Device_EjectW(DevInstParent, &VetoType, VetoNameW, MAX_PATH, 0);
-        //res = CM_Request_Device_EjectW(DevInstParent, NULL, NULL, 0, 0); // with messagebox (W2K, Vista) or balloon (XP)
+        res = CM_Request_Device_EjectW(DevInstParent, &VetoType, VetoNameW, MAX_PATH, 0);       // sadly, this ejects the card reader device, too. I don't like it, but otherwise the card is not ejected AT ALL.
 
         bSuccess = (res==CR_SUCCESS && VetoType==PNP_VetoTypeUnknown);
         if ( bSuccess )  {
