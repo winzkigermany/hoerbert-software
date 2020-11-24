@@ -1746,8 +1746,21 @@ void MainWindow::createActions()
     m_subMenuBegin = new QMenu(tr("Beginning of..."), this);
     m_moveToPlaylistMenu->addMenu(m_subMenuBegin);
 
+    QSettings s;
+    s.beginGroup("Global");
+    bool darkMode = s.value("darkMode").toBool();
+    s.endGroup();
+
     m_moveToB1 = new QAction("1", this);
     m_moveToB1->setStatusTip(tr("Move to beginning of playlist %1").arg(1));
+    if( darkMode )
+    {
+        m_moveToB1->setIcon(QIcon(":/images/colorblind_hint_01_dark.png"));
+    }
+    else
+    {
+        m_moveToB1->setIcon(QIcon(":/images/colorblind_hint_01.png"));
+    }
     connect(m_moveToB1, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(0, true);
     });
@@ -1755,6 +1768,14 @@ void MainWindow::createActions()
 
     m_moveToB2 = new QAction("2", this);
     m_moveToB2->setStatusTip(tr("Move to beginning of playlist %1").arg(2));
+    if( darkMode )
+    {
+        m_moveToB2->setIcon(QIcon(":/images/colorblind_hint_02_dark.png"));
+    }
+    else
+    {
+        m_moveToB2->setIcon(QIcon(":/images/colorblind_hint_02.png"));
+    }
     connect(m_moveToB2, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(1, true);
     });
@@ -1762,6 +1783,14 @@ void MainWindow::createActions()
 
     m_moveToB3 = new QAction("3", this);
     m_moveToB3->setStatusTip(tr("Move to beginning of playlist %1").arg(3));
+    if( darkMode )
+    {
+        m_moveToB3->setIcon(QIcon(":/images/colorblind_hint_03_dark.png"));
+    }
+    else
+    {
+        m_moveToB3->setIcon(QIcon(":/images/colorblind_hint_03.png"));
+    }
     connect(m_moveToB3, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(2, true);
     });
@@ -1769,6 +1798,14 @@ void MainWindow::createActions()
 
     m_moveToB4 = new QAction("4", this);
     m_moveToB4->setStatusTip(tr("Move to beginning of playlist %1").arg(4));
+    if( darkMode )
+    {
+        m_moveToB4->setIcon(QIcon(":/images/colorblind_hint_04_dark.png"));
+    }
+    else
+    {
+        m_moveToB4->setIcon(QIcon(":/images/colorblind_hint_04.png"));
+    }
     connect(m_moveToB4, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(3, true);
     });
@@ -1776,6 +1813,14 @@ void MainWindow::createActions()
 
     m_moveToB5 = new QAction("5", this);
     m_moveToB5->setStatusTip(tr("Move to beginning of playlist %1").arg(5));
+    if( darkMode )
+    {
+        m_moveToB5->setIcon(QIcon(":/images/colorblind_hint_05_dark.png"));
+    }
+    else
+    {
+        m_moveToB5->setIcon(QIcon(":/images/colorblind_hint_05.png"));
+    }
     connect(m_moveToB5, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(4, true);
     });
@@ -1783,6 +1828,14 @@ void MainWindow::createActions()
 
     m_moveToB6 = new QAction("6", this);
     m_moveToB6->setStatusTip(tr("Move to beginning of playlist %1").arg(6));
+    if( darkMode )
+    {
+        m_moveToB6->setIcon(QIcon(":/images/colorblind_hint_06_dark.png"));
+    }
+    else
+    {
+        m_moveToB6->setIcon(QIcon(":/images/colorblind_hint_06.png"));
+    }
     connect(m_moveToB6, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(5, true);
     });
@@ -1790,6 +1843,14 @@ void MainWindow::createActions()
 
     m_moveToB7 = new QAction("7", this);
     m_moveToB7->setStatusTip(tr("Move to beginning of playlist %1").arg(7));
+    if( darkMode )
+    {
+        m_moveToB7->setIcon(QIcon(":/images/colorblind_hint_07_dark.png"));
+    }
+    else
+    {
+        m_moveToB7->setIcon(QIcon(":/images/colorblind_hint_07.png"));
+    }
     connect(m_moveToB7, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(6, true);
     });
@@ -1797,6 +1858,14 @@ void MainWindow::createActions()
 
     m_moveToB8 = new QAction("8", this);
     m_moveToB8->setStatusTip(tr("Move to beginning of playlist %1").arg(8));
+    if( darkMode )
+    {
+        m_moveToB8->setIcon(QIcon(":/images/colorblind_hint_08_dark.png"));
+    }
+    else
+    {
+        m_moveToB8->setIcon(QIcon(":/images/colorblind_hint_08.png"));
+    }
     connect(m_moveToB8, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(7, true);
     });
@@ -1804,6 +1873,14 @@ void MainWindow::createActions()
 
     m_moveToB9 = new QAction("9", this);
     m_moveToB9->setStatusTip(tr("Move to beginning of playlist %1").arg(9));
+    if( darkMode )
+    {
+        m_moveToB9->setIcon(QIcon(":/images/colorblind_hint_09_dark.png"));
+    }
+    else
+    {
+        m_moveToB9->setIcon(QIcon(":/images/colorblind_hint_09.png"));
+    }
     connect(m_moveToB9, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(8, true);
     });
@@ -1815,6 +1892,14 @@ void MainWindow::createActions()
 
     m_moveToE1 = new QAction("1", this);
     m_moveToE1->setStatusTip(tr("Move to end of playlist %1").arg(1));
+    if( darkMode )
+    {
+        m_moveToE1->setIcon(QIcon(":/images/colorblind_hint_01_dark.png"));
+    }
+    else
+    {
+        m_moveToE1->setIcon(QIcon(":/images/colorblind_hint_01.png"));
+    }
     connect(m_moveToE1, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(0, false);
     });
@@ -1822,6 +1907,14 @@ void MainWindow::createActions()
 
     m_moveToE2 = new QAction("2", this);
     m_moveToE2->setStatusTip(tr("Move to end of playlist %1").arg(2));
+    if( darkMode )
+    {
+        m_moveToE2->setIcon(QIcon(":/images/colorblind_hint_02_dark.png"));
+    }
+    else
+    {
+        m_moveToE2->setIcon(QIcon(":/images/colorblind_hint_02.png"));
+    }
     connect(m_moveToE2, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(1, false);
     });
@@ -1829,6 +1922,14 @@ void MainWindow::createActions()
 
     m_moveToE3 = new QAction("3", this);
     m_moveToE3->setStatusTip(tr("Move to end of playlist %1").arg(3));
+    if( darkMode )
+    {
+        m_moveToE3->setIcon(QIcon(":/images/colorblind_hint_03_dark.png"));
+    }
+    else
+    {
+        m_moveToE3->setIcon(QIcon(":/images/colorblind_hint_03.png"));
+    }
     connect(m_moveToE3, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(2, false);
     });
@@ -1836,6 +1937,14 @@ void MainWindow::createActions()
 
     m_moveToE4 = new QAction("4", this);
     m_moveToE4->setStatusTip(tr("Move to end of playlist %1").arg(4));
+    if( darkMode )
+    {
+        m_moveToE4->setIcon(QIcon(":/images/colorblind_hint_04_dark.png"));
+    }
+    else
+    {
+        m_moveToE4->setIcon(QIcon(":/images/colorblind_hint_04.png"));
+    }
     connect(m_moveToE4, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(3, false);
     });
@@ -1843,6 +1952,14 @@ void MainWindow::createActions()
 
     m_moveToE5 = new QAction("5", this);
     m_moveToE5->setStatusTip(tr("Move to end of playlist %1").arg(5));
+    if( darkMode )
+    {
+        m_moveToE5->setIcon(QIcon(":/images/colorblind_hint_05_dark.png"));
+    }
+    else
+    {
+        m_moveToE5->setIcon(QIcon(":/images/colorblind_hint_05.png"));
+    }
     connect(m_moveToE5, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(4, false);
     });
@@ -1850,6 +1967,14 @@ void MainWindow::createActions()
 
     m_moveToE6 = new QAction("6", this);
     m_moveToE6->setStatusTip(tr("Move to end of playlist %1").arg(6));
+    if( darkMode )
+    {
+        m_moveToE6->setIcon(QIcon(":/images/colorblind_hint_06_dark.png"));
+    }
+    else
+    {
+        m_moveToE6->setIcon(QIcon(":/images/colorblind_hint_06.png"));
+    }
     connect(m_moveToE6, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(5, false);
     });
@@ -1857,6 +1982,14 @@ void MainWindow::createActions()
 
     m_moveToE7 = new QAction("7", this);
     m_moveToE7->setStatusTip(tr("Move to end of playlist %1").arg(7));
+    if( darkMode )
+    {
+        m_moveToE7->setIcon(QIcon(":/images/colorblind_hint_07_dark.png"));
+    }
+    else
+    {
+        m_moveToE7->setIcon(QIcon(":/images/colorblind_hint_07.png"));
+    }
     connect(m_moveToE7, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(6, false);
     });
@@ -1864,6 +1997,14 @@ void MainWindow::createActions()
 
     m_moveToE8 = new QAction("8", this);
     m_moveToE8->setStatusTip(tr("Move to end of playlist %1").arg(8));
+    if( darkMode )
+    {
+        m_moveToE8->setIcon(QIcon(":/images/colorblind_hint_08_dark.png"));
+    }
+    else
+    {
+        m_moveToE8->setIcon(QIcon(":/images/colorblind_hint_08.png"));
+    }
     connect(m_moveToE8, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(7, false);
     });
@@ -1871,6 +2012,14 @@ void MainWindow::createActions()
 
     m_moveToE9 = new QAction("9", this);
     m_moveToE9->setStatusTip(tr("Move to end of playlist %1").arg(9));
+    if( darkMode )
+    {
+        m_moveToE9->setIcon(QIcon(":/images/colorblind_hint_09_dark.png"));
+    }
+    else
+    {
+        m_moveToE9->setIcon(QIcon(":/images/colorblind_hint_09.png"));
+    }
     connect(m_moveToE9, &QAction::triggered, [this] () {
        this->moveToAnotherPlaylist(8, false);
     });
