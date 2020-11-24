@@ -233,9 +233,9 @@ int main(int argc, char *argv[])
 
     settings.endGroup();
 
-    if( darkMode == "true" ){
-        QApplication::setStyle("Fusion");
+    QApplication::setStyle("Fusion");
 
+    if( darkMode == "true" ){
         QPalette palette;
         // Now use a palette to switch to dark colors:
         palette.setColor(QPalette::Window, QColor(53, 53, 53));
