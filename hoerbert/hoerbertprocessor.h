@@ -25,6 +25,7 @@
 #include <QThread>
 #include <QObject>
 #include <QProcess>
+#include <QMutex>
 
 #include "define.h"
 
@@ -50,7 +51,7 @@ public:
     /**
      * @brief HoerbertProcessor destructor
      */
-     ~HoerbertProcessor();
+    ~HoerbertProcessor() override;
 
     /**
      * @brief add entries to be processed to the thread
