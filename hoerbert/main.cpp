@@ -118,8 +118,9 @@ int main(int argc, char *argv[])
         HOERBERT_TEMP_PATH = tailPath(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
 
 #if defined (Q_OS_WIN)
-        ZIP_PATH = QCoreApplication::applicationDirPath() + "/7z/7zr.exe";
+        ZIP_PATH = QCoreApplication::applicationDirPath() + "/7z/7za.exe";
 #endif
+
     }
     else if (platform.compare("osx") == 0)
     {

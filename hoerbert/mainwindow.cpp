@@ -874,10 +874,11 @@ void MainWindow::collectInformationForSupport()
         return;
     }
 
+    QString destinationZipFilename = destination_path+".zip";
 
-    if (QFile::exists(destination_path+".zip"))
+    if (QFile::exists(destinationZipFilename))
     {
-        auto overwriteAnswer = QMessageBox::question(this, tr("Collecting support information"), tr("The file [%1] already exists in that destination. Overwrite the file?").arg( destination_path ), QMessageBox::Yes|QMessageBox::Cancel, QMessageBox::Cancel );
+        auto overwriteAnswer = QMessageBox::question(this, tr("Collecting support information"), tr("The file [%1] already exists in that destination. Overwrite the file?").arg( destinationZipFilename ), QMessageBox::Yes|QMessageBox::Cancel, QMessageBox::Cancel );
         if (overwriteAnswer == QMessageBox::Yes)
         {
             doOverwrite = true;
@@ -1023,9 +1024,14 @@ void MainWindow::collectInformationForSupport()
     QStringList arguments;
     bool processSuccess = true;
 
-#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
-    process.setWorkingDirectory(HOERBERT_TEMP_PATH);
+    if( doOverwrite ){
+        QFile::remove( destinationZipFilename );
+    }
 
+    process.setWorkingDirectory(HOERBERT_TEMP_PATH);
+    QFile::remove( collect_path + ".zip" );         // remove our temp file if it should exist.
+
+#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
     arguments << "-r" << collect_path + ".zip" << COLLECT_FILE_NAME+"/";
     qDebug() << "zip" << arguments.join(" ");
 
@@ -1038,8 +1044,8 @@ void MainWindow::collectInformationForSupport()
 
 #else
 
-    arguments << "a" << collect_path + ".zip" << tailPath(HOERBERT_TEMP_PATH) + COLLECT_FILE_NAME;
-    qDebug() << "7zr.exe" << arguments.join(" ");
+    arguments << "-tzip" << "a" << collect_path + ".zip" << tailPath(HOERBERT_TEMP_PATH) + COLLECT_FILE_NAME;
+    qDebug() << "7za.exe" << arguments.join(" ");
 
     process.start(ZIP_PATH, arguments);
 
@@ -1060,20 +1066,17 @@ void MainWindow::collectInformationForSupport()
 #endif
 
     process.close();
-    if( doOverwrite ){
-        QFile::remove( destination_path+".zip" );
-    }
 
-    if ( processSuccess && !QFile::copy( collect_path + ".zip", destination_path + ".zip"))
+    if ( processSuccess && !QFile::copy( collect_path + ".zip", destinationZipFilename))
     {
         perror("File copy");
-        QMessageBox::information(this, tr("Collecting support information"), tr("Failed to copy the zip file from [%1] to: [%2]").arg( collect_path+".zip" ).arg( destination_path+".zip" ) );
+        QMessageBox::information(this, tr("Collecting support information"), tr("Failed to copy the zip file from [%1] to: [%2]").arg( collect_path+".zip" ).arg( destinationZipFilename ) );
     }
 
     // clean up
     if (tmp_dir.exists())
     {
-        tmp_dir.removeRecursively();
+ //       tmp_dir.removeRecursively();
     }
 
     QApplication::restoreOverrideCursor();
