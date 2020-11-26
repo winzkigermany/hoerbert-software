@@ -1443,11 +1443,20 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
         {
             QDir sub_dir(tailPath(card_dir.absolutePath()) + QString::number(i));
             if (sub_dir.exists())
-            {
-                QFile file(sub_dir.absoluteFilePath("1.WAV"));
-                if (file.exists())
+            {                
+                QFile file0(sub_dir.absoluteFilePath("0.WAV"));
+                if (file0.exists())
                 {
-                    if (!file.remove())
+                    if (!file0.remove())
+                    {
+                        qDebug() << "Failed deleting diagnostics file. 0.WAV";
+                    }
+                }
+
+                QFile file1(sub_dir.absoluteFilePath("1.WAV"));
+                if (file1.exists())
+                {
+                    if (!file1.remove())
                     {
                         qDebug() << "Failed deleting diagnostics file. 1.WAV";
                     }
@@ -1485,14 +1494,6 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
 
                 for (const auto& file_info : file_list)
                 {
-                    // if 0.WAV exists in original folder, then delete diagnostics 0.WAV file first and then move original file to original folder
-                    if (file_info.fileName().toUpper().compare("0.WAV") == 0 )
-                    {
-                        auto zero_indexed_file = tailPath(card_dir.absoluteFilePath(QString::number(i))) + "0.WAV";
-                        if (QFile::exists(zero_indexed_file))
-                            if (!QFile::remove(zero_indexed_file))
-                                qDebug() << "Failed removing 0.WAV diagnostics file";
-                    }
                     moveFile(file_info.absoluteFilePath(), tailPath(card_dir.absoluteFilePath(QString::number(i))) + file_info.fileName());
                 }
             }
