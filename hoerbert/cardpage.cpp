@@ -340,6 +340,8 @@ void CardPage::formatSelectedDrive(bool retry)
 
     m_deviceManager->formatDrive(this, selectedDrive, driveLabel, passwd);
 
+    updateDriveList();
+    deselectDrive();
 }
 
 void CardPage::ejectDrive()
@@ -356,6 +358,8 @@ void CardPage::ejectDrive()
     if (currentDevice.isEmpty())
     {
         QMessageBox::information(this, tr("Eject"), tr("No memory card is selected.")+"\n"+tr("Please select the device you want to eject."));
+        updateDriveList();
+        deselectDrive();
         return;
     }
 
