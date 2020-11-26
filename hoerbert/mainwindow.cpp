@@ -44,7 +44,6 @@
 #include <QSettings>
 #include <QDebug>
 #include <QMutex>
-#include <QSettings>
 #include <QLocale>
 
 #include "aboutdialog.h"
@@ -895,7 +894,7 @@ void MainWindow::collectInformationForSupport()
     qApp->processEvents();
 
     QStringList info_list;
-    info_list << "[Operating System]" << QSysInfo::prettyProductName() << QLocale::languageToString(QLocale::system().language()) << "";
+    info_list << "[Operating System]" << QSysInfo::productType() << QSysInfo::productVersion() << QLocale::languageToString(QLocale::system().language()) << "";
 
     qint64 free_space_of_installation_drive = 0;
     for (auto info : QStorageInfo::mountedVolumes())
@@ -998,18 +997,18 @@ void MainWindow::collectInformationForSupport()
     info_list << "";
     info_list << "[settings]";
 
-    QSettings s;
-    s.beginGroup("Global");
+    QSettings settings;
+    settings.beginGroup("Global");
 
-    QStringList keys = s.allKeys();
+    QStringList keys = settings.allKeys();
     QStringListIterator it(keys);
     while ( it.hasNext() )
     {
         QString currentKey = it.next();
-        QString newString = currentKey + "=" + s.value(currentKey).toString();
+        QString newString = currentKey + "=" + settings.value(currentKey).toString();
         info_list << newString;
     }
-    s.endGroup();
+    settings.endGroup();
 
 
     // write collected information to our file
@@ -1760,10 +1759,10 @@ void MainWindow::createActions()
     m_subMenuBegin = new QMenu(tr("Beginning of..."), this);
     m_moveToPlaylistMenu->addMenu(m_subMenuBegin);
 
-    QSettings s;
-    s.beginGroup("Global");
-    bool darkMode = s.value("darkMode").toBool();
-    s.endGroup();
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool darkMode = settings.value("darkMode").toBool();
+    settings.endGroup();
 
     m_moveToB1 = new QAction("1", this);
     m_moveToB1->setStatusTip(tr("Move to beginning of playlist %1").arg(1));

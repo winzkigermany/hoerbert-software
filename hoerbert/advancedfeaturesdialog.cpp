@@ -43,8 +43,6 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     setWindowTitle(tr("Advanced features"));
     setFixedSize(600, 396);
 
-    m_settings = new QSettings(this);
-
     m_layout = new QVBoxLayout(this);
     m_layout->setContentsMargins(25, 20, 25, 25);
     m_layout->setAlignment(Qt::AlignHCenter);
@@ -172,9 +170,10 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_layout->addWidget(m_closeButton, 1, Qt::AlignHCenter);
 
     connect(m_buttonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this](int count) {
-        m_settings->beginGroup("Global");
-        m_settings->setValue("buttons", count);
-        m_settings->endGroup();
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("buttons", count);
+        settings.endGroup();
 
         emit buttonSettingsChanged();
     });
@@ -192,18 +191,20 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     });
 
     connect(m_darkModeOption, &QCheckBox::clicked, this, [this] () {
-        m_settings->beginGroup("Global");
-        m_settings->setValue("darkMode", m_darkModeOption->isChecked());
-        m_settings->endGroup();
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("darkMode", m_darkModeOption->isChecked());
+        settings.endGroup();
 
         QMessageBox::information(this, tr("Dark mode switch"), tr("Please restart this app to see the change."));
     });
 
     connect(m_reminderOption, &QCheckBox::clicked, this, [this] (int state) {
         Q_UNUSED(state);
-        m_settings->beginGroup("Global");
-        m_settings->setValue("showBackupReminder", m_reminderOption->isChecked());
-        m_settings->endGroup();
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("showBackupReminder", m_reminderOption->isChecked());
+        settings.endGroup();
     });
 
     connect(m_diagnosticsButton, &QPushButton::clicked, this, [this] () {
@@ -212,16 +213,18 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
 
     connect(m_showLargeDriveCheck, &QCheckBox::stateChanged, this, [this] (int state) {
         Q_UNUSED(state);
-        m_settings->beginGroup("Global");
-        m_settings->setValue("showLargeDrives", m_showLargeDriveCheck->isChecked());
-        m_settings->endGroup();
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("showLargeDrives", m_showLargeDriveCheck->isChecked());
+        settings.endGroup();
     });
 
     connect(m_regenerateXmlCheck, &QCheckBox::stateChanged, this, [this] (int state) {
         Q_UNUSED(state);
-        m_settings->beginGroup("Global");
-        m_settings->setValue("regenerateHoerbertXml", m_regenerateXmlCheck->isChecked());
-        m_settings->endGroup();
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("regenerateHoerbertXml", m_regenerateXmlCheck->isChecked());
+        settings.endGroup();
     });
 
     connect(m_collectSupportInfoButton, &QPushButton::clicked, this, &AdvancedFeaturesDialog::collectInformationForSupport);
@@ -233,9 +236,10 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
 
 void AdvancedFeaturesDialog::readSettings()
 {
-    m_settings->beginGroup("Global");
+    QSettings settings;
+    settings.beginGroup("Global");
 
-    auto buttons = m_settings->value("buttons").toInt();
+    auto buttons = settings.value("buttons").toInt();
     switch (buttons) {
         case 1:
             m_showOneButton->setChecked(true);
@@ -248,7 +252,7 @@ void AdvancedFeaturesDialog::readSettings()
             m_showNineButtons->setChecked(true);
     }
 
-    QString volume = m_settings->value("volume").toString();
+    QString volume = settings.value("volume").toString();
 
     if (volume.compare("-6") == 0)
         m_lowVolumeOption->setChecked(true);
@@ -257,26 +261,27 @@ void AdvancedFeaturesDialog::readSettings()
     else
         m_normalVolumeOption->setChecked(true);
 
-    bool darkMode = m_settings->value("darkMode").toBool();
+    bool darkMode = settings.value("darkMode").toBool();
     m_darkModeOption->setChecked(darkMode);
 
-    bool showReminder = m_settings->value("showBackupReminder").toBool();
+    bool showReminder = settings.value("showBackupReminder").toBool();
     m_reminderOption->setChecked(showReminder);
 
-    bool showLarge = m_settings->value("showLargeDrives").toBool();
+    bool showLarge = settings.value("showLargeDrives").toBool();
     m_showLargeDriveCheck->setChecked(showLarge);
 
-    bool generateXml = m_settings->value("regenerateHoerbertXml").toBool();
+    bool generateXml = settings.value("regenerateHoerbertXml").toBool();
     m_regenerateXmlCheck->setChecked(generateXml);
 
-    m_settings->endGroup();
+    settings.endGroup();
 }
 
 void AdvancedFeaturesDialog::writeVolumeSettings(const QString &volume)
 {
-    m_settings->beginGroup("Global");
-    m_settings->setValue("volume", volume);
-    m_settings->endGroup();
+    QSettings settings;
+    settings.beginGroup("Global");
+    settings.setValue("volume", volume);
+    settings.endGroup();
 }
 
 void AdvancedFeaturesDialog::setDiagnosticsSwitchingEnabled(bool enable)

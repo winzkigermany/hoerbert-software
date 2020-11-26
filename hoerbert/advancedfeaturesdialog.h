@@ -91,8 +91,6 @@ signals:
     void buttonSettingsChanged();
 
 private:
-    QSettings *m_settings;
-
     QLabel *m_versionLabel;
     QLabel *m_companyLabel;
     QLabel *m_siteUrlLabel;
