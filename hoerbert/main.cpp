@@ -36,6 +36,7 @@
 #include "define.h"
 #include "functions.h"
 #include "dpiscale.h"
+#include "runguard.h"
 
 QString FFMPEG_PATH;
 QString FFPROBE_PATH;
@@ -64,6 +65,7 @@ QStringList PROCESS_ERROR;
 
 int main(int argc, char *argv[])
 {
+
     signal(SIGINT, signalHandler);
     signal(SIGABRT, signalHandler);
     signal(SIGSEGV, signalHandler);
@@ -275,6 +277,15 @@ int main(int argc, char *argv[])
     }
 
     qRegisterMetaType <AudioList> ("AudioList");
+
+
+    RunGuard guard( "winzki_hoerbert_app_running" );
+    if ( !guard.tryToRun() )
+    {
+        // this app is already running.
+        QMessageBox::information(NULL, QObject::tr("Already running"), QObject::tr("This app is already running. It can not be started twice."));
+        exit(0);
+    }
 
     MainWindow w;
     w.show();

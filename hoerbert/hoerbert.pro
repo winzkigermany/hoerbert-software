@@ -75,6 +75,7 @@ SOURCES += \
         playsymbolbutton.cpp \
         pleasewaitdialog.cpp \
         qprocesspriority.cpp \
+        runguard.cpp \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         waitingspinnerwidget.cpp \
@@ -105,6 +106,7 @@ HEADERS += \
         playsymbolbutton.h \
         pleasewaitdialog.h \
         qprocesspriority.h \
+        runguard.h \
         triplecheckbox.h \
         triplecheckboxwidget.h \
         version.h \
