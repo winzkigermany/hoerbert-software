@@ -71,6 +71,19 @@ public:
      */
     void makePlausible(std::list <int> fixList);
 
+signals:
+    /**
+     * @brief changeAlbumColumnVisibility is a signal that's sent when the user toggles visibility of the album column
+     * @return
+     */
+    void changeAlbumColumnVisibility( bool onOff );
+
+    /**
+     * @brief changeAlbumColumnVisibility is a signal that's sent when the user toggles visibility of the comment column
+     * @return
+     */
+    void changeCommentColumnVisibility( bool onOff );
+
 
 private slots:
     void addTitle();
@@ -84,10 +97,9 @@ private slots:
     void advancedFeatures();
     void selectDestinationManually();
 
-    void switchDiagnosticsMode(bool enabled);
+    void switchDiagnosticsMode();
 
     void about();
-    void findMusicAndAudioBooks();
     void checkForUpdates();
 
     void processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index);
@@ -140,8 +152,12 @@ private:
     QMenu *m_subMenuBegin;
     QMenu *m_subMenuEnd;
     QMenu *m_extrasMenu;
+    QMenu *m_viewMenu;
+    QMenu *m_subMenuColumns;
     QMenu *m_helpMenu;
     QMenu *m_editMenu;
+    QMenu *m_serviceToolsMenu;
+
     QAction *m_addTitleAction;
     QAction *m_removeTitleAction;
     QAction *m_printAction;
@@ -150,6 +166,9 @@ private:
     QAction *m_formatAction;
     QAction *m_advancedFeaturesAction;
     QAction *m_selectManually;
+    QAction *m_showAlbumAction;
+    QAction *m_showPathAction;
+    QAction *m_darkModeAction;
 
     QAction *m_moveToB1;
     QAction *m_moveToB2;
@@ -174,6 +193,10 @@ private:
     QAction *aboutAction;
     QAction *findBooksAction;
     QAction *checkUpdatesAction;
+
+    QAction *m_visitServiceWebsiteAction;
+    QAction *m_collectDataAction;
+    QAction *m_toggleDiagnosticsModeAction;
 
     QMutex m_plausibilityCheckMutex;
 

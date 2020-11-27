@@ -278,7 +278,7 @@ signals:
      * @brief this signal is emitted when user switches diagnostics mode
      * @param enabled
      */
-    void diagnosticsModeSwitched(bool enabled = false);
+    void toggleDiagnosticsMode();
 
     /**
      * @brief this signal is emitted when the memory card has plausibility issues

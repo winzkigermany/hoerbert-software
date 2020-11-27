@@ -119,9 +119,6 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_optionLayout->addWidget(m_normalVolumeOption);
     m_optionLayout->addWidget(m_maxVolumeOption);
 
-    m_darkModeOption = new QCheckBox(this);
-    m_darkModeOption->setText(tr("Dark mode"));
-
     m_reminderOption = new QCheckBox(this);
     m_reminderOption->setText(tr("Restore backup reminder"));
 
@@ -134,26 +131,9 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_checkLayout = new QVBoxLayout;
     m_checkLayout->setAlignment(Qt::AlignCenter);
 
-    m_checkLayout->addWidget(m_darkModeOption);
     m_checkLayout->addWidget(m_reminderOption);
     m_checkLayout->addWidget(m_showLargeDriveCheck);
     m_checkLayout->addWidget(m_regenerateXmlCheck);
-
-    m_diagLayout = new QHBoxLayout;
-    m_diagLayout->setAlignment(Qt::AlignCenter);
-
-    m_diagnosticsLabel = new QLabel(this);
-    m_diagnosticsLabel->setText(tr("Switch to diagnostics mode"));
-
-    m_diagnosticsButton = new QPushButton(this);
-    m_diagnosticsButton->setText(tr("Switch"));
-
-    m_diagLayout->addWidget(m_diagnosticsLabel);
-    m_diagLayout->addWidget(m_diagnosticsButton);
-
-    m_collectSupportInfoButton = new QPushButton(this);
-    m_collectSupportInfoButton->setText(tr("Collect information for support"));
-    m_collectSupportInfoButton->setFixedWidth(300);
 
     m_closeButton = new QPushButton(this);
     m_closeButton->setText(tr("Close"));
@@ -163,9 +143,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_layout->addLayout(m_companyLayout);
     m_layout->addLayout(m_optionLayout);
     m_layout->addLayout(m_checkLayout, 0);
-    m_layout->addLayout(m_diagLayout);
     m_layout->addLayout(m_showButtonLayout);
-    m_layout->addWidget(m_collectSupportInfoButton, 0, Qt::AlignCenter);
     m_layout->addItem(new QSpacerItem(100, 15, QSizePolicy::Fixed, QSizePolicy::Maximum));
     m_layout->addWidget(m_closeButton, 1, Qt::AlignHCenter);
 
@@ -190,14 +168,6 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
         writeVolumeSettings("0");
     });
 
-    connect(m_darkModeOption, &QCheckBox::clicked, this, [this] () {
-        QSettings settings;
-        settings.beginGroup("Global");
-        settings.setValue("darkMode", m_darkModeOption->isChecked());
-        settings.endGroup();
-
-        QMessageBox::information(this, tr("Dark mode switch"), tr("Please restart this app to see the change."));
-    });
 
     connect(m_reminderOption, &QCheckBox::clicked, this, [this] (int state) {
         Q_UNUSED(state);
@@ -205,10 +175,6 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
         settings.beginGroup("Global");
         settings.setValue("showBackupReminder", m_reminderOption->isChecked());
         settings.endGroup();
-    });
-
-    connect(m_diagnosticsButton, &QPushButton::clicked, this, [this] () {
-        emit diagnosticsModeSwitched(true);
     });
 
     connect(m_showLargeDriveCheck, &QCheckBox::stateChanged, this, [this] (int state) {
@@ -226,8 +192,6 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
         settings.setValue("regenerateHoerbertXml", m_regenerateXmlCheck->isChecked());
         settings.endGroup();
     });
-
-    connect(m_collectSupportInfoButton, &QPushButton::clicked, this, &AdvancedFeaturesDialog::collectInformationForSupport);
 
     connect(m_closeButton, &QPushButton::clicked, this, &QDialog::close);
 
@@ -261,9 +225,6 @@ void AdvancedFeaturesDialog::readSettings()
     else
         m_normalVolumeOption->setChecked(true);
 
-    bool darkMode = settings.value("darkMode").toBool();
-    m_darkModeOption->setChecked(darkMode);
-
     bool showReminder = settings.value("showBackupReminder").toBool();
     m_reminderOption->setChecked(showReminder);
 
@@ -282,15 +243,4 @@ void AdvancedFeaturesDialog::writeVolumeSettings(const QString &volume)
     settings.beginGroup("Global");
     settings.setValue("volume", volume);
     settings.endGroup();
-}
-
-void AdvancedFeaturesDialog::setDiagnosticsSwitchingEnabled(bool enable)
-{
-    m_diagnosticsLabel->setEnabled(enable);
-    m_diagnosticsButton->setEnabled(enable);
-}
-
-void AdvancedFeaturesDialog::collectInformationForSupport()
-{
-    emit collectInformationForSupportRequested();
 }

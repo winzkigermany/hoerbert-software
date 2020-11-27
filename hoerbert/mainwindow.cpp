@@ -122,10 +122,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_aboutDlg, &AboutDialog::checkForUpdateRequested, this, &MainWindow::checkForUpdates);
 
-    connect(m_featuresDlg, &AdvancedFeaturesDialog::diagnosticsModeSwitched, this, &MainWindow::switchDiagnosticsMode);
-
-    connect(m_featuresDlg, &AdvancedFeaturesDialog::collectInformationForSupportRequested, this, &MainWindow::collectInformationForSupport);
-
     connect(m_featuresDlg, &AdvancedFeaturesDialog::buttonSettingsChanged, this, [this]() {
         m_cardPage->updateButtons();
     });
@@ -167,9 +163,21 @@ MainWindow::MainWindow(QWidget *parent)
             m_backupAction->setEnabled(false);
             m_restoreAction->setEnabled(false);
             m_formatAction->setEnabled(false);
-            if (m_cardPage->isDiagnosticsModeEnabled())
+            m_selectManually->setEnabled(true);
+
+            if( driveName.isEmpty() )
+            {
+                m_toggleDiagnosticsModeAction->setEnabled(false);
+                m_toggleDiagnosticsModeAction->setChecked(false);
+            }
+
+            if( m_cardPage->isDiagnosticsModeEnabled() && !driveName.isEmpty() )
+            {
                 m_advancedFeaturesAction->setEnabled(false);
-//            m_selectManually->setEnabled(true);
+                m_toggleDiagnosticsModeAction->setEnabled(true);
+                m_toggleDiagnosticsModeAction->setChecked(true);
+            }
+
         }
         else {
             // enable menu actions
@@ -178,7 +186,8 @@ MainWindow::MainWindow(QWidget *parent)
             m_restoreAction->setEnabled(true);
             m_formatAction->setEnabled(true);
             m_advancedFeaturesAction->setEnabled(true);
-//            m_selectManually->setEnabled(false);
+            m_toggleDiagnosticsModeAction->setEnabled(true);
+            m_selectManually->setEnabled(false);
 
             if (remind_backup)
                 this->remindBackup();
@@ -220,7 +229,7 @@ MainWindow::MainWindow(QWidget *parent)
         this->m_migrationPath = dirPath;
     });
 
-    connect(m_cardPage, &CardPage::diagnosticsModeSwitched, this, &MainWindow::switchDiagnosticsMode);
+    connect(m_cardPage, &CardPage::toggleDiagnosticsMode, this, &MainWindow::switchDiagnosticsMode);
 
     connect(m_cardPage, &CardPage::plausibilityFixNeeded, this, &MainWindow::makePlausible);
 
@@ -1072,10 +1081,9 @@ void MainWindow::collectInformationForSupport()
         QMessageBox::information(this, tr("Collecting support information"), tr("Failed to copy the zip file from [%1] to: [%2]").arg( collect_path+".zip" ).arg( destinationZipFilename ) );
     }
 
-    // clean up
     if (tmp_dir.exists())
     {
- //       tmp_dir.removeRecursively();
+        tmp_dir.removeRecursively();
     }
 
     QApplication::restoreOverrideCursor();
@@ -1290,7 +1298,6 @@ void MainWindow::advancedFeatures()
 {
     m_featuresDlg->show();
     m_featuresDlg->readSettings();
-    m_featuresDlg->setDiagnosticsSwitchingEnabled(!m_cardPage->currentDriveName().isEmpty() && !m_cardPage->isDiagnosticsModeEnabled());
 }
 
 void MainWindow::selectDestinationManually()
@@ -1307,10 +1314,13 @@ void MainWindow::selectDestinationManually()
     }
 }
 
-void MainWindow::switchDiagnosticsMode(bool enabled)
+void MainWindow::switchDiagnosticsMode()
 {
-    if (enabled)
+    bool doEnable = !m_cardPage->isDiagnosticsModeEnabled();
+
+    if (doEnable)
     {
+        m_toggleDiagnosticsModeAction->setChecked(true);
         // if on playlist page, discard changes and quit the page to card page
         if (m_stackWidget->currentIndex() == 1)
         {
@@ -1322,6 +1332,10 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
                                                                               "Create a backup now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
         if (selected == QMessageBox::Yes)
             backupCard();
+    }
+    else
+    {
+        m_toggleDiagnosticsModeAction->setChecked(false);
     }
 
     auto drive_path = m_cardPage->currentDrivePath();
@@ -1341,7 +1355,7 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
 
     m_isWritingToDisk = true;
 
-    if (enabled) // switch to diagnostics mode
+    if (doEnable) // switch to diagnostics mode
     {
         m_progress->setWindowTitle(tr("Switching to diagnostics mode"));
 
@@ -1430,6 +1444,7 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
         if (!file.exists() && !file.open(QIODevice::WriteOnly))
             qDebug() << "Failed creating diagnostics mode file.";
 
+        m_cardPage->switchDiagnosticsMode(true);
         m_progress->setValue(100);
         QApplication::processEvents();
     }
@@ -1519,15 +1534,22 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
                 qDebug() << "Failed moving backup info file";
         }
 
+        bool criticalError = false;
         if (dir.exists(CARD_INFO_FILE))
         {
-            if (!moveFile(tailPath(original_path) + CARD_INFO_FILE, drive_path + CARD_INFO_FILE))
+            if (!moveFile(tailPath(original_path) + CARD_INFO_FILE, drive_path + CARD_INFO_FILE)){
+                criticalError = true;                   // there's nothing we can do but stay in diagnostics mode.
                 qDebug() << "Failed moving card info file";
+            }
         }
 
-        if (!dir.removeRecursively())
-        {
-            qDebug() << "Failed removing empty original directory";
+        if( !criticalError ){
+            if (!dir.removeRecursively())
+            {
+                qDebug() << "Failed removing empty original directory";
+            }
+
+            m_cardPage->switchDiagnosticsMode(false);
         }
 
         m_progress->setValue(100);
@@ -1536,16 +1558,14 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
 
     sync();
 
-    m_featuresDlg->setDiagnosticsSwitchingEnabled(!enabled);
     m_progress->close();
     m_progress->deleteLater();
-    m_cardPage->switchDiagnosticsMode(enabled);
     QApplication::processEvents();
 
-    m_printAction->setEnabled(!enabled);
-    m_backupAction->setEnabled(!enabled);
-    m_restoreAction->setEnabled(!enabled);
-    m_formatAction->setEnabled(!enabled);
+    m_printAction->setEnabled(!doEnable);
+    m_backupAction->setEnabled(!doEnable);
+    m_restoreAction->setEnabled(!doEnable);
+    m_formatAction->setEnabled(!doEnable);
 
     QApplication::restoreOverrideCursor();
     qApp->processEvents();
@@ -1554,11 +1574,6 @@ void MainWindow::switchDiagnosticsMode(bool enabled)
 void MainWindow::about()
 {
     m_aboutDlg->show();
-}
-
-void MainWindow::findMusicAndAudioBooks()
-{
-    QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/contents/")));
 }
 
 void MainWindow::checkForUpdates()
@@ -2049,6 +2064,82 @@ void MainWindow::createActions()
 #endif
 */
 
+    m_viewMenu = new QMenu(tr("View"), this);
+    menuBar()->addMenu(m_viewMenu);
+
+    m_darkModeAction = new QAction(tr("Dark mode"), this);
+    m_darkModeAction->setStatusTip(tr("Switch on or off dark mode"));
+    m_darkModeAction->setEnabled(true);
+    m_darkModeAction->setCheckable(true);
+    connect(m_darkModeAction, &QAction::triggered, this, [this] () {
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("darkMode", m_darkModeAction->isChecked());
+        settings.endGroup();
+
+        QMessageBox::information(this, tr("Dark mode switch"), tr("Please restart this app to see the change."));
+    });
+
+    {
+        QSettings settings;
+        settings.beginGroup("Global");
+        bool darkMode = settings.value("darkMode").toBool();
+        m_darkModeAction->setChecked( darkMode );
+        settings.endGroup();
+    }
+    m_viewMenu->addAction(m_darkModeAction);
+
+
+    m_subMenuColumns = new QMenu(tr("Playlist columns..."), this);
+    m_viewMenu->addMenu(m_subMenuColumns);
+
+    m_showAlbumAction = new QAction(tr("Show artist column in playlists"), this);
+    m_showAlbumAction->setStatusTip(tr("Show artist column in playlists"));
+    m_showAlbumAction->setEnabled(true);
+    m_showAlbumAction->setCheckable(true);
+    connect(m_showAlbumAction, &QAction::triggered, this, [this] () {
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("album", m_showAlbumAction->isChecked() );
+        settings.endGroup();
+
+        changeAlbumColumnVisibility( m_showAlbumAction->isChecked() );
+    });
+
+    {
+        QSettings settings;
+        settings.beginGroup("Global");
+        bool enabled = settings.value("album").toBool();
+        settings.endGroup();
+        m_showAlbumAction->setChecked(enabled);
+    }
+    m_subMenuColumns->addAction(m_showAlbumAction);
+
+
+    m_showPathAction = new QAction(tr("Show comment column in playlists"), this);
+    m_showPathAction->setStatusTip(tr("Show comment column in playlists"));
+    m_showPathAction->setEnabled(true);
+    m_showPathAction->setCheckable(true);
+    connect(m_showPathAction, &QAction::triggered, this, [this] () {
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("comment", m_showPathAction->isChecked() );
+        settings.endGroup();
+
+        changeCommentColumnVisibility( m_showPathAction->isChecked() );
+    });
+
+    {
+        QSettings settings;
+        settings.beginGroup("Global");
+        bool enabled = settings.value("comment").toBool();
+        settings.endGroup();
+        m_showPathAction->setChecked(enabled);
+    }
+    m_subMenuColumns->addAction(m_showPathAction);
+
+
+
     m_extrasMenu = new QMenu(tr("E&xtras"), this);
     menuBar()->addMenu(m_extrasMenu);
 
@@ -2106,13 +2197,40 @@ void MainWindow::createActions()
 
     findBooksAction = new QAction(tr("&Find music and audio books"), this);
     findBooksAction->setStatusTip(tr("Find music and audio books"));
-    connect(findBooksAction, &QAction::triggered, this, &MainWindow::findMusicAndAudioBooks);
+    connect(findBooksAction, &QAction::triggered, this, [=](){
+        QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/contents/")));
+    });
     m_helpMenu->addAction(findBooksAction);
 
     checkUpdatesAction = new QAction(tr("&Check for updates"), this);
     checkUpdatesAction->setStatusTip(tr("Check for updates"));
     connect(checkUpdatesAction, &QAction::triggered, this, &MainWindow::checkForUpdates);
     m_helpMenu->addAction(checkUpdatesAction);
+
+    m_helpMenu->addSeparator();
+
+    m_visitServiceWebsiteAction = new QAction(tr("Visit service web site"), this);
+    m_visitServiceWebsiteAction->setStatusTip(tr("Visit service web site"));
+    connect(m_visitServiceWebsiteAction, &QAction::triggered, this, [=](){
+        QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/service/hoerbert-application")));
+    });
+    m_helpMenu->addAction(m_visitServiceWebsiteAction);
+
+    m_serviceToolsMenu = new QMenu(tr("Service tools"), this);
+    m_helpMenu->addMenu(m_serviceToolsMenu);
+
+    m_collectDataAction = new QAction(tr("Collect data for service"), this);
+    m_collectDataAction->setStatusTip(tr("Collect data for service"));
+    connect(m_collectDataAction, &QAction::triggered, this, &MainWindow::collectInformationForSupport);
+    m_serviceToolsMenu->addAction(m_collectDataAction);
+
+    m_toggleDiagnosticsModeAction = new QAction(tr("Diagnostics mode"), this);
+    m_toggleDiagnosticsModeAction->setStatusTip(tr("Switch card to diagnostics mode and back"));
+    m_toggleDiagnosticsModeAction->setCheckable(true);
+    m_toggleDiagnosticsModeAction->setEnabled(false);
+    m_toggleDiagnosticsModeAction->setChecked(false);
+    connect(m_toggleDiagnosticsModeAction, &QAction::triggered, this, &MainWindow::switchDiagnosticsMode);
+    m_serviceToolsMenu->addAction(m_toggleDiagnosticsModeAction);
 }
 
 bool MainWindow::copyRecursively(const QString &sourceFolder, const QString &destFolder)
@@ -2175,6 +2293,7 @@ void MainWindow::showHideEditMenuEntries( bool showHide )
         m_restoreAction->setEnabled(false);
         m_formatAction->setEnabled(false);
         m_advancedFeaturesAction->setEnabled(false);
+        m_toggleDiagnosticsModeAction->setEnabled(false);
 
     }
     else
@@ -2199,5 +2318,9 @@ void MainWindow::showHideEditMenuEntries( bool showHide )
         m_restoreAction->setEnabled(true);
         m_formatAction->setEnabled(true);
         m_advancedFeaturesAction->setEnabled(false);
+
+        m_toggleDiagnosticsModeAction->setEnabled(true);
+
     }
 }
+

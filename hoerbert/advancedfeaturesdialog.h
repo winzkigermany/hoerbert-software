@@ -62,28 +62,7 @@ public:
      */
     void writeVolumeSettings(const QString &);
 
-    /**
-     * @brief enable/disable diagnostics switching
-     * @param enable
-     */
-    void setDiagnosticsSwitchingEnabled(bool enable);
-
-    /**
-     * @brief collect information for support and output to a plain text file
-     */
-    void collectInformationForSupport();
-
 signals:
-    /**
-     * @brief this signal is emitted when state of diagnostics checkbox is changed
-     * @param enabled true when the mode is enabled, otherwise false
-     */
-    void diagnosticsModeSwitched(bool enabled);
-
-    /**
-     * @brief this signal is emitted when user click on collect button to get information for support
-     */
-    void collectInformationForSupportRequested();
 
     /**
      * @brief buttonSettingsChanged
@@ -108,15 +87,9 @@ private:
     QRadioButton *m_normalVolumeOption;
     QRadioButton *m_maxVolumeOption;
 
-    QCheckBox *m_darkModeOption;
     QCheckBox *m_reminderOption;
     QCheckBox *m_showLargeDriveCheck;
     QCheckBox *m_regenerateXmlCheck;
-
-    QLabel *m_diagnosticsLabel;
-    QPushButton *m_diagnosticsButton;
-
-    QPushButton *m_collectSupportInfoButton;
 
     QPushButton *m_closeButton;
 
@@ -125,7 +98,6 @@ private:
     QHBoxLayout *m_showButtonLayout;
     QHBoxLayout *m_optionLayout;
     QVBoxLayout *m_checkLayout;
-    QHBoxLayout *m_diagLayout;
 };
 
 #endif // ADVANCEDFEATURESDIALOG_H

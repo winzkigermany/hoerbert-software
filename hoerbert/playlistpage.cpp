@@ -44,6 +44,7 @@
 #include "piebutton.h"
 #include "playlistview.h"
 #include "audioinfothread.h"
+#include "mainwindow.h"
 #include "functions.h"
 
 PlaylistPage::PlaylistPage(QWidget *parent)
@@ -71,11 +72,10 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_leftToolLayout = new QHBoxLayout();
     m_leftToolLayout->setAlignment(Qt::AlignLeft);
 
-    m_viewConfigButton = new QPushButton(this);
-    m_viewConfigButton->setFlat(true);
-    m_viewConfigButton->setObjectName("ColorblindHint");
-    m_viewConfigButton->setGeometry(QRect(QPoint(0, 0), QSize(42, 42)));
-    connect( m_viewConfigButton, &QPushButton::released, this, &PlaylistPage::setTableColumns );
+    m_colorBlindHintLabel = new QLabel(this);
+    m_colorBlindHintLabel->setObjectName("ColorblindHint");
+    m_colorBlindHintLabel->setScaledContents(true);
+    m_colorBlindHintLabel->setFixedSize(42, 42);
 
     m_silenceLabel = new QLabel(this);
     m_silenceLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
@@ -97,7 +97,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));
     m_addSilenceButton->setToolTip(tr("Add silence of given duration") + QString(" (Ctrl+S)"));
 
-    m_leftToolLayout->addWidget(m_viewConfigButton);
+    m_leftToolLayout->addWidget(m_colorBlindHintLabel);
     m_leftToolLayout->addSpacing(10);
     m_leftToolLayout->addWidget(m_silenceLabel);
     m_leftToolLayout->addWidget(m_silenceDuration);
@@ -161,26 +161,13 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     setTabOrder(m_playlistView, m_silenceDuration);
     m_playlistView->setFocus();
 
-    m_configViewMenu = new QMenu(this);
-
-    m_actionAlbumVisible = new QAction(tr("Show album"), this);
-    m_actionAlbumVisible->setCheckable(true);
-    m_actionAlbumVisible->setChecked(columnVisibleFromSettings("album"));
-    connect(m_actionAlbumVisible, &QAction::triggered, this, [this]() {
-       this->updateColumnVisibleSettings("album", m_actionAlbumVisible->isChecked());
-       this->m_playlistView->setColumnVisible(METADATA_ALBUM_COLUMN_INDEX, m_actionAlbumVisible->isChecked());
+    connect( (MainWindow*)parent, &MainWindow::changeAlbumColumnVisibility, [this]( bool onOff ) {
+       m_playlistView->setColumnVisible(METADATA_ALBUM_COLUMN_INDEX, onOff);
     });
 
-    m_actionCommentVisible = new QAction(tr("Show paths"), this);
-    m_actionCommentVisible->setCheckable(true);
-    m_actionCommentVisible->setChecked(columnVisibleFromSettings("comment"));
-    connect(m_actionCommentVisible, &QAction::triggered, this, [this]() {
-       this->updateColumnVisibleSettings("comment", m_actionCommentVisible->isChecked());
-       this->m_playlistView->setColumnVisible(METADATA_COMMENT_COLUMN_INDEX, m_actionCommentVisible->isChecked());
+    connect( (MainWindow*)parent, &MainWindow::changeCommentColumnVisibility, [this]( bool onOff ) {
+       m_playlistView->setColumnVisible(METADATA_COMMENT_COLUMN_INDEX, onOff);
     });
-
-    m_configViewMenu->addAction(m_actionAlbumVisible);
-    m_configViewMenu->addAction(m_actionCommentVisible);
 
     if (!columnVisibleFromSettings("album"))
         m_playlistView->setColumnVisible(METADATA_ALBUM_COLUMN_INDEX, false);
@@ -225,11 +212,7 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
         pixmap.load( QString(":/images/colorblind_hint_0%1.png").arg(dir_num + 1) );
     }
 
-
-    QIcon iconBack( pixmap.copy(100, 100, 400, 400));
-    m_viewConfigButton->setIcon(iconBack);
-    m_viewConfigButton->setIconSize(QSize(42,42));
-    m_viewConfigButton->setFixedSize(QSize(42,42));
+    m_colorBlindHintLabel->setPixmap(pixmap.copy(100, 100, 400, 400));
 
     m_originalList[dir_num] = result;
     m_playlistView->load(result, dir_num);
@@ -415,11 +398,6 @@ void PlaylistPage::contextMenuEvent(QContextMenuEvent *e)
     ; // there is no context menu, since we don't need it (yet?)
 }
 
-void PlaylistPage::setTableColumns()
-{
-      m_configViewMenu->exec(QCursor::pos());
-}
-
 void PlaylistPage::onClosePage(bool doCommitChanges)
 {
     m_playlistView->stopPlayer();
@@ -552,19 +530,11 @@ int PlaylistPage::getSelectedSilenceDurationInSeconds()
     return duration;
 }
 
-void PlaylistPage::updateColumnVisibleSettings(const QString &columnName, bool visible)
-{
-    QSettings settings;
-    settings.beginGroup("Playlist");
-    settings.setValue(columnName, visible);
-    settings.endGroup();
-}
-
 bool PlaylistPage::columnVisibleFromSettings(const QString &columnName)
 {
     bool ret;
     QSettings settings;
-    settings.beginGroup("Playlist");
+    settings.beginGroup("Global");
     ret = settings.value(columnName).toBool();
     settings.endGroup();
 

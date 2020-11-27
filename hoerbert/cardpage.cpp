@@ -197,7 +197,7 @@ CardPage::CardPage(QWidget *parent)
     connect(m_ejectDriveButton, &QPushButton::clicked, this, &CardPage::ejectDrive);
 
     connect(m_return2Normal, &QPushButton::clicked, this, [this] () {
-        emit this->diagnosticsModeSwitched();
+        toggleDiagnosticsMode();
     });
 
 #if defined (Q_OS_WIN)

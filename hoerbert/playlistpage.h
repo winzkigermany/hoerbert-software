@@ -156,11 +156,6 @@ private slots:
      */
     void onClosePage(bool doCommitChanges);
 
-    /**
-     * @brief this signal must open the configuration menu for the view configuration
-     */
-    void setTableColumns();
-
 private:
     /**
      * @brief getSelectedSilenceDurationInSeconds get duration of silence from combobox in seconds
@@ -190,8 +185,8 @@ private:
     QMap<int, AudioList> m_originalList;
     QMap<int, AudioList> m_implicitlyMovedList;
 
-    QPushButton *m_viewConfigButton;
     QLabel *m_silenceLabel;
+    QLabel *m_colorBlindHintLabel;
     QComboBox *m_silenceDuration;
     PieButton *m_addSilenceButton;
     PieButton *m_addButton;
@@ -207,10 +202,6 @@ private:
     QHBoxLayout *m_rightToolLayout;
 
     QPalette m_pal;
-
-    QMenu *m_configViewMenu;
-    QAction *m_actionAlbumVisible;
-    QAction *m_actionCommentVisible;
 };
 
 #endif // PLAYLISTPAGE_H
