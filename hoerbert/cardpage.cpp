@@ -754,6 +754,9 @@ void CardPage::setCardManageButtonsEnabled(bool flag)
 
 void CardPage::switchDiagnosticsMode(bool enabled)
 {
+    if( enabled == isDiagnosticsModeEnabled() )
+        return;
+
     m_stackWidget->setCurrentIndex(enabled ? 1 : 0);
     if (!enabled)
         selectDrive();

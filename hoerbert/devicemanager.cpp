@@ -463,6 +463,8 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 {
     if( isWorkingOnCustomDirectory() ){ // we're working on a custom directory, not a drive that's ejectable.
         m_custom_destination_path = QString();
+        m_currentDrive = QString();
+        m_currentDriveName = QString();
         return SUCCESS;
     }
 
