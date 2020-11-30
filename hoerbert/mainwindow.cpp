@@ -612,6 +612,29 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
     loop.exec();
 }
 
+QString MainWindow::printButtons( int currentPlaylistIndex )
+{
+    QString contents = "";
+    contents += "<div><table>";
+    for (int l=0; l < 3; l++) {
+        contents += "<tr>";
+        for (int j=0; j < 3; j++) {
+            contents += "<td>";
+            contents += QString("<span style='height: 10px; width: 10px; opacity: %3;background-color: %1; "
+                                "border-radius: 50%; border: 2px solid %2;display: inline-block'>"
+                                "</span>")
+                    .arg(COLOR_LIST.at(l * 3 + j))
+                    .arg(COLOR_LIST.at(l * 3 + j))
+                    .arg(currentPlaylistIndex == (l * 3 + j) ? "1" : "0.1");
+            contents += "</td>";
+        }
+        contents += "</tr>";
+    }
+    contents += "</table></div>";
+
+    return contents;
+}
+
 void MainWindow::printHtml(const AudioList &list, const QString &outputPath, bool showOnBrowser)
 {
     if (list.count() <= 0)
@@ -638,8 +661,8 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
     QString block_end = "</div>";
 
     // %1: order number(filename + 1), %2: metadata of audio
-    QString tableStart = "<table class='item' cellspacing='5'>";
-    QString tableEnd = "</table>";
+    QString tableStart = "<div><table class='item' cellspacing='5'>";
+    QString tableEnd = "</table></div>";
     QString item = "<tr><td class='track' style='font-weight:bold;'>"
                    "%1"
                    "</td>"
@@ -655,94 +678,33 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
 
 
     QString contents = QString("");
-    int prev_dir_num = -1;
-    int id = 1;
-    for (const auto& entry : list)
+    QVector< QVector<AudioEntry> > playListList(9);
+
+    // pre-sort by playlist
+    for (const AudioEntry& entry : list)
     {
-        int new_dir_num = entry.path.section("/", -2).section("/", 0, 0).toInt();
-        if (new_dir_num != prev_dir_num) {
-            if (prev_dir_num != -1) {
-                contents += tableEnd;
-                contents += block_end;
-                id = 1;
-            }
-
-            if (new_dir_num - prev_dir_num > 1)
-            {
-                for (int i = prev_dir_num + 1; i < new_dir_num; i++)
-                {
-                    contents += block_start.arg(COLOR_LIST.at(i));
-                    contents += "<table>";
-                    for (int l=0; l < 3; l++) {
-                        contents += "<tr>";
-                        for (int j=0; j < 3; j++) {
-                            contents += "<td>";
-                            contents += QString("<span style='height: 10px; width: 10px; opacity: %3;background-color: %1; "
-                                                "border-radius: 50%; border: 2px solid %2;display: inline-block'>"
-                                                "</span>")
-                                    .arg(COLOR_LIST.at(l * 3 + j))
-                                    .arg(COLOR_LIST.at(l * 3 + j))
-                                    .arg(i == (l * 3 + j) ? "1" : "0.1");
-                            contents += "</td>";
-                        }
-                        contents += "</tr>";
-                    }
-                    contents += "</table>";
-                    contents += block_end;
-                }
-            }
-
-            contents += block_start.arg(COLOR_LIST.at(new_dir_num));
-            contents += "<table>";
-            for (int i=0; i < 3; i++) {
-                contents += "<tr>";
-                for (int j=0; j < 3; j++) {
-                    contents += "<td>";
-                    contents += QString("<span style='height: 10px; width: 10px; opacity: %3;background-color: %1; "
-                                        "border-radius: 50%; border: 2px solid %2;display: inline-block'>"
-                                        "</span>")
-                            .arg(COLOR_LIST.at(i * 3 + j))
-                            .arg(COLOR_LIST.at(i * 3 + j))
-                            .arg(new_dir_num == (i * 3 + j) ? "1" : "0.1");
-                    contents += "</td>";
-                }
-                contents += "</tr>";
-            }
-            contents += "</table>";
-            prev_dir_num = new_dir_num;
-
-            contents += tableStart;
-        }
-
-        contents += item.arg(id).arg(entry.metadata.title).arg(entry.metadata.album).arg(entry.metadata.comment);
-        id++;
+        int playlistIndex = entry.path.section("/", -2).section("/", 0, 0).toInt();
+        playListList[playlistIndex].append(entry);
     }
 
-    contents += block_end;
-
-    if (prev_dir_num != 8)
+    for( int n=0; n<9; n++ )
     {
-        for (int i = prev_dir_num + 1; i < 9; i++)
+        contents += block_start.arg(COLOR_LIST.at(n));
+        contents += printButtons( n );
+
+        int index = 0;
+        if( playListList[n].length()>0 )
         {
-            contents += block_start.arg(COLOR_LIST.at(i));
-            contents += "<table>";
-            for (int l=0; l < 3; l++) {
-                contents += "<tr>";
-                for (int j=0; j < 3; j++) {
-                    contents += "<td>";
-                    contents += QString("<span style='height: 10px; width: 10px; opacity: %3;background-color: %1; "
-                                        "border-radius: 50%; border: 2px solid %2;display: inline-block'>"
-                                        "</span>")
-                            .arg(COLOR_LIST.at(l * 3 + j))
-                            .arg(COLOR_LIST.at(l * 3 + j))
-                            .arg(i == (l * 3 + j) ? "1" : "0.1");
-                    contents += "</td>";
-                }
-                contents += "</tr>";
+            contents += tableStart;
+            for (const AudioEntry& entry : playListList[n])
+            {
+                contents += item.arg(index).arg(entry.metadata.title).arg(entry.metadata.album).arg(entry.metadata.comment);   // all the rows of this playlist
+                index++;
             }
-            contents += "</table>";
-            contents += block_end;
+            contents += tableEnd;
         }
+
+        contents += block_end;
     }
 
     QString html = "<html>" + head + body.arg(tr("hörbert table of contents"))

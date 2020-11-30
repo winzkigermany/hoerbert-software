@@ -132,6 +132,8 @@ private:
 
     void doRestoreBackup(const QString &sourcePath, bool doMerge );
 
+    QString printButtons(int);
+
     bool m_isWritingToDisk;
     QString m_migrationPath;
     BackupManager *m_backupManager;
