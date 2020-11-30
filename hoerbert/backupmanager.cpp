@@ -406,6 +406,8 @@ bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString des
     arguments.append(sourcePath);
     arguments.append("-y");
     arguments.append("-hide_banner");
+    arguments.append("-v");
+    arguments.append("quiet");
     arguments.append(destPath);
 
     m_process->start(FFMPEG_PATH, arguments);
@@ -466,10 +468,11 @@ void BackupManager::OnProcessReadyReadStandardError()
 
 void BackupManager::OnProcessReadyReadStandardOutput()
 {
-    qDebug() << m_process->readAllStandardOutput();
+//    qDebug() << m_process->readAllStandardOutput();
 }
 
 void BackupManager::OnProcessStateChanged(QProcess::ProcessState newState)
 {
-    qDebug() << " + Process state changed to" << newState;
+    Q_UNUSED(newState);
+//    qDebug() << " + Process state changed to" << newState;
 }
