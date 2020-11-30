@@ -308,6 +308,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
     }
 
     m_cardPage->update();
+    sync();
     m_plausibilityCheckMutex.unlock();
 }
 
@@ -647,6 +648,11 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
     QString head = QString("<head>"
                    "<META http-equiv=Content-Type content='text/html; charset=utf-8'>"
                    "<title>%1 [%2]</title>"
+                   "<style>"
+                           "table.items { border: none; border-collapse: collapse; margin:1em; }"
+                           "table.items td { border-left: 1px solid #cccccc; padding-left:1em; padding-right:1em; }"
+                           "table.items td:first-child { border-left: none; }"
+                   "</style>"
                    "</head>").arg(tr("hoerbert table of contents")).arg(m_cardPage->currentDriveName());
 
     // %1: constant string "hoerbert table of contents", %2: drive name, %3: contents
@@ -661,20 +667,35 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
     QString block_end = "</div>";
 
     // %1: order number(filename + 1), %2: metadata of audio
-    QString tableStart = "<div><table class='item' cellspacing='5'>";
+    QString tableStart = "<div><table class='items'>";
     QString tableEnd = "</table></div>";
     QString item = "<tr><td class='track' style='font-weight:bold;'>"
                    "%1"
                    "</td>"
-                   "<td class='title' style=''>"
+                   "<td class='title'>"
                    "%2"
-                   "</td>"
-                   "<td class='artist' style=''>"
-                   "%3"
-                   "</td>"
-                   "<td class='file' style=''>"
-                   "%4"
-                   "</td></tr>";
+                   "</td>";
+
+    QSettings settings;
+    settings.beginGroup("Global");
+
+    if(settings.value("album").toBool())
+    {
+        item += "<td class='album'>"
+                "%3"
+                "</td>";
+    }
+
+    if(settings.value("comment").toBool())
+    {
+        item += "<td class='file'>"
+                "%4"
+                "</td>";
+    }
+
+    settings.endGroup();
+
+    item += "</tr>";
 
 
     QString contents = QString("");
@@ -2014,8 +2035,8 @@ void MainWindow::createActions()
     m_subMenuColumns = new QMenu(tr("Playlist columns..."), this);
     m_viewMenu->addMenu(m_subMenuColumns);
 
-    m_showAlbumAction = new QAction(tr("Show artist column in playlists"), this);
-    m_showAlbumAction->setStatusTip(tr("Show artist column in playlists"));
+    m_showAlbumAction = new QAction(tr("Show album column in playlists"), this);
+    m_showAlbumAction->setStatusTip(tr("Show album column in playlists"));
     m_showAlbumAction->setEnabled(true);
     m_showAlbumAction->setCheckable(true);
     connect(m_showAlbumAction, &QAction::triggered, this, [this] () {
