@@ -156,7 +156,7 @@ bool BackupRestoreDialog::parseXml(const QString &fileName)
     if(xml.hasError())
     {
         qDebug() << "xmlError occurred when reading info.xml";
-        return false;
+        //return false; // this may not be fatal. Worst case: No information about the backup was found.
     }
 
     xml.clear();
