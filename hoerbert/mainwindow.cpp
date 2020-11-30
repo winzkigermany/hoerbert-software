@@ -21,16 +21,15 @@
 
 #include "mainwindow.h"
 
+#include <QProcess>
+
 #include <QApplication>
-#include <QWidget>
 #include <QLayout>
 #include <QCheckBox>
-#include <QStackedWidget>
-#include <QAction>
+
 #include <QMenuBar>
 #include <QFileDialog>
-#include <QGraphicsDropShadowEffect>
-#include <QProgressDialog>
+
 #include <QPushButton>
 #include <QMessageBox>
 #include <QDate>
@@ -43,22 +42,8 @@
 #include <QDesktopWidget>
 #include <QSettings>
 #include <QDebug>
-#include <QMutex>
 #include <QLocale>
 
-#include "aboutdialog.h"
-#include "advancedfeaturesdialog.h"
-#include "cardpage.h"
-#include "playlistpage.h"
-#include "capacitybar.h"
-#include "hoerbertprocessor.h"
-#include "backupmanager.h"
-#include "debugdialog.h"
-#include "xmlmetadatareader.h"
-#include "audioinfothread.h"
-#include "version.h"
-#include "functions.h"
-#include "playlistview.h"
 
 extern QString SYNC_PATH;
 extern QString HOERBERT_TEMP_PATH;
@@ -109,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_aboutDlg = new AboutDialog(this);
 
     m_featuresDlg = new AdvancedFeaturesDialog(this);
+    m_featuresDlg->setModal(true);
 
     m_stackWidget->addWidget(m_cardPage);
     m_stackWidget->addWidget(m_playlistPage);
@@ -652,7 +638,7 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
     QString block_end = "</div>";
 
     // %1: order number(filename + 1), %2: metadata of audio
-    QString tableStart = "<table class='item'>";
+    QString tableStart = "<table class='item' cellspacing='5'>";
     QString tableEnd = "</table>";
     QString item = "<tr><td class='track' style='font-weight:bold;'>"
                    "%1"
@@ -1177,7 +1163,7 @@ void MainWindow::backupCard()
     qApp->processEvents();
 }
 
-void MainWindow::restoreBackup()
+void MainWindow::restoreBackupQuestion()
 {
     QString sourcePath = QFileDialog::getExistingDirectory(this, tr("Please select the backup directory you want to restore"), QString());
     if (sourcePath.isEmpty())
@@ -1185,49 +1171,22 @@ void MainWindow::restoreBackup()
 
     sourcePath = tailPath(sourcePath);
 
-    QString stamp = "";
+    m_backupRestoreDialog = new BackupRestoreDialog();
+    m_backupRestoreDialog->setSourcePath(sourcePath);
+    m_backupRestoreDialog->setParent( this );
+    m_backupRestoreDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    m_backupRestoreDialog->setWindowModality(Qt::ApplicationModal);
+    m_backupRestoreDialog->setModal(true);
+    m_backupRestoreDialog->open();
 
-    QFile file(sourcePath + BACKUP_INFO_FILE);
-    if (file.open(QIODevice::ReadOnly))
-    {
-        QTextStream stream(&file);
-        QString line = "";
-        while(!stream.atEnd())
-        {
-            line = QString(stream.readLine());
-            if (line.startsWith("<?") || line.startsWith("<hoerbert") || line.startsWith("</") || !line.startsWith("<"))
-                continue;
+    connect(m_backupRestoreDialog, &BackupRestoreDialog::mergeClicked, this, &MainWindow::doRestoreBackup );
+    connect(m_backupRestoreDialog, &BackupRestoreDialog::overwriteClicked, this, &MainWindow::doRestoreBackup );
+}
 
-            stamp += line.section(">", 0, 0).section("<", 1) + ": " + line.section(">", 1).section("<", 0, 0) + "\n";
-        }
-        file.close();
-    }
+void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
+{
 
-    if (!stamp.isEmpty())
-    {
-        stamp += "\n\n" + tr("Please click Yes to continue restore. No to cancel.");
-
-        auto selected = QMessageBox::question(this, tr("Backup Information"), stamp, QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
-
-        if (selected == QMessageBox::No)
-            return;
-    }
-
-    auto selected = QMessageBox::question(this, tr("Restore backup to memory card"), tr("Click 'Yes' to merge backup contents with the memory card \nor 'No' to restore only the backup"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
-
-    bool restore_only = false;
-    if (selected == QMessageBox::Cancel)
-    {
-        return;
-    }
-    else if (selected == QMessageBox::Yes)
-    {
-        restore_only = false;
-    }
-    else if (selected == QMessageBox::No)
-    {
-        restore_only = true;
-    }
+    bool restore_only = !doMerge;
 
     QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
     qApp->processEvents();
@@ -1296,7 +1255,7 @@ void MainWindow::formatCard()
 
 void MainWindow::advancedFeatures()
 {
-    m_featuresDlg->show();
+    m_featuresDlg->open();
     m_featuresDlg->readSettings();
 }
 
@@ -1573,7 +1532,7 @@ void MainWindow::switchDiagnosticsMode()
 
 void MainWindow::about()
 {
-    m_aboutDlg->show();
+    m_aboutDlg->open();
 }
 
 void MainWindow::checkForUpdates()
@@ -2160,7 +2119,7 @@ void MainWindow::createActions()
     m_restoreAction = new QAction(tr("&Restore a backup"), this);
     m_restoreAction->setStatusTip(tr("Restore a backup"));
     m_restoreAction->setEnabled(false);
-    connect(m_restoreAction, &QAction::triggered, this, &MainWindow::restoreBackup);
+    connect(m_restoreAction, &QAction::triggered, this, &MainWindow::restoreBackupQuestion);
     m_extrasMenu->addAction(m_restoreAction);
 
     m_extrasMenu->addSeparator();

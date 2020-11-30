@@ -38,5 +38,7 @@
         <file>images/colorblind_hint_07_dark.png</file>
         <file>images/colorblind_hint_08_dark.png</file>
         <file>images/colorblind_hint_09_dark.png</file>
+        <file>images/merge_copy.png</file>
+        <file>images/overwrite_copy.png</file>
     </qresource>
 </RCC>

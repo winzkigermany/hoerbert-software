@@ -21,12 +21,8 @@
 
 #include "aboutdialog.h"
 
-#include <QLabel>
-#include <QTextBrowser>
-#include <QLayout>
 #include <QLocale>
 #include <QWidget>
-#include <QPushButton>
 #include <QApplication>
 
 #include "version.h"
@@ -45,11 +41,10 @@ AboutDialog::AboutDialog(QWidget* parent)
     setSizePolicy(sizePolicy);
     setWindowTitle(tr("About this software"));
 
-
     m_disclaimer = new QTextBrowser(this);
     m_disclaimer->setObjectName("disclaimer");
     m_disclaimer->setAlignment(Qt::AlignHCenter);
-    m_disclaimer->resize( 620, 160 );
+    m_disclaimer->resize( 600, 160 );
     m_disclaimer->setLocale(QLocale(QLocale::English, QLocale::UnitedStates));
     m_disclaimer->setReadOnly(true);
     m_disclaimer->setStyleSheet("#disclaimer {background: white; color: black}");
@@ -77,20 +72,17 @@ AboutDialog::AboutDialog(QWidget* parent)
     m_company = new QLabel(this);
     m_company->setObjectName(QString("company"));
     m_company->setFont(font);
-    m_company->setLocale(QLocale(QLocale::English, QLocale::UnitedStates));
     m_company->setAlignment(Qt::AlignCenter);
     m_company->setText(tr("h\303\266rbert Software"));
 
     m_version = new QLabel(this);
     m_version->setObjectName(QString("app_version"));
     m_version->setFont(font);
-    m_version->setLocale(QLocale(QLocale::English, QLocale::UnitedStates));
     m_version->setAlignment(Qt::AlignCenter);
     m_version->setText(tr("Version")+" "+VER_PRODUCTVERSION_STR);
 
     m_companysite = new QLabel(this);
     m_companysite->setObjectName(QString("companysite"));
-    m_companysite->setLocale(QLocale(QLocale::English, QLocale::UnitedStates));
     m_companysite->setAlignment(Qt::AlignCenter);
     m_companysite->setText(tr("www.hoerbert.com"));
 
@@ -101,16 +93,23 @@ AboutDialog::AboutDialog(QWidget* parent)
     m_checkForUpdateButton->setText(tr("Check for newer version"));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setMargin(30);
-    layout->setSpacing(10);
+    layout->setMargin(20);
+//    layout->setSpacing(10);
     layout->addWidget(m_company);
     layout->addWidget(m_copyright);
     layout->addWidget(m_companysite);
-    layout->addSpacing(30);
+    layout->addSpacing(10);
     layout->addWidget(m_version);
     layout->addWidget(m_checkForUpdateButton, 0, Qt::AlignCenter);
-    layout->addSpacing(30);
+    layout->addSpacing(10);
     layout->addWidget(m_disclaimer);
+
+    m_cancelButton = new QPushButton(this);
+    m_cancelButton->setGeometry(QRect(250, 100, 112, 32));
+    m_cancelButton->setText(tr("Close"));
+    layout->addWidget(m_cancelButton, 0, Qt::AlignRight);
+    connect( m_cancelButton, &QAbstractButton::clicked, this, &AboutDialog::close);
+
 
     connect(m_checkForUpdateButton, &QPushButton::clicked, this, [this] () {
         emit checkForUpdateRequested();

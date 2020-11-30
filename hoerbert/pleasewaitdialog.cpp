@@ -11,25 +11,30 @@ PleaseWaitDialog::PleaseWaitDialog(QDialog *parent) : QDialog(parent)
     resize(387, 146);
     m_allowClose = false;
 
+    m_layout = new QVBoxLayout(this);
+    m_layout->setContentsMargins(25, 20, 25, 25);
+
     m_label = new QLabel(this);
-    m_label->setGeometry(QRect(10, 10, 361, 101));
+    m_label->setGeometry(QRect(10, 10, 367, 101));
     m_label->setAlignment(Qt::AlignCenter);
     m_label->setText( tr("This might take several minutes.") );
+    m_layout->addWidget(m_label);
 
-    m_closeButton = new QPushButton(this);
-    m_closeButton->setGeometry(QRect(270, 110, 112, 32));
-    m_closeButton->setText(tr("OK"));
-    m_closeButton->setDisabled(true);
-
-    connect( m_closeButton, &QAbstractButton::clicked, this, &QWidget::close);
-
-    QMetaObject::connectSlotsByName(this);
 
     m_progressBar = new QProgressBar(this);
     m_progressBar->setRange(0, 0);
     m_progressBar->setValue(0);
-    m_progressBar->setGeometry(QRect(32, 110, 220, 32));
+    m_progressBar->setGeometry(QRect(32, 40, 323, 32));
+    m_layout->addWidget(m_progressBar);
     m_progressBar->show();
+
+    m_closeButton = new QPushButton(this);
+    m_closeButton->setGeometry(QRect(250, 100, 112, 32));
+    m_closeButton->setText(tr("OK"));
+    m_closeButton->setDisabled(true);
+    m_layout->addWidget(m_closeButton, 0, Qt::AlignRight);
+    connect( m_closeButton, &QAbstractButton::clicked, this, &QWidget::close);
+    QMetaObject::connectSlotsByName(this);
 
     QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
     qApp->processEvents();

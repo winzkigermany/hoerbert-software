@@ -22,31 +22,34 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QProcess>
-#include <QMutex>
-
 #include "define.h"
 
-class QWidget;
-class QLabel;
-class QVBoxLayout;
-class QHBoxLayout;
-class QStackedWidget;
-class QGraphicsDropShadowEffect;
-class QAction;
-class QMenu;
-class QProgressDialog;
-class QMutex;
+#include <QMainWindow>
+#include <QWidget>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QStackedWidget>
+#include <QGraphicsDropShadowEffect>
+#include <QAction>
+#include <QMenu>
+#include <QProgressDialog>
+#include <QMutex>
 
-class AboutDialog;
-class AdvancedFeaturesDialog;
-class CardPage;
-class PlaylistPage;
-class CapacityBar;
-class HoerbertProcessor;
-class BackupManager;
-class DebugDialog;
+#include "aboutdialog.h"
+#include "advancedfeaturesdialog.h"
+#include "cardpage.h"
+#include "playlistpage.h"
+#include "capacitybar.h"
+#include "hoerbertprocessor.h"
+#include "backupmanager.h"
+#include "debugdialog.h"
+#include "xmlmetadatareader.h"
+#include "audioinfothread.h"
+#include "version.h"
+#include "functions.h"
+#include "playlistview.h"
+#include "backuprestoredialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -92,7 +95,7 @@ private slots:
 
     void printTableOfContent(const QString &outputPath = QString(), bool showOnBrowser = true);
     void backupCard();
-    void restoreBackup();
+    void restoreBackupQuestion();
     void formatCard();
     void advancedFeatures();
     void selectDestinationManually();
@@ -127,6 +130,8 @@ private:
 
     bool copyRecursively(const QString &sourceFolder, const QString &destFolder);
 
+    void doRestoreBackup(const QString &sourcePath, bool doMerge );
+
     bool m_isWritingToDisk;
     QString m_migrationPath;
     BackupManager *m_backupManager;
@@ -136,6 +141,7 @@ private:
     AboutDialog *m_aboutDlg;
     AdvancedFeaturesDialog *m_featuresDlg;
     DebugDialog *m_dbgDlg;
+    BackupRestoreDialog *m_backupRestoreDialog;
     CardPage *m_cardPage;
     PlaylistPage *m_playlistPage;
 

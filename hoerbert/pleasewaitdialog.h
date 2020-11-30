@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QVBoxLayout>
 
 class PleaseWaitDialog : public QDialog
 {
@@ -36,6 +37,8 @@ private:
     QPushButton* m_closeButton;
 
     QProgressBar* m_progressBar;
+
+    QVBoxLayout* m_layout;
 
     /**
      * @brief flag to indicate whether we inhibit closing the dialog or not.

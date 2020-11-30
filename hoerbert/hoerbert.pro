@@ -57,6 +57,7 @@ SOURCES += \
         audiobookconverter.cpp \
         audioinfothread.cpp \
         backupmanager.cpp \
+        backuprestoredialog.cpp \
         capacitybar.cpp \
         cardpage.cpp \
         cdripper.cpp \
@@ -88,6 +89,7 @@ HEADERS += \
         audiobookconverter.h \
         audioinfothread.h \
         backupmanager.h \
+        backuprestoredialog.h \
         capacitybar.h \
         cardpage.h \
         cdripper.h \

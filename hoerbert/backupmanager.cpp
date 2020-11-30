@@ -384,7 +384,6 @@ bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString des
     arguments.append(sourcePath);
     arguments.append("-y");
     arguments.append("-hide_banner");
-
     arguments.append(destPath);
 
     m_process->start(FFMPEG_PATH, arguments);

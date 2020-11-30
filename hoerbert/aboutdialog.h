@@ -24,10 +24,10 @@
 
 #include <QDialog>
 
-class QLabel;
-class QTextBrowser;
-class QPushButton;
-class QLayout;
+#include <QLabel>
+#include <QTextBrowser>
+#include <QLayout>
+#include <QPushButton>
 
 /**
  * @brief A dialog showing more information about this software
@@ -51,6 +51,7 @@ private:
     QLabel *m_version;
     QLabel *m_companysite;
     QPushButton *m_checkForUpdateButton;
+    QPushButton *m_cancelButton;
 };
 
 #endif // ABOUTDIALOG_H

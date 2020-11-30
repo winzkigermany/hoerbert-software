@@ -145,7 +145,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_layout->addLayout(m_checkLayout, 0);
     m_layout->addLayout(m_showButtonLayout);
     m_layout->addItem(new QSpacerItem(100, 15, QSizePolicy::Fixed, QSizePolicy::Maximum));
-    m_layout->addWidget(m_closeButton, 1, Qt::AlignHCenter);
+    m_layout->addWidget(m_closeButton, 0, Qt::AlignRight);
 
     connect(m_buttonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this](int count) {
         QSettings settings;
