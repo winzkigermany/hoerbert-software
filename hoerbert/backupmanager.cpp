@@ -113,7 +113,8 @@ void BackupManager::process()
                         emit failed("Failed deleting file on card");
                         return;
                     }
-                    else {
+                    else
+                    {
                         qDebug() << "Removed file" << file;
                     }
                 }
@@ -138,7 +139,8 @@ void BackupManager::process()
     QMap<int, QFileInfoList> file_list_map;
     QDir source_dir(m_sourcePath);
 
-    if (source_dir.exists()) {
+    if (source_dir.exists())
+    {
 
         QDir dest_dir(m_destPath);
         if (!dest_dir.exists())
@@ -147,6 +149,7 @@ void BackupManager::process()
             emit failed("Destination directory does not exist! " + m_destPath);
             return;
         }
+
         for (int i = 0; i < 9; i++)
         {
             QString sub_dir = QString();
@@ -177,7 +180,8 @@ void BackupManager::process()
             }
         }
     }
-    else {
+    else
+    {
         qDebug() << "Source directory does not exist!" << m_sourcePath;
         emit failed("Source directory does not exist! " + m_sourcePath);
         return;
@@ -237,19 +241,37 @@ void BackupManager::process()
         if (!file_list_map.keys().contains(i))
             continue;
 
+        QString dest_dir_path = tailPath(tailPath(m_destPath) + QString::number(i));
+
+        QDir dir( dest_dir_path );
+        dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot );
+        int total_files_offset = dir.count();
+
         auto file_list = file_list_map.value(i);
         for (const auto& file_info : file_list)
         {
-            QString dest_dir_path = "";
-
-            dest_dir_path = tailPath(tailPath(m_destPath) + QString::number(i));
-
             bool success = false;
 
             if (m_isBackup)
-                success = convertWav2Flac(file_info.filePath(), dest_dir_path + file_info.fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT, 0, 0) + ".FLAC");
+            {
+                success = convertWav2Flac(file_info.filePath(), dest_dir_path + file_info.fileName().replace( DEFAULT_DESTINATION_FORMAT, ".FLAC", Qt::CaseInsensitive));
+            }
             else
-                success = convertFlac2Wav(file_info.filePath(), dest_dir_path + file_info.fileName().toUpper().section(".FLAC", 0, 0) + DEFAULT_DESTINATION_FORMAT);
+            {
+                QString destinationFileNumber = file_info.fileName().replace(".FLAC", "", Qt::CaseInsensitive);
+
+                bool ok;
+                int decimalFileNumber = destinationFileNumber.toInt(&ok, 10);       // dec == 0, ok == false
+                if( ok )
+                {
+                    decimalFileNumber += total_files_offset;
+                    destinationFileNumber = QString::number(decimalFileNumber);
+                }
+
+                QString destinationFileName = destinationFileNumber+DEFAULT_DESTINATION_FORMAT;
+
+                success = convertFlac2Wav(file_info.filePath(), dest_dir_path + destinationFileName);
+            }
 
             if (success)
             {
@@ -268,8 +290,7 @@ void BackupManager::process()
         QString xml_string_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                              "<hoerbert>\n";
 
-        QString xml_string_tail = "</hoerbert>\n"
-                             "</xml>";
+        QString xml_string_tail = "</hoerbert>\n";
 
         QFile backup_info_file(tailPath(dest_dir.absolutePath()) + BACKUP_INFO_FILE);
         if (backup_info_file.exists())

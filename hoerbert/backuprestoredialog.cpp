@@ -84,7 +84,7 @@ void BackupRestoreDialog::setSourcePath(const QString &sourcePath)
         m_mergeButton->setEnabled(true);
         m_overwriteButton->setEnabled(true);
     } else {
-        m_label->setText(tr("Either the selected folder does not contain a backup made with this app, or the backup is incomplete. If you selected the correct folder, you will have to restore your backup manually."));
+        m_label->setText(tr("Either the selected folder does not contain a backup made with this app,\nor the backup is incomplete. If you selected the correct folder,\nyou will have to restore your backup manually."));
     }
 }
 
