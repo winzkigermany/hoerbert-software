@@ -244,7 +244,8 @@ void BackupManager::process()
         QString dest_dir_path = tailPath(tailPath(m_destPath) + QString::number(i));
 
         QDir dir( dest_dir_path );
-        dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot );
+        dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot );   // NOT case sensitive by default
+        dir.setNameFilters( QStringList()<<"*.wav" );
         int total_files_offset = dir.count();
 
         auto file_list = file_list_map.value(i);
