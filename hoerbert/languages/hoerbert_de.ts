@@ -155,13 +155,26 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
         <translation>0dB (maximal)</translation>
     </message>
     <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="123"/>
+        <source>Show backup reminders</source>
+        <translation>Zeige Erinnerungen an Datensicherung</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="129"/>
+        <source>Keep cards compatible with old hoerbert.app version 1.x</source>
+        <translation>Halte die Karten kompatibel mit der alten hoerbert.app Version 1.x</translation>
+    </message>
+    <message>
+        <source>Recreate hoerbert.xml when closing the app</source>
+        <translation type="vanished">hoerbert.xml beim Schließen der App neu erstellen</translation>
+    </message>
+    <message>
         <source>Dark mode</source>
         <translation type="vanished">Dunkler Modus</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="123"/>
         <source>Restore backup reminder</source>
-        <translation>Backup-Erinnerungen wieder einschalten</translation>
+        <translation type="obsolete">Erinnerung an Datensicherung</translation>
     </message>
     <message>
         <location filename="../advancedfeaturesdialog.cpp" line="126"/>
@@ -169,9 +182,8 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
         <translation>Zeige Laufwerke =&gt; %1GB</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="129"/>
         <source>Regenerate hoerbert.xml when closing the app</source>
-        <translation>Beim beenden hoerbert.xml erzeugen</translation>
+        <translation type="vanished">Beim beenden hoerbert.xml erzeugen</translation>
     </message>
     <message>
         <source>Switch to diagnostics mode</source>
@@ -224,12 +236,12 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
     <message>
         <location filename="../backuprestoredialog.cpp" line="11"/>
         <source>Restore backup</source>
-        <translation>Backup zurückspielen</translation>
+        <translation>Datensicherung zurückspielen</translation>
     </message>
     <message>
         <location filename="../backuprestoredialog.cpp" line="27"/>
         <source>Please choose to merge or replace the contents of the current card.</source>
-        <translation>Bitte wählen Sie, ob Du den Inhalt der aktuellen Karte zusammenführen oder ersetzen möchtest.</translation>
+        <translation>Bitte wähle, ob Du den Inhalt der aktuellen Karte zusammenführen oder ersetzen möchtest.</translation>
     </message>
     <message>
         <source>Copy the backup contents after the card&apos;s contents in each playlist</source>
@@ -238,12 +250,12 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
     <message>
         <location filename="../backuprestoredialog.cpp" line="43"/>
         <source>Copy the backup in each playlist behind the contents on the card</source>
-        <translation>Die Sicherung in jeder Wiedergabeliste hinter den Inhalt auf der Karte kopieren</translation>
+        <translation>Die Datensicherung in jeder Wiedergabeliste hinter den Inhalt auf der Karte kopieren</translation>
     </message>
     <message>
         <location filename="../backuprestoredialog.cpp" line="54"/>
         <source>Replace all contents of the memory card by the contents of the backup</source>
-        <translation>Den gesamten Inhalt der Speicherkarte durch den Inhalt der Sicherung ersetzen</translation>
+        <translation>Den gesamten Inhalt der Speicherkarte durch den Inhalt der Datensicherung ersetzen</translation>
     </message>
     <message>
         <location filename="../backuprestoredialog.cpp" line="61"/>
@@ -253,17 +265,17 @@ Sie sollten eine Kopie der GNU General Public License zusammen mit diesem Progra
     <message>
         <location filename="../backuprestoredialog.cpp" line="87"/>
         <source>Backup of card</source>
-        <translation>Sicherung der Karte</translation>
+        <translation>Datensicherung der Karte</translation>
     </message>
     <message>
         <location filename="../backuprestoredialog.cpp" line="87"/>
         <source>Backup by</source>
-        <translation>Sicherung durch</translation>
+        <translation>Datensicherung durch</translation>
     </message>
     <message>
         <location filename="../backuprestoredialog.cpp" line="87"/>
         <source>Backup date</source>
-        <translation>Sicherungsdatum</translation>
+        <translation>Zeitpunkt der Datensicherung</translation>
     </message>
     <message>
         <location filename="../backuprestoredialog.cpp" line="87"/>
@@ -821,12 +833,12 @@ Please click Yes to continue restore. No to cancel.</source>
     <message>
         <location filename="../mainwindow.cpp" line="1069"/>
         <source>Please select the destination directory for this backup</source>
-        <translation>Bitte wähle das Zielverzeichnis für dieses Backup</translation>
+        <translation>Bitte wähle das Zielverzeichnis für diese Datensicherung</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1151"/>
         <source>Please select the backup directory you want to restore</source>
-        <translation>Bitte wähle das Backupverzeichnis, das Du wiederherstellen möchtest</translation>
+        <translation>Bitte wähle das Verzeichnis der Datensicherung, die Du zurückspielen möchtest</translation>
     </message>
     <message>
         <source>Please click Yes to continue restore. No to cancel.</source>
@@ -947,7 +959,7 @@ Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Program
         <location filename="../mainwindow.cpp" line="262"/>
         <location filename="../mainwindow.cpp" line="1097"/>
         <source>Backup</source>
-        <translation>Sicherungskopie</translation>
+        <translation>Datensicherung</translation>
     </message>
     <message>
         <source>Copying files ... (%1%)</source>
@@ -966,7 +978,7 @@ und &apos;Nein&apos;, um nur die Sicherungskopie alleine auf die Speicherkarte z
     <message>
         <location filename="../mainwindow.cpp" line="1183"/>
         <source>Restore</source>
-        <translation>Wiederherstellen</translation>
+        <translation>Zurückspielen</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1185"/>
@@ -1043,7 +1055,7 @@ Willst Du wirklich diese App schließen und Daten verlieren?</translation>
     <message>
         <location filename="../mainwindow.cpp" line="1078"/>
         <source>Cannot create subdirectory for backup</source>
-        <translation>Unterverzeichnis für Backup kann nicht erstellt werden</translation>
+        <translation>Unterverzeichnis für Datensicherung kann nicht erstellt werden</translation>
     </message>
     <message>
         <source>appVersion</source>
@@ -1070,7 +1082,7 @@ Willst Du wirklich diese App schließen und Daten verlieren?</translation>
         <location filename="../mainwindow.cpp" line="1273"/>
         <location filename="../mainwindow.cpp" line="1628"/>
         <source>Backup reminder</source>
-        <translation>Backup-Erinnerung</translation>
+        <translation>Erinnerung an Datensicherung</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="439"/>
@@ -1152,12 +1164,12 @@ Dies verhindert versehentlichen Datenverlust. Mächtest Du jetzt ein Backup anle
     <message>
         <location filename="../mainwindow.cpp" line="1632"/>
         <source>This will keep you from losing files accidently. Do you want to create a backup now?</source>
-        <translation>Dies verhindert versehentlichen Datenverlust. Möchtest Du jetzt ein Backup anlegen?</translation>
+        <translation>Dies verhindert versehentlichen Datenverlust. Möchtest Du jetzt eine Datensicherung anlegen?</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1632"/>
         <source>Backup reminder: Don&apos;t forget to backup your memory card to your computer.</source>
-        <translation>Backup-Erinnerung: Denke daran, Deine Speicherkarte auf Deinen Computer zu sichern.</translation>
+        <translation>Erinnerung an Datensicherung: Denke daran, Deine Speicherkarte auf Deinen Computer zu sichern.</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1698"/>
@@ -1228,7 +1240,7 @@ Dies verhindert versehentlichen Datenverlust. Mächtest Du jetzt ein Backup anle
     <message>
         <location filename="../mainwindow.cpp" line="262"/>
         <source>It is recommended to backup memory card before cleaning up. Do you want to backup now?</source>
-        <translation>Es wird empfohlen, vor dem Aufräumen eine Sicherungskopie der Speicherkarte anzufertigen. Möchtest Du die Daten jetzt sichern?</translation>
+        <translation>Es wird empfohlen, vor dem Aufräumen eine Datensicherung der Speicherkarte anzufertigen. Möchtest Du die Daten jetzt sichern?</translation>
     </message>
     <message>
         <source>This memory card&apos;s files need to be updated to a new format.
@@ -1283,8 +1295,8 @@ Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Program
         <location filename="../mainwindow.cpp" line="1273"/>
         <source>We recommend to back up your memory card to your computer before switching to diagnostics mode.
 Create a backup now?</source>
-        <translation>Wir empfehlen, eine Sicherungskopie der Speicherkarte auf Ihrem Computer zu erstellen, bevor Du sie in den Diagnosemodus schaltest.
-Jetzt ein Backup erstellen?</translation>
+        <translation>Wir empfehlen, eine Datensicherung der Speicherkarte auf Deinem Computer zu erstellen, bevor Du sie in den Diagnosemodus schaltest.
+Jetzt eine Datensicherung erstellen?</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1288"/>
@@ -1356,7 +1368,7 @@ Jetzt ein Backup erstellen?</translation>
     <message>
         <location filename="../mainwindow.cpp" line="2096"/>
         <source>Backup...</source>
-        <translation>Sicherung...</translation>
+        <translation>Datensicherung...</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="2125"/>
@@ -1408,7 +1420,7 @@ Jetzt ein Backup erstellen?</translation>
         <location filename="../mainwindow.cpp" line="2097"/>
         <location filename="../mainwindow.cpp" line="2098"/>
         <source>Backup memory card</source>
-        <translation>Backup anlegen</translation>
+        <translation>Datensicherung anlegen</translation>
     </message>
     <message>
         <source>&amp;Restore a backup</source>
@@ -1418,7 +1430,7 @@ Jetzt ein Backup erstellen?</translation>
         <location filename="../mainwindow.cpp" line="2103"/>
         <location filename="../mainwindow.cpp" line="2104"/>
         <source>Restore a backup</source>
-        <translation>Backup wiederherstellen</translation>
+        <translation>Datensicherung zurückspielen</translation>
     </message>
     <message>
         <source>&amp;Format memory card</source>

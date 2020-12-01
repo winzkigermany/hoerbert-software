@@ -145,13 +145,26 @@ Vous devez avoir reçu une copie de la GNU General Public License en même temps
         <translation>0 dB (maximum)</translation>
     </message>
     <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="123"/>
+        <source>Show backup reminders</source>
+        <translation>Afficher les rappels de sauvegarde</translation>
+    </message>
+    <message>
+        <location filename="../advancedfeaturesdialog.cpp" line="129"/>
+        <source>Keep cards compatible with old hoerbert.app version 1.x</source>
+        <translation>Gardez les cartes compatibles avec l&apos;ancienne version 1.x de hoerbert.app</translation>
+    </message>
+    <message>
+        <source>Recreate hoerbert.xml when closing the app</source>
+        <translation type="vanished">Recréer hoerbert.xml lors de la fermeture de l&apos;application</translation>
+    </message>
+    <message>
         <source>Dark mode</source>
         <translation type="vanished">Mode noir</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="123"/>
         <source>Restore backup reminder</source>
-        <translation>Réactiver le rappel de sauvegarde</translation>
+        <translation type="vanished">Réactiver le rappel de sauvegarde</translation>
     </message>
     <message>
         <location filename="../advancedfeaturesdialog.cpp" line="126"/>
@@ -159,9 +172,8 @@ Vous devez avoir reçu une copie de la GNU General Public License en même temps
         <translation>Afficher les disques &gt;= %1GB</translation>
     </message>
     <message>
-        <location filename="../advancedfeaturesdialog.cpp" line="129"/>
         <source>Regenerate hoerbert.xml when closing the app</source>
-        <translation>Régénérer hoerbert.xml lors de la fermeture de l&apos;application</translation>
+        <translation type="vanished">Régénérer hoerbert.xml lors de la fermeture de l&apos;application</translation>
     </message>
     <message>
         <source>Switch to diagnostics mode</source>
@@ -253,9 +265,9 @@ Vous devez avoir reçu une copie de la GNU General Public License en même temps
         <source>Either the selected folder does not contain a backup made with this app,
 or the backup is incomplete. If this really is your backup folder,
 you will have to restore that backup manually.</source>
-        <translatorcomment>Entweder enthält der ausgewählte Ordner keine Sicherung, die mit dieser Anwendung
-erstellt wurde, oder die Sicherung ist unvollständig. Wenn dies wirklich Dein
-Sicherungsordner ist, musst Du diese Sicherung manuell wiederherstellen.</translatorcomment>
+        <translatorcomment>Entweder enthält der ausgewählte Ordner keine Datensicherung, die mit dieser Anwendung
+erstellt wurde, oder die Datensicherung ist unvollständig. Wenn dies wirklich Dein
+Datensicherungsordner ist, musst Du diese Datensicherung manuell zurückspielen.</translatorcomment>
         <translation>Soit le dossier sélectionné ne contient pas une sauvegarde effectuée avec cette application,
 ou la sauvegarde est incomplète. Si c&apos;est vraiment votre dossier de sauvegarde,
 vous devrez restaurer cette sauvegarde manuellement.</translation>
