@@ -32,21 +32,25 @@ BackupRestoreDialog::BackupRestoreDialog(QDialog *parent) : QDialog(parent)
     m_layout->addWidget(m_buttonGroup);
 
     QSize buttonSize(200, 200);
-    m_mergeButton = new QPushButton(this);
-    QPixmap mergePixmap(":/images/merge_copy.png");
-    m_mergeButton->setIconSize(buttonSize);
+    m_mergeButton = new QPushButton(this);  //@TODO: How on earth can an icon be added without being pixelated by Qt?
+    QIcon mergeIcon;
+    mergeIcon.addFile(":/images/merge_copy_400.png", QSize(400,400));
+    mergeIcon.addFile(":/images/merge_copy_200.png", QSize(200,200));
     m_mergeButton->setFixedSize(buttonSize);
-    m_mergeButton->setIcon(QIcon(mergePixmap));
+    m_mergeButton->setIconSize(buttonSize);
+    m_mergeButton->setIcon(mergeIcon);
     m_mergeButton->setEnabled(false);
     m_mergeButton->setToolTip(tr("Copy the backup contents after the card's contents in each playlist"));
     m_buttonHLayout->addWidget(m_mergeButton);
     connect( m_mergeButton, &QAbstractButton::clicked, this, &BackupRestoreDialog::confirmMerge );
 
-    m_overwriteButton = new QPushButton(this);
-    QPixmap overwritePixmap(":/images/overwrite_copy.png");
-    m_overwriteButton->setIconSize(buttonSize);
+    m_overwriteButton = new QPushButton(this);  //@TODO: How on earth can an icon be added without being pixelated by Qt?
+    QIcon overwriteIcon;
+    overwriteIcon.addFile(":/images/overwrite_copy_400.png", QSize(400,400));
+    overwriteIcon.addFile(":/images/overwrite_copy_200.png", QSize(200,200));
+    m_overwriteButton->setIcon(overwriteIcon);
     m_overwriteButton->setFixedSize(buttonSize);
-    m_overwriteButton->setIcon(QIcon(overwritePixmap));
+    m_overwriteButton->setIconSize(buttonSize);
     m_overwriteButton->setToolTip(tr("Replace all contents of the memory card by the contents of the backup"));
     m_overwriteButton->setEnabled(false);
     m_buttonHLayout->addWidget(m_overwriteButton);
