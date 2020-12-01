@@ -40,7 +40,7 @@ BackupRestoreDialog::BackupRestoreDialog(QDialog *parent) : QDialog(parent)
     m_mergeButton->setIconSize(buttonSize);
     m_mergeButton->setIcon(mergeIcon);
     m_mergeButton->setEnabled(false);
-    m_mergeButton->setToolTip(tr("Copy the backup contents after the card's contents in each playlist"));
+    m_mergeButton->setToolTip(tr("Copy the backup in each playlist behind the contents on the card"));
     m_buttonHLayout->addWidget(m_mergeButton);
     connect( m_mergeButton, &QAbstractButton::clicked, this, &BackupRestoreDialog::confirmMerge );
 
@@ -84,11 +84,11 @@ void BackupRestoreDialog::setSourcePath(const QString &sourcePath)
 
     if( parseXml( sourcePath+BACKUP_INFO_FILE ) )
     {
-        m_label->setText(tr("Backup of card")+": "+m_infoDriveName+"\n"+tr("Backup by")+": "+m_infoByWhom+" "+m_infoAppVersion+"\n"+tr("Backup date")+": "+m_infoLastWriteDate.toString( tr("dd.MM.yyyy hh:mm:ss")));
+        m_label->setText(tr("Backup of card")+": "+m_infoDriveName+"\n"+tr("Backup by")+": "+m_infoByWhom+" "+m_infoAppVersion+"\n"+tr("Backup date")+": "+m_infoLastWriteDate.toString( tr("yyyy-MM-dd hh:mm:ss")));
         m_mergeButton->setEnabled(true);
         m_overwriteButton->setEnabled(true);
     } else {
-        m_label->setText(tr("Either the selected folder does not contain a backup made with this app,\nor the backup is incomplete. If you selected the correct folder,\nyou will have to restore your backup manually."));
+        m_label->setText(tr("Either the selected folder does not contain a backup made with this app,\nor the backup is incomplete. If this really is your backup folder,\nyou will have to restore that backup manually."));
     }
 }
 

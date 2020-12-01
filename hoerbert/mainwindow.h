@@ -159,6 +159,7 @@ private:
     QMenu *m_moveToPlaylistMenu;
     QMenu *m_subMenuBegin;
     QMenu *m_subMenuEnd;
+    QMenu *m_backupMenu;
     QMenu *m_extrasMenu;
     QMenu *m_viewMenu;
     QMenu *m_subMenuColumns;

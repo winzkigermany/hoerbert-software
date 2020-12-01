@@ -1695,22 +1695,22 @@ void MainWindow::remindBackup()
 
 void MainWindow::createActions()
 {
-    m_editMenu = new QMenu( tr("&Edit"), this );
+    m_editMenu = new QMenu( tr("Edit"), this );
     menuBar()->addMenu( m_editMenu );
 
-    m_addTitleAction = new QAction(tr("&Add title"), this);
+    m_addTitleAction = new QAction(tr("Add title"), this);
     m_addTitleAction->setStatusTip(tr("Add title"));
     m_addTitleAction->setEnabled(false);
     connect(m_addTitleAction, &QAction::triggered, this, &MainWindow::addTitle);
     m_editMenu->addAction(m_addTitleAction);
 
-    m_removeTitleAction = new QAction(tr("&Remove title"), this);
+    m_removeTitleAction = new QAction(tr("Remove title"), this);
     m_removeTitleAction->setStatusTip(tr("Remove title"));
     m_removeTitleAction->setEnabled(false);
     connect(m_removeTitleAction, &QAction::triggered, this, &MainWindow::removeTitle);
     m_editMenu->addAction(m_removeTitleAction);
 
-    m_moveToPlaylistMenu = new QMenu(tr("&Move to playlist..."), this);
+    m_moveToPlaylistMenu = new QMenu(tr("Move to playlist..."), this);
     m_moveToPlaylistMenu->setEnabled(false);
     m_editMenu->addMenu( m_moveToPlaylistMenu );
 
@@ -2082,10 +2082,10 @@ void MainWindow::createActions()
 
 
 
-    m_extrasMenu = new QMenu(tr("E&xtras"), this);
+    m_extrasMenu = new QMenu(tr("Extras"), this);
     menuBar()->addMenu(m_extrasMenu);
 
-    m_printAction = new QAction(tr("&Print table of contents"), this);
+    m_printAction = new QAction(tr("Print table of contents"), this);
     m_printAction->setStatusTip(tr("Print table of contents"));
     m_printAction->setEnabled(false);
     connect(m_printAction, &QAction::triggered, this, [this] () {
@@ -2093,34 +2093,36 @@ void MainWindow::createActions()
     });
     m_extrasMenu->addAction(m_printAction);
 
-    m_backupAction = new QAction(tr("&Backup memory card"), this);
+    m_backupMenu = new QMenu(tr("Backup..."), this);
+    m_backupAction = new QAction(tr("Backup memory card"), this);
     m_backupAction->setStatusTip(tr("Backup memory card"));
     m_backupAction->setEnabled(false);
     connect(m_backupAction, &QAction::triggered, this, &MainWindow::backupCard);
-    m_extrasMenu->addAction(m_backupAction);
+    m_backupMenu->addAction(m_backupAction);
 
-    m_restoreAction = new QAction(tr("&Restore a backup"), this);
+    m_restoreAction = new QAction(tr("Restore a backup"), this);
     m_restoreAction->setStatusTip(tr("Restore a backup"));
     m_restoreAction->setEnabled(false);
     connect(m_restoreAction, &QAction::triggered, this, &MainWindow::restoreBackupQuestion);
-    m_extrasMenu->addAction(m_restoreAction);
+    m_backupMenu->addAction(m_restoreAction);
+    m_extrasMenu->addMenu(m_backupMenu);
 
     m_extrasMenu->addSeparator();
 
-    m_formatAction = new QAction(tr("&Format memory card"), this);
+    m_formatAction = new QAction(tr("Format memory card"), this);
     m_formatAction->setStatusTip(tr("Format memory card"));
     m_formatAction->setEnabled(true);
     connect(m_formatAction, &QAction::triggered, this, &MainWindow::formatCard);
     m_extrasMenu->addAction(m_formatAction);
 
-    m_advancedFeaturesAction = new QAction(tr("&Advanced features"), this);
+    m_advancedFeaturesAction = new QAction(tr("Advanced features"), this);
     m_advancedFeaturesAction->setStatusTip(tr("Advanced features"));
     connect(m_advancedFeaturesAction, &QAction::triggered, this, &MainWindow::advancedFeatures);
     m_extrasMenu->addAction(m_advancedFeaturesAction);
 
     m_extrasMenu->addSeparator();
 
-    m_selectManually = new QAction(tr("Select destination &manually"), this);
+    m_selectManually = new QAction(tr("Select destination manually"), this);
     m_selectManually->setStatusTip(tr("Select mount point of memory card manually"));
     m_selectManually->setEnabled(true);
 #ifndef Q_OS_LINUX
@@ -2129,36 +2131,36 @@ void MainWindow::createActions()
     connect(m_selectManually, &QAction::triggered, this, &MainWindow::selectDestinationManually);
     m_extrasMenu->addAction(m_selectManually);
 
-    m_helpMenu = new QMenu(tr("&Help"), this);
+    m_helpMenu = new QMenu(tr("Help"), this);
     menuBar()->addMenu(m_helpMenu);
 
-    aboutAction = new QAction(tr("&About"), this);
+    aboutAction = new QAction(tr("About"), this);
     aboutAction->setStatusTip(tr("About"));
     connect(aboutAction, &QAction::triggered, this, &MainWindow::about);
     m_helpMenu->addAction(aboutAction);
 
-    findBooksAction = new QAction(tr("&Find music and audio books"), this);
+    m_visitServiceWebsiteAction = new QAction(tr("Online help and customer service"), this);
+    m_visitServiceWebsiteAction->setStatusTip(tr("Online help and customer service"));
+    connect(m_visitServiceWebsiteAction, &QAction::triggered, this, [=](){
+        QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/service/hoerbert-application")));
+    });
+    m_helpMenu->addAction(m_visitServiceWebsiteAction);
+
+    findBooksAction = new QAction(tr("Find music and audio books"), this);
     findBooksAction->setStatusTip(tr("Find music and audio books"));
     connect(findBooksAction, &QAction::triggered, this, [=](){
         QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/contents/")));
     });
     m_helpMenu->addAction(findBooksAction);
 
-    checkUpdatesAction = new QAction(tr("&Check for updates"), this);
+    m_helpMenu->addSeparator();
+
+    checkUpdatesAction = new QAction(tr("Check for updates"), this);
     checkUpdatesAction->setStatusTip(tr("Check for updates"));
     connect(checkUpdatesAction, &QAction::triggered, this, &MainWindow::checkForUpdates);
     m_helpMenu->addAction(checkUpdatesAction);
 
-    m_helpMenu->addSeparator();
-
-    m_visitServiceWebsiteAction = new QAction(tr("Visit service web site"), this);
-    m_visitServiceWebsiteAction->setStatusTip(tr("Visit service web site"));
-    connect(m_visitServiceWebsiteAction, &QAction::triggered, this, [=](){
-        QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/service/hoerbert-application")));
-    });
-    m_helpMenu->addAction(m_visitServiceWebsiteAction);
-
-    m_serviceToolsMenu = new QMenu(tr("Service tools"), this);
+    m_serviceToolsMenu = new QMenu(tr("Service tools..."), this);
     m_helpMenu->addMenu(m_serviceToolsMenu);
 
     m_collectDataAction = new QAction(tr("Collect data for service"), this);
