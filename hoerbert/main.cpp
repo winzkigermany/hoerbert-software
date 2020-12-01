@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
         palette.setColor(QPalette::Disabled,QPalette::WindowText,QColor(127,127,127));
         palette.setColor(QPalette::Base,QColor(42,42,42));
         palette.setColor(QPalette::AlternateBase,QColor(66,66,66));
-        palette.setColor(QPalette::ToolTipBase,Qt::white);
+        palette.setColor(QPalette::ToolTipBase,QColor(35,35,35));
         palette.setColor(QPalette::ToolTipText,Qt::white);
         palette.setColor(QPalette::Text,Qt::white);
         palette.setColor(QPalette::Disabled,QPalette::Text,QColor(127,127,127));
