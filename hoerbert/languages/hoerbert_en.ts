@@ -118,7 +118,7 @@
     </message>
     <message>
         <location filename="../advancedfeaturesdialog.cpp" line="123"/>
-        <source>Restore backup reminder</source>
+        <source>Show backup reminders</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -128,7 +128,7 @@
     </message>
     <message>
         <location filename="../advancedfeaturesdialog.cpp" line="129"/>
-        <source>Regenerate hoerbert.xml when closing the app</source>
+        <source>Keep cards compatible with old hoerbert.app version 1.x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
