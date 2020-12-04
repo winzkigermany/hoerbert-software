@@ -39,6 +39,7 @@ QDeviceWatcher https://github.com/wang-bin/qdevicewatcher
 df by Paul Sadowski
 EjectMedia https://www.uwe-sieber.de
 7-Zip https://7-zip.org
+OpenClipart.org https://www.openclipart.org
 
 
 #####################################################################################################
