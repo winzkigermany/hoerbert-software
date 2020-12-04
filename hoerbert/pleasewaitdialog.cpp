@@ -1,25 +1,21 @@
-#include <QApplication>
-#include <QLabel>
-#include <QPushButton>
-#include <QProgressBar>
-
 #include "pleasewaitdialog.h"
 
 PleaseWaitDialog::PleaseWaitDialog(QDialog *parent) : QDialog(parent)
 {
     setWindowTitle(tr("Please wait"));
     resize(387, 146);
-    m_allowClose = false;
 
     m_layout = new QVBoxLayout(this);
-    m_layout->setContentsMargins(25, 20, 25, 25);
+    m_layout->setContentsMargins(25, 15, 25, 25);
 
     m_label = new QLabel(this);
-    m_label->setGeometry(QRect(10, 10, 367, 101));
     m_label->setAlignment(Qt::AlignCenter);
-    m_label->setText( tr("This might take several minutes.") );
     m_layout->addWidget(m_label);
 
+    m_checkBox = new QCheckBox(this);
+    m_checkBox->setVisible(false);
+    connect( m_checkBox, &QCheckBox::clicked, this, &PleaseWaitDialog::checkboxIsClicked );
+    m_layout->addWidget(m_checkBox);
 
     m_progressBar = new QProgressBar(this);
     m_progressBar->setRange(0, 0);
@@ -35,11 +31,20 @@ PleaseWaitDialog::PleaseWaitDialog(QDialog *parent) : QDialog(parent)
     m_layout->addWidget(m_closeButton, 0, Qt::AlignRight);
     connect( m_closeButton, &QAbstractButton::clicked, this, &QWidget::close);
     QMetaObject::connectSlotsByName(this);
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
 }
 
+void PleaseWaitDialog::setWaitMessage( QString waitMessageString )
+{
+    if( waitMessageString.isEmpty() )
+    {
+        m_label->setText( tr("This might take several minutes.") );
+    }
+    else
+    {
+        m_label->setText(waitMessageString);
+    }
+    m_closeButton->setDisabled(true);
+}
 
 void PleaseWaitDialog::setResultString( QString resultString )
 {
@@ -47,21 +52,60 @@ void PleaseWaitDialog::setResultString( QString resultString )
         resultString = "Finished.";
     }
 
-    QApplication::restoreOverrideCursor();
-    setCursor(Qt::ArrowCursor);
-    qApp->processEvents();
-
     m_label->setText( resultString );
     m_closeButton->setDisabled(false);
     m_progressBar->hide();
+}
 
-    m_allowClose = true;
+void PleaseWaitDialog::setCheckBoxLabel( QString label )
+{
+    m_checkBox->setText(label);
+    if( label.isEmpty() )
+    {
+        m_checkBox->setVisible(false);
+    }
+    else
+    {
+        m_checkBox->setVisible(true);
+    }
 }
 
 void PleaseWaitDialog::reject()
 {
-    if( m_allowClose ){
+    if( m_closeButton->isEnabled() ){
         done(0);
+    }
+}
+
+void PleaseWaitDialog::setProgressRange( int min, int max )
+{
+   if( m_progressBar->value() > max )
+   {
+       m_progressBar->setValue( max );
+   }
+
+   if( m_progressBar->value() < min )
+   {
+       m_progressBar->setValue( min );
+   }
+
+   m_progressBar->setRange( min, max );
+}
+
+void PleaseWaitDialog::setProgressValue( int percentValue )
+{
+    m_progressBar->setValue( qMin( qMax( percentValue, m_progressBar->minimum() ), m_progressBar->maximum() ) );
+}
+
+void PleaseWaitDialog::showButton( bool yesNo )
+{
+    if( yesNo )
+    {
+        m_closeButton->show();
+    }
+    else
+    {
+        m_closeButton->hide();
     }
 }
 

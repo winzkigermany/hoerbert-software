@@ -21,10 +21,11 @@
 
 #include "cardpage.h"
 
-
 CardPage::CardPage(QWidget *parent)
     : QWidget(parent)
 {
+    m_mainWindow = dynamic_cast<MainWindow*>(parent);
+
     m_deviceManager = nullptr;
     m_deviceManager = std::make_shared<DeviceManager> ();
 
@@ -357,32 +358,72 @@ void CardPage::ejectDrive()
     QString currentDevice = m_driveList->currentText();
     if (currentDevice.isEmpty())
     {
-        QMessageBox::information(this, tr("Eject"), tr("No memory card is selected.")+"\n"+tr("Please select the device you want to eject."));
         updateDriveList();
         deselectDrive();
         return;
     }
 
+    m_pleaseWaitDialog = new PleaseWaitDialog();
+    connect( m_pleaseWaitDialog, &QDialog::finished, m_pleaseWaitDialog, &QObject::deleteLater);
+    m_pleaseWaitDialog->setParent( this );
+    m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
+
     QSettings settings;
     settings.beginGroup("Global");
     bool regenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
     settings.endGroup();
-    if( this->isHoerbertXMLDirty() && regenerateHoerbertXml ){
+    if( isHoerbertXMLDirty() && regenerateHoerbertXml ){
+        m_pleaseWaitDialog->setWindowTitle(tr("Generating hoerbert.xml"));
+        m_pleaseWaitDialog->setWaitMessage(tr("Making this card compatible with the old hoerbert app V1.x"));
+        m_pleaseWaitDialog->setProgressRange( 0, 100 );
+        connect( this, &CardPage::sendProgressPercent, m_pleaseWaitDialog, &PleaseWaitDialog::setProgressValue );
+        m_pleaseWaitDialog->show();
         recreateXml();
     }
 
+    m_pleaseWaitDialog->setProgressRange( 0, 0 );
+    m_pleaseWaitDialog->setWindowTitle(tr("Ejecting card"));
+    m_pleaseWaitDialog->setWaitMessage(tr("Waiting for all write operations to finish."));
+    m_pleaseWaitDialog->show();
+
+    m_mainWindow->sync();
     auto result = m_deviceManager->ejectDrive(currentDevice);
 
     if (result == SUCCESS)
     {
         updateDriveList();
         deselectDrive();
-        QMessageBox::information(this, tr("Eject"), tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer."));
+        m_pleaseWaitDialog->setWindowTitle(tr("Finished"));
+
+        bool doGenerateHoerbertXml = false;
+        {
+            QSettings settings;
+            settings.beginGroup("Global");
+            doGenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
+            settings.endGroup();
+        }
+
+        if(doGenerateHoerbertXml)
+        {
+            m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer.")+"\n"+tr("If you do not need hoerbert.xml for the old hoerbert app 1.x,\nskip this step by ticking the check box below."));
+            connect( m_pleaseWaitDialog, &PleaseWaitDialog::checkboxIsClicked, this, [=](bool onOff){
+                QSettings settings;
+                settings.beginGroup("Global");
+                settings.setValue("regenerateHoerbertXml", !onOff);
+                settings.endGroup();
+            });
+            m_pleaseWaitDialog->setCheckBoxLabel(tr("I only will use my memory cards with this new software from now on."));
+        }
+        else
+        {
+            m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer."));
+        }
         switchDiagnosticsMode( false );
     }
     else
     {
-        QMessageBox::information(this, tr("Eject"), tr("Failed to eject the memory card [%1].").arg(currentDevice)+"\n"+tr("Please try again or try to remove it with your operating system"));
+        m_pleaseWaitDialog->setResultString( tr("Failed to eject the memory card [%1].").arg(currentDevice)+"\n"+tr("Please try again or try to remove it with your operating system") );
     }
 
     m_hasFat32WarningShown = false;
@@ -390,8 +431,6 @@ void CardPage::ejectDrive()
 
 void CardPage::recreateXml()
 {
-    QProgressDialog *m_progress = new QProgressDialog(this);
-
     QFileInfoList file_info_list;
     for (int i = 0; i < 9; i++) {
         QString sub_dir = QString();
@@ -412,12 +451,9 @@ void CardPage::recreateXml()
     }
 
     AudioInfoThread *thread = new AudioInfoThread(file_info_list);
-    connect(thread, &AudioInfoThread::processUpdated, this, [m_progress] (int percent) {
-        m_progress->setValue(percent);
-        m_progress->setLabelText(tr("Getting audio information..."));
-        QCoreApplication::processEvents();
-    });
-    connect(thread, &AudioInfoThread::taskCompleted, this, [this, m_progress] (const AudioList &result) {
+    connect(thread, &AudioInfoThread::processUpdated, this, &CardPage::sendProgressPercent);
+
+    connect(thread, &AudioInfoThread::taskCompleted, this, [=] (const AudioList &result) {
         XmlWriter writer(this->currentDrivePath() + HOERBERT_XML, result, QFile::exists(this->currentDrivePath() + DIAGMODE_FILE));
         bool success = writer.create();
         if (success){
@@ -429,49 +465,15 @@ void CardPage::recreateXml()
                 qDebug() << "CardPage: Failed creating hoerbert xml backup file!";
             }
         } else {
-            qDebug() << "CardPage: Failed creating hoerbert xml file!";
+            qDebug() << "CardPage: Failed creating hoerbert.xml file!";
         }
-
-        this->setCursor(Qt::ArrowCursor);
-        m_progress->deleteLater();
     });
+
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
-
-    m_progress->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    m_progress->setWindowTitle(tr("Recreating xml"));
-    m_progress->setModal(true);
-    m_progress->setLabelText(tr("Getting audio information..."));
-    m_progress->setRange(0, 100);
-    m_progress->setFixedWidth(360);
-
-    QPushButton *abort_button = new QPushButton(m_progress);
-    abort_button->setText(tr("Abort"));
-
-    // setting cancel button connects the button to the dialog to hide the dialog on button click
-    m_progress->setCancelButton(abort_button);
-    // need to disconnect the connections since clicking on the button immediately hides the dialog
-    m_progress->disconnect(abort_button);
-
-    // then define custom connections
-    connect(abort_button, &QPushButton::clicked, this, [m_progress, abort_button, thread] () {
-        m_progress->setLabelText(tr("Aborting..."));
-        m_progress->show();
-        QCoreApplication::processEvents();
-        abort_button->setDisabled(true);
-
-        thread->quit();
-        thread->wait();
-        thread->deleteLater();
-    });
-
-    m_progress->show();
-    QCoreApplication::processEvents();
 
     QEventLoop loop;
     connect(thread, &QThread::finished, &loop, &QEventLoop::quit);
-
     thread->start();
-
     loop.exec();
 
     m_hoerbertXMLIsDirty = false;
@@ -791,7 +793,7 @@ QString CardPage::getCardFileSystemType()
         return m_deviceManager->getVolumeFileSystem(m_driveList->currentText());
 }
 
-void CardPage::setPercent(int buttonIndex, int percentage)
+void CardPage::sendPercent(int buttonIndex, int percentage)
 {
     m_dirs[buttonIndex]->setPercentage(percentage);
     updateUsedSpace();

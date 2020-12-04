@@ -120,13 +120,13 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_optionLayout->addWidget(m_maxVolumeOption);
 
     m_reminderOption = new QCheckBox(this);
-    m_reminderOption->setText(tr("Show backup reminders"));
+    m_reminderOption->setText(tr("Remind of backups regularly"));
 
     m_showLargeDriveCheck = new QCheckBox(this);
-    m_showLargeDriveCheck->setText(tr("Show drives >= %1GB").arg(VOLUME_SIZE_LIMIT));
+    m_showLargeDriveCheck->setText(tr("Show drives larger than %1GB").arg(VOLUME_SIZE_LIMIT));
 
     m_regenerateXmlCheck = new QCheckBox(this);
-    m_regenerateXmlCheck->setText( tr("Keep cards compatible with old hoerbert.app version 1.x") );
+    m_regenerateXmlCheck->setText( tr("Always regenerate hoerbert.xml for the old hoerbert app versions 1.x") );
 
     m_checkLayout = new QVBoxLayout;
     m_checkLayout->setAlignment(Qt::AlignCenter);

@@ -54,7 +54,6 @@ extern QString ZIP_PATH;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    m_isWritingToDisk = false;
     m_migrationPath = QString("");
 
     QDesktopWidget dw;
@@ -234,15 +233,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    QSettings settings;
-    settings.beginGroup("Global");
-    bool regenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
-    settings.endGroup();
-
-    if( m_cardPage->isHoerbertXMLDirty() && regenerateHoerbertXml ){
-        m_cardPage->recreateXml();
-    }
-
     if (!deleteAllFilesInDirecotry(HOERBERT_TEMP_PATH))
     {
         perror("Failed to delete old files in temp folder");
@@ -351,7 +341,7 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     processor->setEntryList(list);
 
     connect(processor, &HoerbertProcessor::processUpdated, m_cardPage, [=] (int percentage) {
-       m_cardPage->setPercent(processor->directoryNumber(), percentage);
+       m_cardPage->sendPercent(processor->directoryNumber(), percentage);
     }, Qt::UniqueConnection);
 
     connect(processor, &HoerbertProcessor::taskCompleted, m_cardPage, [=] (int failCounter, int totalEntryCount) {
@@ -368,9 +358,11 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     }, Qt::UniqueConnection);
 
     connect(processor, &QThread::finished, this, [=] () {
-       // enable the button back
+        this->sync();
+
+        // enable the button back
         m_cardPage->setButtonEnabled(dir_index, true);
-        m_cardPage->setPercent(dir_index, 0);
+        m_cardPage->sendPercent(dir_index, 0);
         m_cardPage->update();
         m_capBar->resetEstimation();
         m_cardPage->updateUsedSpace();
@@ -378,7 +370,6 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
         processor->quit();
         processor->deleteLater();
 
-        this->sync();
 
         if (*no_silence_counter > 0)
         {
@@ -398,7 +389,6 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     }, Qt::UniqueConnection);
 
     processor->start();
-    m_isWritingToDisk = true;
 }
 
 void MainWindow::processorErrorOccurred(const QString &errorString)
@@ -414,12 +404,6 @@ void MainWindow::taskCompleted(int failCount, int totalCount)
 
 void MainWindow::migrate(const QString &dirPath)
 {
-// migration is now mandatory. We create hoerbert.xml anyways before ejecting the card, so this should be no problem.
-//    auto selected = QMessageBox::question(this, tr("Migration is necessary"), tr("This memory card's files need to be updated to a new format.\nDo you want to update the memory card's files for using it with this new app in the future?") );
-//
-//    if (selected == QMessageBox::No)
-//        return;
-
     XmlMetadataReader xml_reader(dirPath);
     AudioList metadata_list = xml_reader.getEntryList();
     for (const AudioEntry & entry : metadata_list) {
@@ -430,74 +414,78 @@ void MainWindow::migrate(const QString &dirPath)
     {
         bool *is_completed = new bool(true);
 
+        m_pleaseWaitDialog = new PleaseWaitDialog();
+        connect( m_pleaseWaitDialog, &QDialog::finished, m_pleaseWaitDialog, &QObject::deleteLater);
+        m_pleaseWaitDialog->setParent( this );
+        m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+        m_pleaseWaitDialog->setWindowTitle(tr("Updating card contents"));
+        m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
+        m_pleaseWaitDialog->setWaitMessage(tr("Updating the card contents for this new hoerbert app version 2.x.\nThis needs to be done only once per card.\nPlease wait and do not interrupt this process!"));
+        m_pleaseWaitDialog->setProgressRange(0, 100);
+        m_pleaseWaitDialog->showButton(false);
+        m_pleaseWaitDialog->show();
+
         HoerbertProcessor *processor = new HoerbertProcessor(dirPath, -1);
-
-        m_progress = new QProgressDialog(this);
-        m_progress->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-        m_progress->setModal(true);
-        m_progress->setWindowTitle(tr("Migration"));
-        m_progress->setLabelText(tr("Migrating files to the new hoerbert.app. Please wait."));
-        m_progress->setFixedWidth(600);
-        m_progress->setRange(0, 100);
-
-        QPushButton *abort_button = new QPushButton(m_progress);
-        abort_button->setText(tr("Abort"));
-
-        // setting cancel button connects the button to the dialog to hide the dialog on button click
-        m_progress->setCancelButton(abort_button);
-        // need to disconnect the connections since clicking on the button immediately hides the dialog
-        m_progress->disconnect(abort_button);
-
-        // then define custom connections
-        connect(abort_button, &QPushButton::clicked, this, [=] () {
-            m_progress->setLabelText(tr("Aborting..."));
-            m_progress->show();
-            QCoreApplication::processEvents();
-            abort_button->setDisabled(true);
-           processor->abort();
-           (*is_completed) = false;
-        });
-
-        m_progress->show();
-
         processor->addEntryList(ENTRY_LIST_TYPE::METADATA_CHANGED_ENTRIES, metadata_list);
 
-        connect(processor, &HoerbertProcessor::processUpdated, this, [this] (int percent) {
-           m_progress->setValue(percent);
-           m_progress->setLabelText(tr("Migrating files to the new hoerbert.app. Please wait."));
-           QCoreApplication::processEvents();
+        connect( processor, &HoerbertProcessor::processUpdated, m_pleaseWaitDialog, &PleaseWaitDialog::setProgressValue );
+
+        connect(processor, &HoerbertProcessor::failed, this, [=](const QString &errorString) {
+            processorErrorOccurred("On migration\n" + errorString);
         });
 
-        connect(processor, &HoerbertProcessor::failed, this, [this](const QString &errorString) {
-            this->processorErrorOccurred("On migration\n" + errorString);
-        });
-
-        connect(processor, &QThread::finished, this, [=] () {
-            processor->quit();
-            processor->deleteLater();
+        connect(processor, &QThread::finished, this, [=]() {
 
             if (*is_completed)
                 moveFile(dirPath + HOERBERT_XML, dirPath + HOERBERT_XML_BACKUP);
 
-            this->sync();
-            m_progress->close();
-            m_progress->deleteLater();
+            disconnect( processor, &HoerbertProcessor::processUpdated, m_pleaseWaitDialog, &PleaseWaitDialog::setProgressValue );
+            processor->quit();
+            processor->deleteLater();
         });
+
 
         QEventLoop loop;
         connect(processor, &QThread::finished, &loop, &QEventLoop::quit);
-
         processor->start();
-
         loop.exec();
 
-        m_isWritingToDisk = true;
+        m_pleaseWaitDialog->setWindowTitle(tr("Generating hoerbert.xml"));
+        m_pleaseWaitDialog->setWaitMessage(tr("Making this card compatible with the old hoerbert app V1.x"));
+        m_pleaseWaitDialog->setProgressRange( 0, 100 );
+        connect( m_cardPage, &CardPage::sendProgressPercent, m_pleaseWaitDialog, &PleaseWaitDialog::setProgressValue );
+        connect( m_pleaseWaitDialog, &PleaseWaitDialog::checkboxIsClicked, this, [=](bool onOff){
+            QSettings settings;
+            settings.beginGroup("Global");
+            settings.setValue("regenerateHoerbertXml", !onOff);
+            settings.endGroup();
+        });
 
         m_cardPage->recreateXml();
         m_cardPage->setHoerbertXMLDirty( false );
+
+        sync();
+
+        bool doGenerateHoerbertXml = false;
+        {
+            QSettings settings;
+            settings.beginGroup("Global");
+            doGenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
+            settings.endGroup();
+        }
+
+        if(doGenerateHoerbertXml)
+        {
+            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version 2.x")+"\n"+tr("If you are sure that you will never ever use the old hoerbert app 1.x,\nyou can skip some time consuming steps in the future\nby ticking the check box below."));
+            m_pleaseWaitDialog->setCheckBoxLabel(tr("I only will use my memory cards with this new software from now on."));
+        }
+        else
+        {
+            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version 2.x"));
+        }
+        m_pleaseWaitDialog->setWindowTitle(tr("Ready for use"));
+        m_pleaseWaitDialog->showButton(true);
     }
-
-
 }
 
 void MainWindow::addTitle()
@@ -513,7 +501,6 @@ void MainWindow::removeTitle()
 void MainWindow::moveToAnotherPlaylist(quint8 toDir, bool toBeginning)
 {
     m_playlistPage->moveSelectedEntriesTo(toDir, toBeginning);
-    m_isWritingToDisk = true;
     sync();
 }
 
@@ -775,8 +762,6 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
 void MainWindow::sync()
 {
     qDebug() << "About to sync disk writing...";
-    if (!m_isWritingToDisk)
-        return;
 
     QProcess process;
     QStringList arguments;
@@ -795,11 +780,11 @@ void MainWindow::sync()
     {
         m_dbgDlg->appendLog("- Sync failed. Failed to start.");
         process.close();
-        m_isWritingToDisk = false;
 
         QApplication::restoreOverrideCursor();
         qApp->processEvents();
 
+        process.close();
         return;
     }
 
@@ -807,11 +792,11 @@ void MainWindow::sync()
     {
         m_dbgDlg->appendLog("- Sync failed. Failed to complete.");
         process.close();
-        m_isWritingToDisk = false;
 
         QApplication::restoreOverrideCursor();
         qApp->processEvents();
 
+        process.close();
         return;
     }
     process.close();
@@ -820,8 +805,6 @@ void MainWindow::sync()
     qApp->processEvents();
 
     qDebug() << "Sync is successful!";
-
-    m_isWritingToDisk = false;
 }
 
 void MainWindow::collectInformationForSupport()
@@ -1030,14 +1013,12 @@ void MainWindow::collectInformationForSupport()
     {
         processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to start.");
-        m_isWritingToDisk = false;
     }
 
     if ( processSuccess && !process.waitForFinished(60000))
     {
         processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to complete.");
-        m_isWritingToDisk = false;
     }
 
 #endif
@@ -1129,8 +1110,6 @@ void MainWindow::backupCard()
         this->processorErrorOccurred("On backup\n" + errorString);
     });
 
-    m_isWritingToDisk = true;
-
     m_progress->setCursor(Qt::WaitCursor);
 
     m_backupManager->process();
@@ -1215,8 +1194,6 @@ void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
         this->processorErrorOccurred("On restoring backup\n" + errorString);
     });
 
-    m_isWritingToDisk = true;
-
     m_backupManager->process();
 
     m_backupManager->deleteLater();
@@ -1294,8 +1271,6 @@ void MainWindow::switchDiagnosticsMode()
 
     QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
     qApp->processEvents();
-
-    m_isWritingToDisk = true;
 
     if (doEnable) // switch to diagnostics mode
     {
@@ -1553,15 +1528,28 @@ void MainWindow::closeEvent(QCloseEvent *e)
     {
         auto selected = QMessageBox::question(this, "hörbert", QString(tr("Current drive [%1] is being processed.")+"\n\n"+tr("Are you sure you want to close this app?")).arg(m_cardPage->currentDriveName()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
 
-        if (selected == QMessageBox::No)
-            return;
+        if (selected == QMessageBox::Yes)
+        {
+            m_cardPage->ejectDrive();       // this may appear quite brutal, but it keeps unexperienced users from harm. Decision made based on experience.
+            e->accept();
+        }
+        else
+        {
+            e->ignore();
+        }
     }
-    QMainWindow::closeEvent(e);
+    else
+    {
+        m_cardPage->ejectDrive();       // this may appear quite brutal, but it keeps unexperienced users from harm. Decision made based on experience.
+        e->accept();
+    }
 }
 
 void MainWindow::showVersion(const QString &version)
 {
     QDialog *dlg = new QDialog();
+    connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
+
     dlg->setModal(true);
     dlg->setFixedSize(320, 198);
 
@@ -1625,11 +1613,12 @@ void MainWindow::remindBackup()
     if (need_to_remind)
     {
         QDialog *dlg = new QDialog(this);
+        connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
         dlg->setWindowTitle(tr("Backup reminder"));
         dlg->setFixedSize(640, 240);
 
         QLabel *text = new QLabel(dlg);
-        text->setText( tr("Backup reminder: Don't forget to backup your memory card to your computer.")+"\n"+tr("This will keep you from losing files accidently. Do you want to create a backup now?") );
+        text->setText( tr("Backup reminder: Don't forget to backup your memory card to your computer.")+"\n"+tr("This will keep you from losing files accidently.\nDo you want to create a backup now?") );
 
         QCheckBox *reminder_chk = new QCheckBox(dlg);
         reminder_chk->setText(tr("Never remind me again"));
@@ -2134,8 +2123,9 @@ void MainWindow::createActions()
     m_helpMenu = new QMenu(tr("Help"), this);
     menuBar()->addMenu(m_helpMenu);
 
-    aboutAction = new QAction(tr("About"), this);
-    aboutAction->setStatusTip(tr("About"));
+    aboutAction = new QAction(tr("About this app"), this);
+    aboutAction->setStatusTip(tr("About this app"));
+    aboutAction->setMenuRole(QAction::ApplicationSpecificRole);
     connect(aboutAction, &QAction::triggered, this, &MainWindow::about);
     m_helpMenu->addAction(aboutAction);
 

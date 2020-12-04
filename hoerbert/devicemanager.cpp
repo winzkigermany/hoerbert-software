@@ -273,6 +273,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
     if ( !cmd.isEmpty() ){
 
         pleaseWait = new PleaseWaitDialog();
+        connect( pleaseWait, &QDialog::finished, pleaseWait, &QObject::deleteLater);
         pleaseWait->setParent( parentWidget );
         pleaseWait->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         pleaseWait->setWindowTitle(tr("Formatting memory card..."));
@@ -389,6 +390,7 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo( QProcess* theProc
 
     if( showPleaseWaitDialog ){
         pleaseWait = new PleaseWaitDialog();
+        connect( pleaseWait, &QDialog::finished, pleaseWait, &QObject::deleteLater);
         pleaseWait->setParent( parentWidget );
         pleaseWait->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         pleaseWait->setWindowTitle(tr("Formatting memory card..."));

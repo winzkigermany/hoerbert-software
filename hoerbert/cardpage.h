@@ -56,11 +56,13 @@
 #include "xmlwriter.h"
 #include "pleasewaitdialog.h"
 #include "devicemanager.h"
-#include "define.h"
+#include "mainwindow.h"
 
 #ifdef Q_OS_WIN
 #include "../libQDeviceWatcher/qdevicewatcher.h"
 #endif
+
+class MainWindow;
 
 const int GRID_SPACING              = 16;
 const int MOUNT_VOLUME_DELAY        = 2; // in seconds
@@ -141,7 +143,7 @@ public:
      * @param buttonIndex the button to set
      * @param percentage the percentage to set
      */
-    void setPercent(int buttonIndex, int percentage);
+    void sendPercent(int buttonIndex, int percentage);
 
     /**
      * @brief set the enabled state of a button
@@ -291,6 +293,11 @@ signals:
      */
     void enableEditMenuItems( bool );
 
+    /**
+     * @brief signals the percentage of long running processes
+     */
+    void sendProgressPercent( int );
+
 public slots:
 
     /**
@@ -387,6 +394,9 @@ private:
     QSpacerItem *m_rightGridSpacer;
 
     QMutex m_audioInputThreadMutex;
+
+    MainWindow* m_mainWindow;   // our parent
+    PleaseWaitDialog* m_pleaseWaitDialog;
 };
 
 #endif // CARDPAGE_H

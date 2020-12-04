@@ -75,6 +75,14 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<QMap<ENTRY_LIST_TYPE,AudioList> >("QMap<ENTRY_LIST_TYPE, AudioList>");
 
+    QCoreApplication::translate("MAC_APPLICATION_MENU", "Services");
+    QCoreApplication::translate("MAC_APPLICATION_MENU", "Hide %1");
+    QCoreApplication::translate("MAC_APPLICATION_MENU", "Hide Others");
+    QCoreApplication::translate("MAC_APPLICATION_MENU", "Show All");
+    QCoreApplication::translate("MAC_APPLICATION_MENU", "Preferences...");
+    QCoreApplication::translate("MAC_APPLICATION_MENU", "Quit %1");
+    QCoreApplication::translate("MAC_APPLICATION_MENU", "About %1");
+
     QCoreApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication a(argc, argv);
 
@@ -253,7 +261,7 @@ int main(int argc, char *argv[])
         palette.setColor(QPalette::Disabled,QPalette::Text,QColor(127,127,127));
         palette.setColor(QPalette::Dark,QColor(35,35,35));
         palette.setColor(QPalette::Shadow,QColor(20,20,20));
-        palette.setColor(QPalette::Button,QColor(53,53,53));
+        palette.setColor(QPalette::Button,QColor(60,60,60));
         palette.setColor(QPalette::ButtonText,Qt::white);
         palette.setColor(QPalette::Disabled,QPalette::ButtonText,QColor(127,127,127));
         palette.setColor(QPalette::BrightText,Qt::red);

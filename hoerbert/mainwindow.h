@@ -51,6 +51,8 @@
 #include "playlistview.h"
 #include "backuprestoredialog.h"
 
+class CardPage;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -73,6 +75,12 @@ public:
      * @param fixList list of folder indices which need plausibility fix
      */
     void makePlausible(std::list <int> fixList);
+
+    /**
+     * @brief sync calls "sync" on OS level to ask the OS politely to dump all changes to the memory card.
+     */
+    void sync();
+
 
 signals:
     /**
@@ -113,14 +121,12 @@ private slots:
 
     void printHtml(const AudioList &list, const QString &outputPath = QString(), bool showOnBrowser = true);
 
-    void sync();
-
     void collectInformationForSupport();
     void showHideEditMenuEntries( bool );
 
 private:
 
-    void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e) override;
 
     void showVersion(const QString &version);
 
@@ -134,7 +140,6 @@ private:
 
     QString printButtons(int);
 
-    bool m_isWritingToDisk;
     QString m_migrationPath;
     BackupManager *m_backupManager;
     QProgressDialog *m_progress;
@@ -210,6 +215,7 @@ private:
     QMutex m_plausibilityCheckMutex;
 
     QMap<int, QString> m_errorLog;
+    PleaseWaitDialog* m_pleaseWaitDialog;
 };
 
 #endif // MAINWINDOW_H
