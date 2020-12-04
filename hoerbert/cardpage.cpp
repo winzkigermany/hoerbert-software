@@ -47,20 +47,19 @@ CardPage::CardPage(QWidget *parent)
     m_driveList->setObjectName("DriveComboBox");
     m_driveList->setEditable(false);
     m_driveList->setToolTip(tr("Shows available memory cards or drives of this computer"));
-//    m_driveList->setMinimumSize(100, 42);   // minimum height - this looks better because of the eject button making the whole row jump when it appears otherwise.
 
     m_selectDriveButton = new QPushButton(this);
     m_selectDriveButton->setText(tr("Read Card"));
-    m_selectDriveButton->setToolTip(tr("Read the selected card to edit it")+" ("+QString(tr("Ctrl+r"))+")" );
-    m_selectDriveButton->setShortcut(QKeySequence(tr("Ctrl+r")) );
+//    m_selectDriveButton->setToolTip(tr("Read the selected card to edit it")+" ("+QString(tr("Ctrl+r"))+")" );     // not ideal, not adjusted for different OSs
+//    m_selectDriveButton->setShortcut(QKeySequence(tr("Ctrl+r")) );                                                // not ideal, not adjusted for different OSs
 
     m_ejectDriveButton = new PieButton(this);
     m_ejectDriveButton->setFixedSize(32, 32);
     m_ejectDriveButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_ejectDriveButton->setMainPixmap(QPixmap(":/images/eject.png"));
     m_ejectDriveButton->setShadowEnabled(false);
-    m_ejectDriveButton->setToolTip( tr("Save all changes and eject card")+" ("+QString(tr("Ctrl+j"))+")" );
-    m_ejectDriveButton->setShortcut( QKeySequence(tr("Ctrl+j")) );
+    m_ejectDriveButton->setToolTip( tr("Save all changes and eject card") );
+//    m_ejectDriveButton->setShortcut( QKeySequence(tr("Ctrl+j")) );        // not ideal, not adjusted for different OSs
     m_ejectDriveButton->hide();
 
     m_ejectButtonLabel = new QLabel(this);

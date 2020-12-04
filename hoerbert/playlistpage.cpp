@@ -94,8 +94,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addSilenceButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addSilenceButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addSilenceButton->setShadowEnabled(false);
-    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));
-    m_addSilenceButton->setToolTip(tr("Add silence of given duration") + QString(" (Ctrl+S)"));
+//    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
+    m_addSilenceButton->setToolTip(tr("Add silence of given duration"));
 
     m_leftToolLayout->addWidget(m_colorBlindHintLabel);
     m_leftToolLayout->addSpacing(10);
@@ -111,8 +111,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addButton->setShadowEnabled(false);
-    m_addButton->setShortcut(QKeySequence("Ctrl+F"));
-    m_addButton->setToolTip(tr("Add audio files or tracks from Finder/Explorer") + QString(" (Ctrl+F)"));
+//    m_addButton->setShortcut(QKeySequence("Ctrl+F"));       // not ideal, not adjusted for different OSs
+    m_addButton->setToolTip(tr("Add audio files or tracks from Finder/Explorer"));
 
     m_removeButton = new PieButton(this);
     m_removeButton->setFixedSize(32, 32);
@@ -120,8 +120,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_removeButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_removeButton->setMainPixmap(QPixmap(":/images/minus.png"));
     m_removeButton->setShadowEnabled(false);
-    m_removeButton->setShortcut(QKeySequence("Ctrl+R"));
-    m_removeButton->setToolTip(tr("Remove tracks from the list") + QString(" (Ctrl+R)"));
+//    m_removeButton->setShortcut(QKeySequence("Ctrl+R"));    // not ideal, not adjusted for different OSs
+    m_removeButton->setToolTip(tr("Remove tracks from the list"));
 
     m_centerToolLayout->addWidget(m_addButton);
     m_centerToolLayout->addWidget(m_removeButton);
@@ -134,8 +134,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_commitButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_commitButton->setMainPixmap(QPixmap(":/images/confirm.png"));
     m_commitButton->setShadowEnabled(false);
-    m_commitButton->setShortcut(QKeySequence("Ctrl+C"));
-    m_commitButton->setToolTip(tr("Write changes to the card") + QString(" (Ctrl+C)"));
+//    m_commitButton->setShortcut(QKeySequence("Ctrl+C"));    // not ideal, not adjusted for different OSs
+    m_commitButton->setToolTip(tr("Write changes to the card"));
 
     m_cancelButton = new PieButton(this);
     m_cancelButton->setFixedSize(32, 32);
@@ -143,8 +143,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_cancelButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_cancelButton->setMainPixmap(QPixmap(":/images/cancel.png"));
     m_cancelButton->setShadowEnabled(false);
-    m_cancelButton->setShortcut(QKeySequence("Escape"));
-    m_cancelButton->setToolTip(tr("Discard changes and exit playlist") + QString(" (Escape)"));
+//    m_cancelButton->setShortcut(QKeySequence("Escape"));    // not ideal, not adjusted for different OSs
+    m_cancelButton->setToolTip(tr("Discard changes and exit playlist"));
 
     m_rightToolLayout->addWidget(m_commitButton);
     m_rightToolLayout->addWidget(m_cancelButton);

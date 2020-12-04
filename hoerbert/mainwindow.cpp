@@ -163,11 +163,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_cardPage, &CardPage::enableEditMenuItems, this, &MainWindow::showHideEditMenuEntries);
 
-
-
-
-    connect( m_playlistPage->getPlaylistView(), &PlaylistView::currentPlaylistIsUntouched,  m_moveToPlaylistMenu, &QMenu::setEnabled );
-
     connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
         m_cardPage->enableButtons(true);
         showHideEditMenuEntries(false);
@@ -1690,6 +1685,7 @@ void MainWindow::createActions()
 
     m_moveToPlaylistMenu = new QMenu(tr("Move to playlist..."), this);
     m_moveToPlaylistMenu->setEnabled(false);
+    connect( m_playlistPage->getPlaylistView(), &PlaylistView::currentPlaylistIsUntouched,  m_moveToPlaylistMenu, &QMenu::setEnabled );
     m_editMenu->addMenu( m_moveToPlaylistMenu );
 
     m_subMenuBegin = new QMenu(tr("Beginning of..."), this);
