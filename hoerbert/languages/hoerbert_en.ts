@@ -229,89 +229,94 @@ you will have to restore that backup manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="313"/>
-        <location filename="../cardpage.cpp" line="327"/>
-        <location filename="../cardpage.cpp" line="349"/>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>Danger of corrupting the card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="317"/>
+        <location filename="../cardpage.cpp" line="329"/>
+        <location filename="../cardpage.cpp" line="351"/>
         <source>Format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="313"/>
+        <location filename="../cardpage.cpp" line="317"/>
         <source>You have selected a custom path to work on.
 This app does not format such paths for safety reasons.
 Please format your memory card manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="340"/>
+        <location filename="../cardpage.cpp" line="342"/>
         <source>If you do not want to enter your root password here,
 please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="341"/>
+        <location filename="../cardpage.cpp" line="343"/>
         <source>Permission required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="374"/>
+        <location filename="../cardpage.cpp" line="376"/>
         <source>Current drive [%1] is being processed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="374"/>
+        <location filename="../cardpage.cpp" line="376"/>
         <source>Are you sure you want to eject the drive?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="374"/>
+        <location filename="../cardpage.cpp" line="376"/>
         <source>Eject</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="400"/>
+        <location filename="../cardpage.cpp" line="402"/>
         <source>Making this card compatible with the old hoerbert app V1.x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="431"/>
-        <location filename="../cardpage.cpp" line="442"/>
+        <location filename="../cardpage.cpp" line="433"/>
+        <location filename="../cardpage.cpp" line="444"/>
         <source>[%1] has been ejected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="431"/>
-        <location filename="../cardpage.cpp" line="442"/>
+        <location filename="../cardpage.cpp" line="433"/>
+        <location filename="../cardpage.cpp" line="444"/>
         <source>It is now safe to remove it from your computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="448"/>
+        <location filename="../cardpage.cpp" line="450"/>
         <source>Failed to eject the memory card [%1].</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="448"/>
+        <location filename="../cardpage.cpp" line="450"/>
         <source>Please try again or try to remove it with your operating system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="562"/>
+        <location filename="../cardpage.cpp" line="564"/>
         <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="562"/>
+        <location filename="../cardpage.cpp" line="564"/>
         <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="568"/>
+        <location filename="../cardpage.cpp" line="570"/>
         <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="568"/>
+        <location filename="../cardpage.cpp" line="570"/>
         <source>Do you you want to format this drive [%1] now?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -326,36 +331,36 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="350"/>
+        <location filename="../cardpage.cpp" line="352"/>
         <source>Please enter the new name for your card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="552"/>
-        <location filename="../cardpage.cpp" line="562"/>
-        <location filename="../cardpage.cpp" line="568"/>
-        <location filename="../cardpage.cpp" line="585"/>
-        <location filename="../cardpage.cpp" line="624"/>
+        <location filename="../cardpage.cpp" line="554"/>
+        <location filename="../cardpage.cpp" line="564"/>
+        <location filename="../cardpage.cpp" line="570"/>
+        <location filename="../cardpage.cpp" line="587"/>
+        <location filename="../cardpage.cpp" line="626"/>
         <source>Select drive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="585"/>
+        <location filename="../cardpage.cpp" line="587"/>
         <source>Volume size is bigger than 32GB. This may not be a memory card at all.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="585"/>
+        <location filename="../cardpage.cpp" line="587"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="624"/>
+        <location filename="../cardpage.cpp" line="626"/>
         <source>This card has never been used with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="624"/>
+        <location filename="../cardpage.cpp" line="626"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -395,49 +400,57 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="328"/>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>DANGER of corrupting the card.
+The memory card has disappeared suddenly.
+NEVER simply pull the card,
+ALWAYS press the eject button of this app before!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="330"/>
         <source>THIS OPERATION WILL ERASE ALL DATA!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="328"/>
+        <location filename="../cardpage.cpp" line="330"/>
         <source>Are you sure you want to format this drive?
 [%1]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="399"/>
+        <location filename="../cardpage.cpp" line="401"/>
         <source>Generating hoerbert.xml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="408"/>
+        <location filename="../cardpage.cpp" line="410"/>
         <source>Ejecting card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="409"/>
+        <location filename="../cardpage.cpp" line="411"/>
         <source>Waiting for all write operations to finish.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="419"/>
+        <location filename="../cardpage.cpp" line="421"/>
         <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="431"/>
+        <location filename="../cardpage.cpp" line="433"/>
         <source>If you do not need hoerbert.xml for the old hoerbert app 1.x,
 skip this step by ticking the check box below.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="438"/>
+        <location filename="../cardpage.cpp" line="440"/>
         <source>I only will use my memory cards with this new software from now on.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="552"/>
+        <location filename="../cardpage.cpp" line="554"/>
         <source>The selected device is write-protected. Please eject the device and remove the write protection, if you want to modify any playlists on it.</source>
         <translation type="unfinished"></translation>
     </message>

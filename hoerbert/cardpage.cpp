@@ -279,8 +279,10 @@ void CardPage::updateDriveList()
     bool selectedDriveExists = false;
     if (!m_deviceManager->selectedDriveName().isEmpty())
     {
-        for (const auto& drive : m_deviceManager->getDeviceList()) {
-            if (drive.compare(m_deviceManager->selectedDriveName()) == 0) {
+        for (const auto& drive : m_deviceManager->getDeviceList())
+        {
+            if (drive.compare(m_deviceManager->selectedDriveName()) == 0)
+            {
                 selectedDriveExists = true;
                 m_driveList->setCurrentText(m_deviceManager->selectedDriveName());
             }
@@ -291,7 +293,7 @@ void CardPage::updateDriveList()
     {
         if(!selectedDriveExists && !m_deviceManager->selectedDriveName().isEmpty()) // this is bad, very bad, presumably a user just ripped out the SD card.
         {
-            QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
+            QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory card has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
         }
 
         deselectDrive();
