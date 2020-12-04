@@ -289,8 +289,7 @@ void CardPage::updateDriveList()
 
     if (!selectedDriveExists || m_deviceManager->selectedDrive().isEmpty())
     {
-        initializePlaylists();
-        //selectDrive(m_driveList->currentText());
+        deselectDrive();
     }
 
     if (m_driveList->count() > 0)
