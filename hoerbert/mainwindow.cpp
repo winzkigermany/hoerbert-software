@@ -80,54 +80,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_stackWidget = new QStackedWidget(m_centralWidget);
 
     m_cardPage = new CardPage(this);
-
     m_playlistPage = new PlaylistPage(this);
 
-    m_shadow = new QGraphicsDropShadowEffect(this);
-    m_shadow->setBlurRadius(10);
-    m_shadow->setOffset(5, 5);
-    m_shadow->setColor(QColor(0, 0, 0));
-
-    m_playlistPage->setGraphicsEffect(m_shadow);
-
-    m_aboutDlg = new AboutDialog(this);
-
-    m_featuresDlg = new AdvancedFeaturesDialog(this);
-    m_featuresDlg->setModal(true);
-
-    m_stackWidget->addWidget(m_cardPage);
-    m_stackWidget->addWidget(m_playlistPage);
-
-    m_layout->addLayout(m_infoLayout);
-    m_layout->addWidget(m_stackWidget);
-
-    m_dbgDlg = new DebugDialog(this);
-
-    createActions();
-
-    connect(m_aboutDlg, &AboutDialog::checkForUpdateRequested, this, &MainWindow::checkForUpdates);
-
-    connect(m_featuresDlg, &AdvancedFeaturesDialog::buttonSettingsChanged, this, [this]() {
-        m_cardPage->updateButtons();
-    });
-
-    connect( m_playlistPage->getPlaylistView(), &PlaylistView::currentPlaylistIsUntouched,  m_moveToPlaylistMenu, &QMenu::setEnabled );
-
-    connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
-        m_cardPage->enableButtons(true);
-        showHideEditMenuEntries(false);
-
-        m_stackWidget->setCurrentIndex(0);
-        m_cardPage->update();
-        m_capBar->resetEstimation();
-
-        this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
-        qApp->processEvents();
-    });
-
-    connect(m_playlistPage, &PlaylistPage::errorOccurred, this, [this] (const QString &errorString) {
-        m_dbgDlg->appendLog(errorString);
-    });
 
     connect(m_cardPage, &CardPage::driveCapacityUpdated, m_capBar, &CapacityBar::setParams);
 
@@ -137,6 +91,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_cardPage, &CardPage::driveSelected, this, [this] (const QString &driveName) {
         bool remind_backup = false;
+
+        if( driveName.isEmpty() )
+            m_migrationPath = QString("");
+
         if (driveName.compare(m_selectedDriveLabel) != 0)
             remind_backup = true;
 
@@ -164,7 +122,8 @@ MainWindow::MainWindow(QWidget *parent)
             }
 
         }
-        else {
+        else
+        {
             // enable menu actions
             m_printAction->setEnabled(true);
             m_backupAction->setEnabled(true);
@@ -192,22 +151,6 @@ MainWindow::MainWindow(QWidget *parent)
         m_shadow->setColor(m_cardPage->getPlaylistColor(dir_num));
 
         showHideEditMenuEntries( true );
-/*
-#if defined(Q_OS_MAC)
-        m_subMenuBegin->setEnabled(true);
-        m_subMenuEnd->setEnabled(true);
-        m_subMenuBegin->menuAction()->setVisible(true);
-        m_subMenuEnd->menuAction()->setVisible(true);
-        m_moveToPlaylistMenu->menuAction()->setVisible(true);
-#endif
-        m_moveToPlaylistMenu->setEnabled(true);
-*/
-    });
-
-    connect(m_cardPage, &CardPage::driveSelected, this, [this](const QString &dirPath) {
-        if( dirPath.isEmpty() ){
-            this->m_migrationPath = QString("");
-        }
     });
 
     connect(m_cardPage, &CardPage::migrationNeeded, this, [this](const QString &dirPath) {
@@ -220,14 +163,60 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_cardPage, &CardPage::enableEditMenuItems, this, &MainWindow::showHideEditMenuEntries);
 
+
+
+
+    connect( m_playlistPage->getPlaylistView(), &PlaylistView::currentPlaylistIsUntouched,  m_moveToPlaylistMenu, &QMenu::setEnabled );
+
+    connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
+        m_cardPage->enableButtons(true);
+        showHideEditMenuEntries(false);
+
+        m_stackWidget->setCurrentIndex(0);
+        m_cardPage->update();
+        m_capBar->resetEstimation();
+
+        this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
+        qApp->processEvents();
+    });
+
+    connect(m_playlistPage, &PlaylistPage::errorOccurred, this, [this] (const QString &errorString) {
+        m_dbgDlg->appendLog(errorString);
+    });
+
     connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
 
     connect(m_playlistPage, &PlaylistPage::durationChanged, m_capBar, &CapacityBar::addSpaceInSeconds);
 
-    //m_cardPage->selectDrive();
+    m_shadow = new QGraphicsDropShadowEffect(this);
+    m_shadow->setBlurRadius(10);
+    m_shadow->setOffset(5, 5);
+    m_shadow->setColor(QColor(0, 0, 0));
+
+    m_playlistPage->setGraphicsEffect(m_shadow);
+
+    m_aboutDlg = new AboutDialog(this);
+
+    connect(m_aboutDlg, &AboutDialog::checkForUpdateRequested, this, &MainWindow::checkForUpdates);
+
+    m_featuresDlg = new AdvancedFeaturesDialog(this);
+    m_featuresDlg->setModal(true);
+
+    connect(m_featuresDlg, &AdvancedFeaturesDialog::buttonSettingsChanged, this, [this]() {
+        m_cardPage->updateButtons();
+    });
+
+    m_stackWidget->addWidget(m_cardPage);
+    m_stackWidget->addWidget(m_playlistPage);
+
+    m_layout->addLayout(m_infoLayout);
+    m_layout->addWidget(m_stackWidget);
+
+    m_dbgDlg = new DebugDialog(this);
+
+    createActions();
 
     m_backupManager = nullptr;
-
     m_dbgDlg = new DebugDialog(this);
 }
 
@@ -2100,9 +2089,24 @@ void MainWindow::createActions()
 
     m_formatAction = new QAction(tr("Format memory card"), this);
     m_formatAction->setStatusTip(tr("Format memory card"));
-    m_formatAction->setEnabled(true);
+    m_formatAction->setEnabled(m_cardPage->getDriveListLength()>0);
     connect(m_formatAction, &QAction::triggered, this, &MainWindow::formatCard);
     m_extrasMenu->addAction(m_formatAction);
+
+    connect(m_cardPage, &CardPage::driveListChanged, this, [=](int numberOfListEntries){
+        if( numberOfListEntries>0 )
+        {
+            if( !m_cardPage->isDiagnosticsModeEnabled() )
+            {
+                m_formatAction->setEnabled(true);
+            }
+        }
+        else
+        {
+            m_formatAction->setEnabled(false);
+        }
+    });
+
 
     m_advancedFeaturesAction = new QAction(tr("Advanced features"), this);
     m_advancedFeaturesAction->setStatusTip(tr("Advanced features"));
@@ -2240,7 +2244,6 @@ void MainWindow::showHideEditMenuEntries( bool showHide )
         m_subMenuEnd->setEnabled(false);
         m_subMenuBegin->menuAction()->setEnabled(false);
         m_subMenuEnd->menuAction()->setEnabled(false);
-//        m_moveToPlaylistMenu->menuAction()->setVisible(false);
 #endif
         m_moveToPlaylistMenu->menuAction()->setEnabled(false);
         m_moveToPlaylistMenu->menuAction()->setDisabled(true);

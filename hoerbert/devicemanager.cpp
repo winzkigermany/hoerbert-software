@@ -276,18 +276,14 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         connect( pleaseWait, &QDialog::finished, pleaseWait, &QObject::deleteLater);
         pleaseWait->setParent( parentWidget );
         pleaseWait->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-        pleaseWait->setWindowTitle(tr("Formatting memory card..."));
         pleaseWait->setWindowModality(Qt::ApplicationModal);
-        pleaseWait->show();
+        pleaseWait->setWindowTitle(tr("Formatting memory card"));
 
         connect( &formatProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int exitCode, QProcess::ExitStatus exitStatus){
-            Q_UNUSED( exitCode )
             Q_UNUSED( exitStatus )
-
-            QString output = formatProcess.readAllStandardOutput();
-            if (output.contains("Finished erase", Qt::CaseInsensitive) || output.contains("Format complete", Qt::CaseInsensitive))
+            if (exitCode==0 )
             {
-                pleaseWait->setResultString( tr("The memory card has been formatted successfully"));
+                pleaseWait->setResultString( tr("The memory card has been formatted successfully.") );
             }
             else
             {
@@ -295,7 +291,17 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
             }
         });
 
-        formatProcess.start(cmd);
+        if( isRemovable(deviceName) )
+        {
+            pleaseWait->setWaitMessage(tr("Please wait while the memory card is being formatted."));
+            pleaseWait->show();
+            formatProcess.start(cmd);
+        }
+        else
+        {
+            pleaseWait->setResultString(tr("The selected drive seems not to be a removable drive\nThis app will not format it for safety reasons."));
+            pleaseWait->show();
+        }
 
         return SUCCESS;
     }
@@ -637,11 +643,13 @@ QString DeviceManager::getFormatCommand(const QString &root, const QString &driv
 {
     QString cmd;
     QString newRoot = "";
+    QString systemRoot = "";
 #if defined (Q_OS_WIN)
     newRoot = root.at(0);
     cmd = "CMD /C format " + newRoot + ": /FS:FAT32 /Q /X /Y /V:" + driveLabel;
 #elif defined (Q_OS_MACOS)
     newRoot = root.left(root.length() - 2);
+
     cmd = QString("diskutil eraseDisk FAT32 %1 MBRFormat %2").arg(driveLabel).arg(newRoot);
 #endif
     return cmd;

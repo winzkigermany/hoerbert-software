@@ -75,22 +75,18 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<QMap<ENTRY_LIST_TYPE,AudioList> >("QMap<ENTRY_LIST_TYPE, AudioList>");
 
-    QCoreApplication::translate("MAC_APPLICATION_MENU", "Services");
-    QCoreApplication::translate("MAC_APPLICATION_MENU", "Hide %1");
-    QCoreApplication::translate("MAC_APPLICATION_MENU", "Hide Others");
-    QCoreApplication::translate("MAC_APPLICATION_MENU", "Show All");
-    QCoreApplication::translate("MAC_APPLICATION_MENU", "Preferences...");
-    QCoreApplication::translate("MAC_APPLICATION_MENU", "Quit %1");
-    QCoreApplication::translate("MAC_APPLICATION_MENU", "About %1");
-
     QCoreApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication a(argc, argv);
 
+    QString localeName = QLocale::system().name();
 
     QTranslator qtTranslator;
-    QString localeName = QLocale::system().name();
-    qtTranslator.load("qt_" + localeName, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    qtTranslator.load("qt_" + localeName.mid(0,2), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     a.installTranslator(&qtTranslator);
+
+    QTranslator qtBaseTranslator;
+    qtTranslator.load("qtbase_" + localeName.mid(0,2), ":/languages");
+    a.installTranslator(&qtBaseTranslator);
 
     QTranslator myappTranslator;
     myappTranslator.load("hoerbert_" + localeName.mid(0,2), ":/languages");

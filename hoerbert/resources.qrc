@@ -42,5 +42,8 @@
         <file>images/merge_copy_400.png</file>
         <file>images/overwrite_copy_200.png</file>
         <file>images/overwrite_copy_400.png</file>
+        <file>languages/qtbase_de.qm</file>
+        <file>languages/qtbase_en.qm</file>
+        <file>languages/qtbase_fr.qm</file>
     </qresource>
 </RCC>

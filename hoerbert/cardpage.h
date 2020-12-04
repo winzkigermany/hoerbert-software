@@ -249,6 +249,12 @@ public:
      */
     void enableButtons( bool onOff );
 
+    /**
+     * @brief getDriveListLength
+     * @return the number of drives in the drop down list
+     */
+    int getDriveListLength();
+
 signals:
 
     /**
@@ -297,6 +303,11 @@ signals:
      * @brief signals the percentage of long running processes
      */
     void sendProgressPercent( int );
+
+    /**
+     * @brief signals the current number of drives in the drive list
+     */
+    void driveListChanged( int );
 
 public slots:
 

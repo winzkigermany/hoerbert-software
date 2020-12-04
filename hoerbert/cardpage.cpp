@@ -179,7 +179,6 @@ CardPage::CardPage(QWidget *parent)
     m_mainLayout->addSpacerItem(new QSpacerItem(20, 50, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     m_driveList->addItems(m_deviceManager->getDeviceList());
-
     updateButtons();
 
     for (const auto& key : m_dirs.keys())
@@ -304,12 +303,14 @@ void CardPage::updateDriveList()
         m_selectDriveButton->setEnabled(false);
         m_ejectDriveButton->setEnabled(false);
     }
+
+    emit driveListChanged(m_driveList->count());
 }
 
 void CardPage::formatSelectedDrive(bool retry)
 {
     if( m_deviceManager->isWorkingOnCustomDirectory() ){
-        QMessageBox::information(this, tr("Format"), tr("You have selected a custom path to work on. For safety purposes, this app does not format such paths. Please format your memory card manually yourself."));
+        QMessageBox::warning(this, tr("Format"), tr("You have selected a custom path to work on.\nThis app does not format such paths for safety reasons.\nPlease format your memory card manually."));
         return;
     }
 
@@ -320,27 +321,46 @@ void CardPage::formatSelectedDrive(bool retry)
 
     if (!retry)
     {
-        auto selected = QMessageBox::question(this, tr("Format"), tr("Are you sure you want to format this drive [%1] ?").arg(selectedDrive), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Format"));
+        msgBox.setText(tr("THIS OPERATION WILL ERASE ALL DATA!")+"\n"+tr("Are you sure you want to format this drive?\n[%1]").arg(selectedDrive));
+        msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setDefaultButton(QMessageBox::No);
 
-        if (selected == QMessageBox::No)
+        if(msgBox.exec() == QMessageBox::No)
             return;
     }
 
     QString passwd = "";
-    bool ok = false;
 #ifdef Q_OS_LINUX
-    auto label = tr("If you do not want to enter your root password here,\nplease format the memory card in terminal with the following command:")
-            + "\n\numount [device]\nmkfs.vfat [device]\n";
-
+    bool ok = false;
+    auto label = tr("If you do not want to enter your root password here,\nplease format the memory card in terminal with the following command:")+"\n\numount [device]\nmkfs.vfat [device]\n";
     passwd = QInputDialog::getText(this, tr("Permission required"), label, QLineEdit::Password, QString(), &ok);
     if (!ok || passwd.isEmpty())
         return;
 #endif
 
-    auto driveLabel = QInputDialog::getText(this, tr("Format"), tr("Please enter the new name for your card"), QLineEdit::Normal, DEFAULT_DRIVE_LABEL, &ok);
+    QInputDialog *dialog = new QInputDialog(this);
+    connect( dialog, &QInputDialog::finished, dialog, &QObject::deleteLater);
+    dialog->setInputMode(QInputDialog::TextInput);
+    dialog->setWindowTitle(tr("Format"));
+    dialog->setLabelText(tr("Please enter the new name for your card"));
+    dialog->setTextValue(selectedDrive);
 
-    m_deviceManager->formatDrive(this, selectedDrive, driveLabel, passwd);
+    QLineEdit *lineEdit = dialog->findChild<QLineEdit *>();
+    lineEdit->setMaxLength(11);
+    lineEdit->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_ ]{1,11}"), lineEdit));
+    connect(lineEdit, &QLineEdit::textChanged, this, [=]( QString currentText ){
+        lineEdit->setText(currentText.toUpper().replace(" ", "_"));
+    });
 
+    if (dialog->exec() == QDialog::Accepted)
+    {
+        m_deviceManager->formatDrive(this, selectedDrive, dialog->textValue(), passwd);
+    }
+
+    dialog->deleteLater();
     updateDriveList();
     deselectDrive();
 }
@@ -913,4 +933,9 @@ void CardPage::enableButtons( bool onOff )
     {
         dir_button->setEnabled(onOff);
     }
+}
+
+int CardPage::getDriveListLength()
+{
+    return m_driveList->count();
 }
