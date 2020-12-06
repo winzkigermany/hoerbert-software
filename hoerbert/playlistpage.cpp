@@ -186,7 +186,9 @@ PlaylistPage::PlaylistPage(QWidget *parent)
         m_cancelButton->setEnabled(false); // make sure the user can't click more than once.
         emit onClosePage(false);
     });
-    connect(m_playlistView, &PlaylistView::durationChanged, this, &PlaylistPage::durationChanged);
+    connect(m_playlistView, &PlaylistView::durationChanged, this, [=](int playlistIndex, int durationInSeconds){
+        emit durationChanged( playlistIndex, durationInSeconds, true);
+    });
 
     connect(m_playlistView, &PlaylistView::errorOccurred, this, &PlaylistPage::errorOccurred);
 }
@@ -334,11 +336,6 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
     qApp->processEvents();
 }
 
-void PlaylistPage::clearDirectoryEstimation(quint8 dirIndex)
-{
-    m_playlistView->clearDirectoryEstimation(dirIndex);
-}
-
 void PlaylistPage::addSilence()
 {
     // do some stuffs for actual commands to generate silence wav files
@@ -387,9 +384,9 @@ void PlaylistPage::discard()
     emit cancelClicked();
 }
 
-void PlaylistPage::setDriveSpaceDetails(quint64 used, quint64 total, quint64 estimatedSeconds)
+void PlaylistPage::setDriveSpaceDetails(quint64 used, quint64 total)
 {
-    m_playlistView->setDriveSpaceDetails(used, total, estimatedSeconds);
+    m_playlistView->setDriveSpaceDetails(used, total);
 }
 
 void PlaylistPage::contextMenuEvent(QContextMenuEvent *e)
@@ -547,4 +544,7 @@ const PlaylistView * PlaylistPage::getPlaylistView()
     return m_playlistView;
 }
 
-
+int PlaylistPage::getPlaylistIndex()
+{
+    return m_dirNum;
+}

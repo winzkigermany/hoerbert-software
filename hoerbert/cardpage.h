@@ -188,7 +188,7 @@ public:
     /**
      * @brief update the numbers: space used and space available
      */
-    void updateUsedSpace();
+    void initUsedSpace();
 
     /**
      * @brief enable/disable buttons for card management on the page
@@ -316,6 +316,16 @@ public slots:
      */
     void updateDriveList();
 
+    /**
+     * @brief commitUsedSpace
+     * @param playlistIndex
+     * @param playlistFolder
+     */
+    void commitUsedSpace( int playlistIndex );
+
+
+    void updateEstimatedDuration( int playlistIndex, quint64 seconds );
+
 private slots:
 
     /**
@@ -345,7 +355,7 @@ private:
      * @brief read the drive and shows directories
      * @param driveName drive label + root path
      */
-    void selectDrive(const QString &driveName);
+    void selectDrive(const QString &driveName, bool doUpdateCapacityBar=true );
 
     /**
      * @brief initialize playlist buttons and hide playlist details
@@ -356,6 +366,11 @@ private:
      * @brief hasFat32WarningShown helps to remember whether we've shown the warning once.
      */
     bool m_hasFat32WarningShown;
+
+    /**
+     * @brief sendDriveCapacity sends information about space used + max space available in bytes
+     */
+    void sendDriveCapacity();
 
     bool m_isProcessing;
     bool m_migrationSuggested;
@@ -408,6 +423,11 @@ private:
 
     MainWindow* m_mainWindow;   // our parent
     PleaseWaitDialog* m_pleaseWaitDialog;
+
+    quint64 m_total_bytes = 0;
+    quint64 m_playlistSize[9];
+    quint64 m_playlistEstimatedSize[9];
+    quint64 m_usedSpaceOffset = 0;           // this is the used space on the card that's NOT in any playlist.
 };
 
 #endif // CARDPAGE_H

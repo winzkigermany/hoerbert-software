@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_cardPage, &CardPage::driveCapacityUpdated, m_capBar, &CapacityBar::setParams);
 
     connect(m_cardPage, &CardPage::driveCapacityUpdated, this, [&](quint64 used, quint64 total) {
-        m_playlistPage->setDriveSpaceDetails(used, total, m_capBar->estimatedSeconds());
+        m_playlistPage->setDriveSpaceDetails(used, total);
     });
 
     connect(m_cardPage, &CardPage::driveSelected, this, [this] (const QString &driveName) {
@@ -112,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 m_toggleDiagnosticsModeAction->setEnabled(false);
                 m_toggleDiagnosticsModeAction->setChecked(false);
+                m_capBar->setEnabled(true);
             }
 
             if( m_cardPage->isDiagnosticsModeEnabled() && !driveName.isEmpty() )
@@ -119,6 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
                 m_advancedFeaturesAction->setEnabled(false);
                 m_toggleDiagnosticsModeAction->setEnabled(true);
                 m_toggleDiagnosticsModeAction->setChecked(true);
+                m_capBar->setEnabled(false);
             }
 
         }
@@ -132,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
             m_advancedFeaturesAction->setEnabled(true);
             m_toggleDiagnosticsModeAction->setEnabled(true);
             m_selectManually->setEnabled(false);
+            m_capBar->setEnabled(true);
 
             if (remind_backup)
                 this->remindBackup();
@@ -161,15 +164,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_cardPage, &CardPage::plausibilityFixNeeded, this, &MainWindow::makePlausible);
 
-    connect(m_cardPage, &CardPage::enableEditMenuItems, this, &MainWindow::showHideEditMenuEntries);
+//    connect(m_cardPage, &CardPage::enableEditMenuItems, this, &MainWindow::showHideEditMenuEntries);
 
-    connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [this]() {
+    connect(m_playlistPage, &PlaylistPage::cancelClicked, this, [=]() {
         m_cardPage->enableButtons(true);
         showHideEditMenuEntries(false);
 
         m_stackWidget->setCurrentIndex(0);
         m_cardPage->update();
-        m_capBar->resetEstimation();
+
+        if (!m_cardPage->isProcessing())    // when no more other playlists are in processing state
+        {
+            m_cardPage->initUsedSpace();
+        }
 
         this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
         qApp->processEvents();
@@ -179,9 +186,13 @@ MainWindow::MainWindow(QWidget *parent)
         m_dbgDlg->appendLog(errorString);
     });
 
-    connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
+    connect(m_playlistPage, &PlaylistPage::durationChanged, this, [=]( int playlistIndex, quint64 durationInSeconds, bool isEstimation) {
+        Q_UNUSED( isEstimation );
+        m_cardPage->updateEstimatedDuration( playlistIndex, durationInSeconds );
+    });
 
-    connect(m_playlistPage, &PlaylistPage::durationChanged, m_capBar, &CapacityBar::addSpaceInSeconds);
+
+    connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
 
     m_shadow = new QGraphicsDropShadowEffect(this);
     m_shadow->setBlurRadius(10);
@@ -289,6 +300,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
 void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index)
 {
     m_cardPage->enableButtons(true);
+    showHideEditMenuEntries(false);
 
     this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
     qApp->processEvents();
@@ -339,28 +351,28 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
 
     connect(processor, &HoerbertProcessor::failed, this, [=] (const QString &errorString) {
         this->processorErrorOccurred("On Commit\n" + errorString);
+        m_cardPage->commitUsedSpace( processor->directoryNumber() );
+
     }, Qt::UniqueConnection);
 
-    connect(processor, &QThread::finished, this, [=] () {
+    connect(processor, &QThread::finished, this, [=]() {
         this->sync();
 
         // enable the button back
         m_cardPage->setButtonEnabled(dir_index, true);
         m_cardPage->sendPercent(dir_index, 0);
         m_cardPage->update();
-        m_capBar->resetEstimation();
-        m_cardPage->updateUsedSpace();
-        m_playlistPage->clearDirectoryEstimation(dir_index);
+        m_cardPage->commitUsedSpace( dir_index );
+
         processor->quit();
         processor->deleteLater();
-
 
         if (*no_silence_counter > 0)
         {
             QMessageBox::information(this, tr("Split Information"), tr("%1 file(s) were not split, because there was no silent part to split at.\nYou may want to split the file(s) in fixed 3-minute chunks").arg(*no_silence_counter));
         }
 
-        if (!m_cardPage->isProcessing())
+        if (!m_cardPage->isProcessing())    // when no more other playlists are in processing state
         {
             m_printAction->setEnabled(true);
             m_backupAction->setEnabled(true);
@@ -368,6 +380,8 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
             m_formatAction->setEnabled(true);
 
             m_cardPage->setCardManageButtonsEnabled(true);
+
+            m_cardPage->initUsedSpace();
         }
 
     }, Qt::UniqueConnection);
@@ -1346,6 +1360,7 @@ void MainWindow::switchDiagnosticsMode()
             qDebug() << "Failed creating diagnostics mode file.";
 
         m_cardPage->switchDiagnosticsMode(true);
+        m_capBar->setEnabled(false);
         m_progress->setValue(100);
         QApplication::processEvents();
     }
@@ -1451,6 +1466,8 @@ void MainWindow::switchDiagnosticsMode()
             }
 
             m_cardPage->switchDiagnosticsMode(false);
+            m_capBar->setEnabled(true);
+            m_cardPage->initUsedSpace();
         }
 
         m_progress->setValue(100);

@@ -199,13 +199,7 @@ public:
      * @param used
      * @param total
      */
-    void setDriveSpaceDetails(quint64 used, quint64 total, quint64 estimatedSeconds);
-
-    /**
-     * @brief clearDirectoryEstimation
-     * @param dirIndex
-     */
-    void clearDirectoryEstimation(quint8 dirIndex);
+    void setDriveSpaceDetails(quint64 used, quint64 total);
 
     /**
      * @brief setColumnVisible
@@ -220,7 +214,7 @@ signals:
       * @brief this signal is emitted when an entry is added or removed
       * @param seconds
       */
-     void durationChanged(int seconds);
+     void durationChanged(int playlistIntex, int seconds);
 
      /**
       * @brief this signal is emitted when error occurs
@@ -345,11 +339,9 @@ private:
 
     int m_maxID;
     quint8 m_dirNum;
-    QList<quint64> m_additionalsInBytes;
 
     quint64 m_usedSpace;
     quint64 m_totalSpace;
-    quint64 m_estimatedSeconds;
 
     int m_playingEntryID;
     QProcess *m_player;

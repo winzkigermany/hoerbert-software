@@ -74,10 +74,6 @@ PlaylistView::PlaylistView(QWidget *parent)
 
     m_totalSpace = 0;
 
-    m_estimatedSeconds = 0;
-
-    m_additionalsInBytes = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-
     m_player = new QProcess(this);
 
     horizontalHeader()->setMinimumSectionSize(DEFAULT_ROW_HEIGHT);
@@ -198,20 +194,10 @@ void PlaylistView::insertBatchAt(const AudioList &list, int index, bool readFrom
 bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=false)
 {
     if (!readFromDrive) {
-        auto expectedFileSizeInBytes = WAV_HEADER_SIZE_IN_BYTES + (entry.duration * 32000 * 16 / 8) + MEMORY_SPARE_SPACE_IN_BYTES;
+        quint64 expectedFileSizeInBytes = WAV_HEADER_SIZE_IN_BYTES + (entry.duration * 32000 * 16 / 8) + MEMORY_SPARE_SPACE_IN_BYTES;
 
-        assert(m_dirNum < 9);
-        m_additionalsInBytes[m_dirNum] += expectedFileSizeInBytes;
-
-        quint64 expectedUsedSpace = 0;
-        expectedUsedSpace = bytesToSeconds(m_usedSpace);
-
-        for (auto est : m_additionalsInBytes) {
-            expectedUsedSpace += bytesToSeconds(est);
-        }
-
-        qDebug() << expectedUsedSpace << bytesToSeconds(m_totalSpace);
-        if (expectedUsedSpace > bytesToSeconds(m_totalSpace)) {
+        qDebug() << expectedFileSizeInBytes << bytesToSeconds(m_totalSpace);
+        if ( expectedFileSizeInBytes > (m_totalSpace-m_usedSpace) ) {
             QMessageBox::information(this, tr("Memory card is full"), tr("The card is already full, you can't add more files to it."), QMessageBox::Ok);
             return false;
         }
@@ -329,8 +315,10 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
 
     m_data.insert(entry.id, entry);
 
+    quint64 duration = entry.duration;
+
     if (!readFromDrive) {
-        emit durationChanged(entry.duration);
+        emit durationChanged(m_dirNum, duration);
     }
 
     this->resizeColumnsToContents();
@@ -367,7 +355,7 @@ bool PlaylistView::removeEntryByTableIndex(int index)
     // remove the row on the table
     removeRow(index);
 
-    emit durationChanged(-(m_data[entry_id].duration));
+    emit durationChanged(m_dirNum, -(m_data[entry_id].duration));
     currentPlaylistIsUntouched( false );
     return m_data.remove(entry_id);
 }
@@ -379,7 +367,7 @@ bool PlaylistView::removeEntryByEntryID(int id)
         if (text(i, ID_COLUMN_INDEX).toInt() == id)
         {
             removeRow(i);
-            emit durationChanged(-(m_data[id].duration));
+            emit durationChanged(m_dirNum, -(m_data[id].duration));
             currentPlaylistIsUntouched( false );
             return m_data.remove(id);
         }
@@ -680,7 +668,7 @@ void PlaylistView::readEntries(const QFileInfoList &fileInfoList, int rowIndex)
     m_infoThread->setDeafultFlag(0);
 
     connect(m_infoThread, &AudioInfoThread::taskCompleted, this, [this, rowIndex] (const AudioList &result) {
-        this->insertBatchAt(result, rowIndex, true);
+        this->insertBatchAt(result, rowIndex, false);
     });
 
     connect(m_infoThread, &QThread::finished, this, [this, file_info_list, metadata_list] () {
@@ -697,18 +685,12 @@ void PlaylistView::setDropIndicatorColor(const QColor &color)
     m_indicatorColor = color;
 }
 
-void PlaylistView::setDriveSpaceDetails(quint64 used, quint64 total, quint64 estimatedSeconds)
+void PlaylistView::setDriveSpaceDetails(quint64 used, quint64 total)
 {
     m_usedSpace = used;
     m_totalSpace = total;
-    m_estimatedSeconds = estimatedSeconds;
 }
 
-void PlaylistView::clearDirectoryEstimation(quint8 dirIndex)
-{
-    assert(dirIndex < 9);
-    m_additionalsInBytes[dirIndex] = 0;
-}
 
 void PlaylistView::setColumnVisible(int index, bool visible)
 {

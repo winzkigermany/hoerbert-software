@@ -104,6 +104,13 @@ public:
     qint64 getVolumeSize(const QString &driveName);
 
     /**
+     * @brief getPlaylistSize
+     * @param playlistPath
+     * @return the playlist size in bytes
+     */
+    qint64 getPlaylistSize(const QString playlistPath);
+
+    /**
      * @brief getAvailableSize
      * @param driveName
      * @return available size of volume in bytes

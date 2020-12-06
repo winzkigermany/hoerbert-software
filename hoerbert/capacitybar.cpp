@@ -38,7 +38,6 @@ CapacityBar::CapacityBar(QWidget *parent)
 
     m_totalBytes = 0;
     m_usedBytes = 0;
-    m_estimatedSeconds = 0;
     setText(tr("Please select a device first."));
     setToolTip(tr("Shows used space / total available space on the card in minutes"));
 }
@@ -48,45 +47,27 @@ void CapacityBar::setParams(quint64 usedBytes, quint64 totalBytes)
     m_usedBytes = usedBytes;
     m_totalBytes = totalBytes;
 
-    assert(m_usedBytes <= m_totalBytes);
+    if( m_usedBytes>m_totalBytes)
+    {
+        m_usedBytes = m_totalBytes;
+    }
 
     update();
-}
-
-void CapacityBar::updateUsedSpace(quint64 usedSize)
-{
-    setParams(usedSize, m_totalBytes);
-}
-
-void CapacityBar::addSpaceInSeconds(int sizeInSeconds)
-{
-    if (m_estimatedSeconds == 0)
-        m_estimatedSeconds = bytesToSeconds(m_usedBytes);
-
-    m_estimatedSeconds = int(m_estimatedSeconds) + int(sizeInSeconds);
-
-    update();
-}
-
-void CapacityBar::resetEstimation()
-{
-    m_estimatedSeconds  = 0;
-    update();
-}
-
-quint64 CapacityBar::estimatedSeconds()
-{
-    return m_estimatedSeconds;
 }
 
 void CapacityBar::paintEvent(QPaintEvent *e)
 {
     if (m_totalBytes > 0)
-        setText(QString("~ %1 / %2 min").arg((m_estimatedSeconds == 0) ? bytesToSeconds(m_usedBytes) / 60 : m_estimatedSeconds / 60).arg(bytesToSeconds(m_totalBytes)/60));
+        setText(QString("~ %1 / %2 min").arg(bytesToSeconds(m_usedBytes) / 60 ).arg(bytesToSeconds(m_totalBytes)/60));
     else
         setText(tr("Please select a device first."));
 
-    int percentage =  (m_estimatedSeconds == 0) ? int(double(m_usedBytes) / double(m_totalBytes) * 100) : int(double(secondsToBytes(m_estimatedSeconds)) / double(m_totalBytes) * 100);
+    int percentage =  int(double(m_usedBytes) / double(m_totalBytes) * 100);
+
+    if( !isEnabled() ){
+        setText("");
+        percentage=100;
+    }
 
     if (percentage > 0 || (m_usedBytes > 0 && percentage == 0))
     {

@@ -82,16 +82,16 @@ public:
     void moveSelectedEntriesTo(quint8 to_dir, bool add2beginning);
 
     /**
-     * @brief clearDirectoryEstimation once processing a dir is completed, need to clear out estimation
-     * @param dirIndex directory index
-     */
-    void clearDirectoryEstimation(quint8 dirIndex);
-
-    /**
      * @brief getPlaylistView return a pointer to the playlistView
      * @return
      */
     const PlaylistView *getPlaylistView();
+
+    /**
+     * @brief getPlaylistIndex
+     * @return the index of this playlist page
+     */
+    int getPlaylistIndex();
 
 signals:
 
@@ -110,7 +110,7 @@ signals:
      * @brief emitted when an entry is added or removed
      * @param seconds seconds added or removed
      */
-    void durationChanged(int seconds);
+    void durationChanged(int playlistIndex, int seconds, bool isEstimation);
 
     /**
      * @brief emitted when error occurs
@@ -144,7 +144,7 @@ public slots:
      * @param used
      * @param total
      */
-    void setDriveSpaceDetails(quint64 used, quint64 total, quint64 estimatedSeconds);
+    void setDriveSpaceDetails(quint64 used, quint64 total);
 protected:
     void contextMenuEvent(QContextMenuEvent *e);
 

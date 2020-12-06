@@ -29,6 +29,7 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QApplication>
+#include <QDirIterator>
 
 #ifdef _WIN32
 #include <tchar.h>
@@ -671,6 +672,21 @@ qint64 DeviceManager::getVolumeSize(const QString &driveName)
         return 0;
     }
     return ret->second->storageInfo.bytesTotal();
+}
+
+qint64 DeviceManager::getPlaylistSize(const QString playlistPath)
+{
+    qint64 dirSize = 0;
+    int fileCount = 0;
+
+    for(QDirIterator itDir(playlistPath, QDir::NoDotAndDotDot|QDir::Files|QDir::Hidden|QDir::System,QDirIterator::Subdirectories); itDir.hasNext(); )
+    {
+        itDir.next();
+        dirSize += itDir.fileInfo().size();
+        ++fileCount;
+    }
+
+    return dirSize;
 }
 
 qint64 DeviceManager::getAvailableSize(const QString &driveName)

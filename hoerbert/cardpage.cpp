@@ -114,7 +114,8 @@ CardPage::CardPage(QWidget *parent)
     m_dirs[DIR7] = m_dir7;
     m_dirs[DIR8] = m_dir8;
 
-    for (const auto& dir_button : m_dirs)
+// not ideal, not adjusted for different OSs
+/*    for (const auto& dir_button : m_dirs)
     {
         dir_button->setToolTip(tr("Edit playlist") + QString(" %1 (Ctrl+%1)").arg(dir_button->ID() + 1));
         QShortcut *shortcut = new QShortcut(QKeySequence(QString("Ctrl+%1").arg(dir_button->ID() + 1)), this);
@@ -125,6 +126,7 @@ CardPage::CardPage(QWidget *parent)
                 this->onPlaylistButtonClicked(dir_button->ID());
         });
     }
+*/
 
     m_horizontalGridSpacer1 = new QSpacerItem(GRID_SPACING, GRID_SPACING, QSizePolicy::Fixed, QSizePolicy::Minimum);
     m_horizontalGridSpacer2 = new QSpacerItem(GRID_SPACING, GRID_SPACING, QSizePolicy::Fixed, QSizePolicy::Minimum);
@@ -508,12 +510,15 @@ void CardPage::initializePlaylists()
     {
         m_dirs[i]->setCount(0);
         m_dirs[i]->disable();
+        m_playlistSize[i] = 0;
+        m_playlistEstimatedSize[i] = 0;
+        m_usedSpaceOffset = 0;
     }
 }
 
 void CardPage::selectDrive()
 {
-    selectDrive(m_driveList->currentText());
+    selectDrive(m_driveList->currentText(), false);
 }
 
 void CardPage::deselectDrive()
@@ -530,7 +535,7 @@ void CardPage::deselectDrive()
     emit driveSelected(QString());
 }
 
-void CardPage::selectDrive(const QString &driveName)
+void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 {
     if (driveName.isEmpty())
     {
@@ -703,7 +708,10 @@ void CardPage::selectDrive(const QString &driveName)
         emit plausibilityFixNeeded(plausibilityFixList);
     }
 
-    updateUsedSpace();
+    if( doUpdateCapacityBar )
+    {
+        initUsedSpace();
+    }
     emit driveSelected(driveName);
 
     this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
@@ -763,12 +771,59 @@ void CardPage::updateButtons()
     }
 }
 
-void CardPage::updateUsedSpace()
+void CardPage::initUsedSpace()
 {
     m_deviceManager->refresh();
-    quint64 total_bytes = m_deviceManager->getVolumeSize(m_deviceManager->selectedDriveName());
-    quint64 used_bytes = total_bytes - m_deviceManager->getAvailableSize(m_deviceManager->selectedDriveName());
-    emit driveCapacityUpdated(used_bytes, total_bytes);
+    m_total_bytes = m_deviceManager->getVolumeSize(m_deviceManager->selectedDriveName());
+
+    quint64 used_bytes = m_total_bytes - m_deviceManager->getAvailableSize(m_deviceManager->selectedDriveName());
+    QString playlistFolder = "";
+
+    quint64 playlists_used_bytes = 0;
+    for( int i=0; i<9; i++ )
+    {
+        playlistFolder = currentDrivePath()+"/"+QString::number(i);
+
+        m_playlistEstimatedSize[i] = 0;
+        m_playlistSize[i] = m_deviceManager->getPlaylistSize(playlistFolder);
+
+        playlists_used_bytes += m_playlistSize[i];
+    }
+
+    m_usedSpaceOffset = used_bytes - playlists_used_bytes;
+
+    emit driveCapacityUpdated(used_bytes, m_total_bytes);
+}
+
+
+void CardPage::commitUsedSpace( int playlistIndex )
+{
+    if( playlistIndex<0 || playlistIndex>8 )
+    {
+        return;
+    }
+
+    QString playlistFolder = currentDrivePath()+"/"+QString::number(playlistIndex);
+
+    // commit the used space
+    m_playlistSize[playlistIndex] = m_deviceManager->getPlaylistSize(playlistFolder);
+    m_playlistEstimatedSize[playlistIndex] = 0;
+
+    sendDriveCapacity();
+}
+
+
+void CardPage::sendDriveCapacity()
+{
+    quint64 playlists_used_bytes = 0;
+
+    for( int i=0; i<9; i++ )
+    {
+        playlists_used_bytes += m_playlistSize[i]+m_playlistEstimatedSize[i];
+    }
+
+
+    emit driveCapacityUpdated(playlists_used_bytes+m_usedSpaceOffset, m_total_bytes);
 }
 
 void CardPage::setCardManageButtonsEnabled(bool flag)
@@ -819,8 +874,6 @@ QString CardPage::getCardFileSystemType()
 void CardPage::sendPercent(int buttonIndex, int percentage)
 {
     m_dirs[buttonIndex]->setPercentage(percentage);
-    updateUsedSpace();
-
     m_hoerbertXMLIsDirty = true;
 }
 
@@ -941,4 +994,14 @@ void CardPage::enableButtons( bool onOff )
 int CardPage::getDriveListLength()
 {
     return m_driveList->count();
+}
+
+void CardPage::updateEstimatedDuration( int playlistIndex, quint64 seconds )
+{
+    if( playlistIndex>-1 && playlistIndex<9 )
+    {
+        m_playlistEstimatedSize[playlistIndex] += secondsToBytes(seconds);
+    }
+
+    sendDriveCapacity();
 }

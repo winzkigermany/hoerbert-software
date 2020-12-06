@@ -38,6 +38,7 @@ public:
      */
     explicit CapacityBar(QWidget *parent = Q_NULLPTR);
 
+public slots:
     /**
      * @brief set the used size and the total size
      * @param used_size in bytes
@@ -45,36 +46,11 @@ public:
      */
     void setParams(quint64 usedSize, quint64 totalSize);
 
-    /**
-     * @brief update used space only
-     * @param usedSize used space in bytes
-     */
-    void updateUsedSpace(quint64 usedSize);
-
-    /**
-     * @brief updateUsedSpaceInSeconds
-     * @param sizeInMinutes the amount of seconds need to be added or subtracted
-     */
-    void addSpaceInSeconds(int sizeInSeconds);
-
-    /**
-     * @brief reset estimated capacity
-     */
-    void resetEstimation();
-
-    /**
-     * @brief estimatedSeconds
-     * @return
-     */
-    quint64 estimatedSeconds();
-
 private:
-
     void paintEvent(QPaintEvent *);
 
     quint64 m_usedBytes; // used size in bytes
     quint64 m_totalBytes; // total size in bytes
-    quint64 m_estimatedSeconds; // size in seconds
 };
 
 #endif // CAPACITYBAR_H

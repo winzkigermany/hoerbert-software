@@ -156,6 +156,6 @@ quint64 bytesToSeconds(quint64 byteSize);
  * @param minutes length in minutes
  * @return
  */
-quint64 secondsToBytes(int minutes);
+quint64 secondsToBytes(int seconds);
 
 #endif // FUNCTIONS_H
