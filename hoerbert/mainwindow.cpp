@@ -153,7 +153,8 @@ MainWindow::MainWindow(QWidget *parent)
         m_playlistPage->setBackgroundColor(m_cardPage->getPlaylistColor(dir_num));
         m_shadow->setColor(m_cardPage->getPlaylistColor(dir_num));
 
-        showHideEditMenuEntries( true );
+        showHideEditMenuEntries( true, dir_num );
+
     });
 
     connect(m_cardPage, &CardPage::migrationNeeded, this, [this](const QString &dirPath) {
@@ -2219,7 +2220,7 @@ bool MainWindow::copyRecursively(const QString &sourceFolder, const QString &des
     return true;
 }
 
-void MainWindow::showHideEditMenuEntries( bool showHide )
+void MainWindow::showHideEditMenuEntries( bool showHide, int playlistIndex )
 {
     if( showHide )
     {
@@ -2238,6 +2239,70 @@ void MainWindow::showHideEditMenuEntries( bool showHide )
         m_moveToPlaylistMenu->menuAction()->setDisabled(false);
         m_moveToPlaylistMenu->setEnabled(true);
         m_moveToPlaylistMenu->setDisabled( false );
+
+        if( playlistIndex>-1 && playlistIndex<9)    // hide the "move to" destination which is the playlist itself
+        {
+            m_moveToB1->setDisabled(false);
+            m_moveToB2->setDisabled(false);
+            m_moveToB3->setDisabled(false);
+            m_moveToB4->setDisabled(false);
+            m_moveToB5->setDisabled(false);
+            m_moveToB6->setDisabled(false);
+            m_moveToB7->setDisabled(false);
+            m_moveToB8->setDisabled(false);
+            m_moveToB9->setDisabled(false);
+
+            m_moveToE1->setDisabled(false);
+            m_moveToE2->setDisabled(false);
+            m_moveToE3->setDisabled(false);
+            m_moveToE4->setDisabled(false);
+            m_moveToE5->setDisabled(false);
+            m_moveToE6->setDisabled(false);
+            m_moveToE7->setDisabled(false);
+            m_moveToE8->setDisabled(false);
+            m_moveToE9->setDisabled(false);
+
+            switch( playlistIndex )
+            {
+                case 0:
+                    m_moveToB1->setDisabled(true);
+                    m_moveToE1->setDisabled(true);
+                break;
+                case 1:
+                    m_moveToB2->setDisabled(true);
+                    m_moveToE2->setDisabled(true);
+                break;
+                case 2:
+                    m_moveToB3->setDisabled(true);
+                    m_moveToE3->setDisabled(true);
+                break;
+                case 3:
+                    m_moveToB4->setDisabled(true);
+                    m_moveToE4->setDisabled(true);
+                break;
+                case 4:
+                    m_moveToB5->setDisabled(true);
+                    m_moveToE5->setDisabled(true);
+                break;
+                case 5:
+                    m_moveToB6->setDisabled(true);
+                    m_moveToE6->setDisabled(true);
+                break;
+                case 6:
+                    m_moveToB7->setDisabled(true);
+                    m_moveToE7->setDisabled(true);
+                break;
+                case 7:
+                    m_moveToB8->setDisabled(true);
+                    m_moveToE8->setDisabled(true);
+                break;
+                case 8:
+                    m_moveToB9->setDisabled(true);
+                    m_moveToE9->setDisabled(true);
+                break;
+            }
+
+        }
 
         m_printAction->setEnabled(false);
         m_backupAction->setEnabled(false);

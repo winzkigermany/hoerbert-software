@@ -122,7 +122,7 @@ private slots:
     void printHtml(const AudioList &list, const QString &outputPath = QString(), bool showOnBrowser = true);
 
     void collectInformationForSupport();
-    void showHideEditMenuEntries( bool );
+    void showHideEditMenuEntries( bool showHide, int playlistIndex=-1 );
 
 private:
 
