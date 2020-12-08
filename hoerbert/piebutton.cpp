@@ -139,6 +139,11 @@ void PieButton::setCount(qint32 count)
     updateStyleSheet();
 }
 
+int PieButton::getCount()
+{
+    return m_count;
+}
+
 void PieButton::increasePercentage()
 {
     setPercentage(static_cast<qint8>(m_percentage) + 1);

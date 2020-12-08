@@ -88,6 +88,12 @@ public:
     void setCount(int );
 
     /**
+     * @brief getCount
+     * @return the number written on the button
+     */
+    int getCount();
+
+    /**
      * @brief increasePercentage
      */
     void increasePercentage();

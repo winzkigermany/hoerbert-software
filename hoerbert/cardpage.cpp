@@ -1018,3 +1018,15 @@ void CardPage::updateEstimatedDuration( int playlistIndex, quint64 seconds )
 
     sendDriveCapacity();
 }
+
+int CardPage::numberOfTracks()
+{
+    int trackCount = 0;
+
+    for( int i=0; i<9; i++ )
+    {
+       trackCount += m_dirs[i]->getCount();
+    }
+
+    return trackCount;
+}

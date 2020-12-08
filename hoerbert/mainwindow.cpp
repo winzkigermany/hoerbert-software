@@ -138,7 +138,12 @@ MainWindow::MainWindow(QWidget *parent)
             m_capBar->setEnabled(true);
 
             if (remind_backup)
-                this->remindBackup();
+            {
+                if( m_cardPage->numberOfTracks()>0 )
+                {
+                    this->remindBackup();
+                }
+            }
 
             if (!m_migrationPath.isEmpty())
             {

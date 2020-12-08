@@ -227,6 +227,12 @@ public:
     QString getCardFileSystemType();
 
     /**
+     * @brief numberOfTracks
+     * @return the overall number of tracks on this card
+     */
+    int numberOfTracks();
+
+    /**
      * @brief select drive by its full path on file system
      * @param path absolute path to the drive storage
      */
