@@ -780,13 +780,22 @@ void CardPage::initUsedSpace()
     m_deviceManager->refresh();
     m_total_bytes = m_deviceManager->getVolumeSize(m_deviceManager->selectedDriveName());
 
-    quint64 used_bytes = m_total_bytes - m_deviceManager->getAvailableSize(m_deviceManager->selectedDriveName());
+    quint64 availableBytes = m_deviceManager->getAvailableSize(m_deviceManager->selectedDriveName());
+    quint64 used_bytes = 0;
+    if( availableBytes>m_total_bytes )
+    {
+        used_bytes=0;
+    }
+    else
+    {
+        used_bytes=m_total_bytes-availableBytes;
+    }
     QString playlistFolder = "";
 
     quint64 playlists_used_bytes = 0;
     for( int i=0; i<9; i++ )
     {
-        playlistFolder = currentDrivePath()+"/"+QString::number(i);
+        playlistFolder = currentDrivePath()+QString::number(i);     // yes, currentDrivePath() ends with a slash "/"
 
         m_playlistEstimatedSize[i] = 0;
         m_playlistSize[i] = m_deviceManager->getPlaylistSize(playlistFolder);
