@@ -1202,6 +1202,7 @@ void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
     sync();
     m_progress->close();
     m_progress->deleteLater();
+    m_cardPage->initUsedSpace();
     m_cardPage->update();
 
     QApplication::restoreOverrideCursor();
