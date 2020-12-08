@@ -127,6 +127,7 @@ PlaylistView::PlaylistView(QWidget *parent)
         if (currentRow != previousRow)
         {
             stopPlayer();
+            updatePlayButton(previousRow, false);
         }
     });
 }
@@ -291,8 +292,7 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
 
             QStringList arguments;
             arguments.append("-nodisp");
-            arguments.append("-loop");
-            arguments.append("0");
+            arguments.append("-autoexit");
             arguments.append(m_data[id].path);
 
             m_player->start(FFPLAY_PATH, arguments);
