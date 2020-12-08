@@ -92,7 +92,7 @@ void PleaseWaitDialog::setProgressRange( int min, int max )
    m_progressBar->setRange( min, max );
 }
 
-void PleaseWaitDialog::setProgressValue( int percentValue )
+void PleaseWaitDialog::setValue( int percentValue )
 {
     m_progressBar->setValue( qMin( qMax( percentValue, m_progressBar->minimum() ), m_progressBar->maximum() ) );
 }
@@ -109,4 +109,7 @@ void PleaseWaitDialog::showButton( bool yesNo )
     }
 }
 
-
+int PleaseWaitDialog::value()
+{
+    return m_progressBar->value();
+}

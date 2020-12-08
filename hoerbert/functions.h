@@ -83,6 +83,23 @@ int getFileCount(const QString &absoluteDirPath);
 bool moveFile(const QString &sourcePath, const QString &destPath);
 
 /**
+ * @brief moveDirectory
+ * @param sourcePath
+ * @param destPath
+ * @return
+ */
+bool moveDirectory(const QString &sourcePath, const QString &destPath, bool overwrite=false);
+
+/**
+ * @brief copyRecursively
+ * @param sourcePath
+ * @param destPath
+ * @return
+ */
+bool copyRecursively(const QString &sourcePath, const QString &destPath, bool overwrite=false);
+
+
+/**
  * @brief Rename batch of files in given dirPath
  * @param dirPath absolute directory path
  * @param from start index of being renamed files

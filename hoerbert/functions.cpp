@@ -124,6 +124,117 @@ bool moveFile(const QString &sourcePath, const QString &destPath)
     }
 }
 
+bool moveDirectory(const QString &sourcePath, const QString &destPath, bool overwrite)
+{
+
+    QDir sourceDir( sourcePath );
+
+    if( !sourceDir.exists() )
+    {
+        qDebug() << QString("Source directory [%1] does not exist").arg(sourcePath);
+        return false;
+    }
+
+    QDir destinationDir(destPath);
+    if( !destinationDir.exists(destPath) )
+    {
+        if( !destinationDir.mkpath(destPath) )
+        {
+            qDebug() << QString("Failed creating the destination directory [%1]").arg(destPath);
+            return false;
+        }
+    }
+
+    sourceDir.setFilter( QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot );
+    QStringList sourceFiles = sourceDir.entryList();
+    foreach(QString filename, sourceFiles)
+    {
+        QDir destinationDir(destPath);
+        qDebug() << "move file from ["+sourcePath+"/"+filename+"] to ["+destPath+"/"+filename+"]";
+
+        if( overwrite && destinationDir.exists(filename) )
+        {
+            if( !destinationDir.remove(filename) )
+            {
+                qDebug() << "error when removing file ["+destPath+"/"+filename+"]";
+                return false;
+            }
+        }
+
+        QString destinationFileName = destPath+"/"+filename;
+        if( !sourceDir.rename(filename, destinationFileName) )
+        {
+            qDebug() << QString("unable to move file [%1] to [%2]").arg(sourcePath+"/"+filename).arg(destinationFileName);
+            return false;
+        }
+    }
+
+    //moving files was successful so far, now remove the source directory.
+    if( !sourceDir.rmdir(sourcePath) )
+    {
+        qDebug() << QString("unable to remove source directory [%1]").arg(sourcePath);
+        return false;
+    }
+
+    return true;
+}
+
+
+bool copyRecursively(const QString &sourcePath, const QString &destPath, bool overwrite)
+{
+    QDir sourceDir(sourcePath);
+
+    if(!sourceDir.exists())
+    {
+        qDebug() << QString("Unable to find source folder [%1]").arg(sourcePath);
+        return false;
+    }
+
+    QDir destDir(destPath);
+    if(!destDir.exists())
+    {
+        if( !destDir.mkpath(destPath) )
+        {
+            qDebug() << QString("Failed creating the destination directory [%1]").arg(destPath);
+            return false;
+        }
+    }
+
+    QStringList files = sourceDir.entryList(QDir::Files);
+    for(int i = 0; i< files.count(); i++) {
+        QString srcName = tailPath(sourcePath) + files[i];
+        QString destName = tailPath(destPath) + files[i];
+
+        if(overwrite && QFile::exists(destName) )
+        {
+            if( !QFile::remove(destName) )
+            {
+                qDebug() << QString("Removing existing target file [%1] failed").arg(destName);
+                return false;
+            }
+        }
+
+        if(!QFile::copy(srcName, destName))
+        {
+            qDebug() << QString("File copy from [%1] to [%2] failed.").arg(srcName).arg(destName);
+            return false;
+        }
+    }
+
+    files.clear();
+    files = sourceDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    for(int i = 0; i< files.count(); i++)
+    {
+        QString srcName = tailPath(sourcePath) + files[i];
+        QString destName = tailPath(destPath) + files[i];
+        if( !copyRecursively(srcName, destName) )   // no need to qDebug here, because we're in a recursion.
+            return false;
+    }
+
+    return true;
+}
+
+
 int batchRenameByIndex(const QString &dirPath, int from, int offset, int to)
 {
     QDir dir(dirPath);

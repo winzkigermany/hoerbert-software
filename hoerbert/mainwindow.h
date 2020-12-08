@@ -134,9 +134,10 @@ private:
 
     void createActions();
 
-    bool copyRecursively(const QString &sourceFolder, const QString &destFolder);
-
     void doRestoreBackup(const QString &sourcePath, bool doMerge );
+
+    void enterDiagnosticsMode();
+    void exitDiagnosticsMode( bool rollbackMode=false );
 
     QString printButtons(int);
 

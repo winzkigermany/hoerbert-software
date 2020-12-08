@@ -65,6 +65,7 @@ SOURCES += \
         devicemanager.cpp \
         dpiscale.cpp \
         functions.cpp \
+        generalexception.cpp \
         helper.cpp \
         hoerbertprocessor.cpp \
         main.cpp \
@@ -97,6 +98,7 @@ HEADERS += \
         devicemanager.h \
         dpiscale.h \
         functions.h \
+        generalexception.h \
         helper.h \
         define.h \
         hoerbertprocessor.h \

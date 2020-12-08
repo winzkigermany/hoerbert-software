@@ -142,5 +142,6 @@ const QString COLLECT_FILE_NAME              = "winzki_service";
 const int METADATA_MAX_LENGTH                = 80; // in bytes
 const int WAV_HEADER_SIZE_IN_BYTES           = 44;
 const int MEMORY_SPARE_SPACE_IN_BYTES        = 1024;
+const int KEEP_FREE_FOR_DIAGNOSTICS_MODE     = 2097152;  // keep 2 MB free for switching on and off diagnostics mode.
 
 #endif // DEFINE_H

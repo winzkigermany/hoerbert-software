@@ -32,6 +32,7 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QDir>
+#include <QTextCodec>
 
 #include "define.h"
 #include "functions.h"
@@ -65,6 +66,7 @@ QStringList PROCESS_ERROR;
 
 int main(int argc, char *argv[])
 {
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
     signal(SIGINT, signalHandler);
     signal(SIGABRT, signalHandler);

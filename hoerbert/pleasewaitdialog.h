@@ -50,12 +50,18 @@ public:
      */
     void setProgressRange( int min, int max );
 
+    /**
+     * @brief value
+     * @return the current progress value
+     */
+    int value();
+
 public slots:
     /**
      * @brief setProgressValue sets the percentage value of the progress bar
      * @param percentValue
      */
-    void setProgressValue( int percentValue );
+    void setValue( int percentValue );
 
     /**
      * @brief showButton show or hide the dialog's button

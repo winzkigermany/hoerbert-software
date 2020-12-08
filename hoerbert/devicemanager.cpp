@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include "devicemanager.h"
+#include "define.h"
+#include "pleasewaitdialog.h"
 
 #include <QStorageInfo>
 #include <QDebug>
@@ -39,7 +41,6 @@
 #include "helper.h"
 #endif
 
-#include "pleasewaitdialog.h"
 
 struct VolumeInfo{
 
@@ -671,7 +672,7 @@ qint64 DeviceManager::getVolumeSize(const QString &driveName)
     {
         return 0;
     }
-    return ret->second->storageInfo.bytesTotal();
+    return ret->second->storageInfo.bytesTotal()-KEEP_FREE_FOR_DIAGNOSTICS_MODE;
 }
 
 qint64 DeviceManager::getPlaylistSize(const QString playlistPath)

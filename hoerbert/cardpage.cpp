@@ -402,7 +402,7 @@ void CardPage::ejectDrive()
         m_pleaseWaitDialog->setWindowTitle(tr("Generating hoerbert.xml"));
         m_pleaseWaitDialog->setWaitMessage(tr("Making this card compatible with the old hoerbert app V1.x"));
         m_pleaseWaitDialog->setProgressRange( 0, 100 );
-        connect( this, &CardPage::sendProgressPercent, m_pleaseWaitDialog, &PleaseWaitDialog::setProgressValue );
+        connect( this, &CardPage::sendProgressPercent, m_pleaseWaitDialog, &PleaseWaitDialog::setValue );
         m_pleaseWaitDialog->show();
         recreateXml();
     }
