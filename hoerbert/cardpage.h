@@ -428,6 +428,7 @@ private:
     quint64 m_playlistSize[9];
     quint64 m_playlistEstimatedSize[9];
     quint64 m_usedSpaceOffset = 0;           // this is the used space on the card that's NOT in any playlist.
+    bool m_isFormatting = false;                // this flag tells us if a formatting operation is underway and keeps us from being afraid of sudden loss of the memory card.
 };
 
 #endif // CARDPAGE_H

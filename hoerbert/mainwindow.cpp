@@ -448,7 +448,7 @@ void MainWindow::migrate(const QString &dirPath)
         QEventLoop loop;
         connect(processor, &QThread::finished, &loop, &QEventLoop::quit);
         processor->start();
-        loop.exec();
+        loop.exec();        
 
         m_pleaseWaitDialog->setWindowTitle(tr("Generating hoerbert.xml"));
         m_pleaseWaitDialog->setWaitMessage(tr("Making this card compatible with the old hoerbert app V1.x"));
@@ -774,8 +774,13 @@ void MainWindow::sync()
     QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
     qApp->processEvents();
 
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     process.start(SYNC_PATH, arguments);
-
     if (!process.waitForStarted())
     {
         m_dbgDlg->appendLog("- Sync failed. Failed to start.");
@@ -787,8 +792,10 @@ void MainWindow::sync()
         process.close();
         return;
     }
+    loop.exec();
+    process.disconnect();
 
-    if (!process.waitForFinished(60000))
+    if (!returnValue)
     {
         m_dbgDlg->appendLog("- Sync failed. Failed to complete.");
         process.close();
@@ -799,6 +806,7 @@ void MainWindow::sync()
         process.close();
         return;
     }
+
     process.close();
 
     QApplication::restoreOverrideCursor();
@@ -995,8 +1003,18 @@ void MainWindow::collectInformationForSupport()
     arguments << "-r" << collect_path + ".zip" << COLLECT_FILE_NAME+"/";
     qDebug() << "zip" << arguments.join(" ");
 
+
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     process.start("/usr/bin/zip", arguments);
-    if (!process.waitForFinished())
+    loop.exec();
+    process.disconnect();
+
+    if (!returnValue)
     {
         QMessageBox::information(this, tr("Collecting support information"), tr("Failed to create the zip file for support information") );
         processSuccess = false;
@@ -1007,15 +1025,22 @@ void MainWindow::collectInformationForSupport()
     arguments << "-tzip" << "a" << collect_path + ".zip" << tailPath(HOERBERT_TEMP_PATH) + COLLECT_FILE_NAME;
     qDebug() << "7za.exe" << arguments.join(" ");
 
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     process.start(ZIP_PATH, arguments);
-
     if (!process.waitForStarted())
     {
         processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to start.");
     }
+    loop.exec();
+    process.disconnect();
 
-    if ( processSuccess && !process.waitForFinished(60000))
+    if ( processSuccess && !returnValue)
     {
         processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to complete.");

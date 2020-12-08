@@ -637,7 +637,6 @@ void PlaylistView::readEntries(const QFileInfoList &fileInfoList, int rowIndex)
 
         QEventLoop loop;
         connect(m_ripperThread, &QThread::finished, &loop, &QEventLoop::quit);
-
         m_ripperThread->start();
         loop.exec();
 

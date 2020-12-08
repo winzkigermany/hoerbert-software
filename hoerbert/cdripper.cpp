@@ -123,8 +123,13 @@ void CDRipper::run()
         qDebug() << "UniqueID:" << uniqueID;
         uniqueID++;
 
+        bool returnValue = false;
+        QEventLoop loop;            // TODO: Do we need a loooong timeout for cd ripping?
+        connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+            returnValue = (result==0);
+            loop.quit();
+        });
         m_process->start(FREAC_PATH, arguments);
-
         if (!m_process->waitForStarted())
         {
             qDebug() << "Ripper process failed to start";
@@ -133,14 +138,8 @@ void CDRipper::run()
             m_process->deleteLater();
             return;
         }
-        if (!m_process->waitForFinished(1800000)) // wait for ten minutes as maximum
-        {
-            qDebug() << "Ripper process failed to finish";
-            emit failed("Ripper process failed to finish");
-            m_process->close();
-            m_process->deleteLater();
-            return;
-        }
+        loop.exec();
+        m_process->disconnect();
 
         file_path_list.append(arguments[3]);
         file_path_list.append(arguments[4]);

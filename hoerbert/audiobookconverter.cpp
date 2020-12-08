@@ -26,6 +26,7 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QDir>
+#include <QEventLoop>
 
 #include "define.h"
 
@@ -73,21 +74,23 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         emit failed(QString("QProcess error: %1\n%2").arg(PROCESS_ERROR.at(error)).arg(QString(process.readAllStandardOutput())));
     });
 
-    process.start(FFMPEG_PATH, arguments);
 
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result, QProcess::ExitStatus x){
+        Q_UNUSED(x);
+        returnValue = (result==0);      // keep in mind that this call will return a non-0 value, because we're just getting info. More parameters are missing!
+        loop.quit();
+    });
+    process.start(FFMPEG_PATH, arguments);
     if (!process.waitForStarted())
     {
         qDebug() << "Failed executing ffmpeg!";
-        emit failed("Failed executing ffmpeg!");
+        emit failed( QString("Failed executing ffmpeg: [%1]").arg(arguments.join(",")) );
         return info_list;
     }
-
-    if (!process.waitForFinished(-1))
-    {
-        qDebug() << "Failed waiting for ffmpeg!";
-        emit failed("Failed waiting for ffmpeg!");
-        return info_list;
-    }
+    loop.exec();
+    process.disconnect();
 
     QString output = process.readAllStandardOutput();
     process.close();
@@ -142,21 +145,21 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
 
         info_list.append(output_path);
 
+        bool returnValue = false;
+        QEventLoop loop;
+        connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+            returnValue = (result==0);
+            loop.quit();
+        });
         process.start(FFMPEG_PATH, arguments);
-
         if (!process.waitForStarted())
         {
             qDebug() << "Failed executing ffmpeg!";
             emit failed("Failed executing ffmpeg!");
             return info_list;
         }
-
-        if (!process.waitForFinished())
-        {
-            qDebug() << "Failed waiting for ffmpeg!";
-            emit failed("Failed waiting for ffmpeg!");
-            return info_list;
-        }
+        loop.exec();
+        process.disconnect();
 
         output = process.readAllStandardOutput();
         auto tail = output.right(300);

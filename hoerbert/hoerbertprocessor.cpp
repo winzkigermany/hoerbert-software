@@ -382,9 +382,17 @@ bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QStrin
 
     arguments.append(destFilePath);
 
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     m_process->start(FFMPEG_PATH, arguments);
+    loop.exec();
+    m_process->disconnect();
 
-    return m_process->waitForFinished(PROCESS_LIFECYCLE);
+    return returnValue;
 }
 
 bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QString &destDir, int outfileName, const MetaData &metadata)
@@ -425,9 +433,17 @@ bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QStri
     arguments.append(tailPath(destDir) + QString::number(outfileName) + "-%01d" + DEFAULT_DESTINATION_FORMAT);
     arguments.append("-y");
 
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     m_process->start(FFMPEG_PATH, arguments);
+    loop.exec();
+    m_process->disconnect();
 
-    return m_process->waitForFinished(PROCESS_LIFECYCLE);
+    return returnValue;
 }
 
 bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QString &destDir, int outfileName, const MetaData &metadata)
@@ -446,8 +462,19 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     arguments.append("null");
     arguments.append("-");
 
-    m_process->start(FFMPEG_PATH, arguments);
-    if (!m_process->waitForFinished(PROCESS_LIFECYCLE))
+    bool returnValue = false;
+    {
+        QEventLoop loop;
+        connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+            returnValue = (result==0);
+            loop.quit();
+        });
+        m_process->start(FFMPEG_PATH, arguments);
+        loop.exec();
+        m_process->disconnect();
+    }
+
+    if (!returnValue)
     {
         qDebug() << "Failed to execute ffmpeg command";
         emit failed("Failed to execute ffmpeg command");
@@ -456,6 +483,7 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
 
     QString result_output = m_process->readAllStandardOutput();
     m_process->close();
+    m_process->disconnect();
 
     QStringList lines;
     QString duration_string;
@@ -563,10 +591,18 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     arguments.append(output_filename);
     arguments.append("-y");
 
-    m_process->start(FFMPEG_PATH, arguments);
-    bool success = m_process->waitForFinished(PROCESS_LIFECYCLE);
+    {
+        QEventLoop loop;
+        connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+            returnValue = (result==0);
+            loop.quit();
+        });
+        m_process->start(FFMPEG_PATH, arguments);
+        loop.exec();
+        m_process->disconnect();
+    }
 
-    if (!success)
+    if (!returnValue)
         return false;
 
     for (int i = 0; i < chunk_count; i++)
@@ -581,10 +617,20 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
 
         output_filename = destDir + "/" + QString::number(outfileName) + "-" + QString::number(i + 1) + DEFAULT_DESTINATION_FORMAT;
         arguments[20] = output_filename;
-        m_process->start(FFMPEG_PATH, arguments);
-        success = m_process->waitForFinished(PROCESS_LIFECYCLE);
+
+        {
+            QEventLoop loop;
+            connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+                returnValue = (result==0);
+                loop.quit();
+            });
+            m_process->start(FFMPEG_PATH, arguments);
+            loop.exec();
+            m_process->disconnect();
+        }
+
         m_process->close();
-        if (!success)
+        if (!returnValue)
             return false;
     }
 
@@ -621,9 +667,18 @@ bool HoerbertProcessor::createSilenceWav(const QString &destFilePath, int durati
     arguments.append(destFilePath);
     arguments.append("-y");
 
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     m_process->start(FFMPEG_PATH, arguments);
+    loop.exec();
+    m_process->disconnect();
+
     qDebug() << arguments;
-    return m_process->waitForFinished(PROCESS_LIFECYCLE);
+    return returnValue;
 }
 
 bool HoerbertProcessor::changeMetaData(const QString &sourceFilePath, const MetaData &metadata, const QString &suffix)
@@ -652,12 +707,19 @@ bool HoerbertProcessor::changeMetaData(const QString &sourceFilePath, const Meta
     arguments.append(tmp_file);
     arguments.append("-y");
 
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     m_process->start(FFMPEG_PATH, arguments);
-    bool success = m_process->waitForFinished(PROCESS_LIFECYCLE);
+    loop.exec();
+    m_process->disconnect();
 
     qDebug() << sourceFilePath << tmp_file;
 
-    if (success)
+    if (returnValue)
     {
         if (QFile::exists(sourceFilePath))
         {

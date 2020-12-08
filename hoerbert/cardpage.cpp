@@ -24,6 +24,7 @@
 CardPage::CardPage(QWidget *parent)
     : QWidget(parent)
 {
+    m_isFormatting = false;
     m_mainWindow = dynamic_cast<MainWindow*>(parent);
 
     m_deviceManager = nullptr;
@@ -294,7 +295,10 @@ void CardPage::updateDriveList()
     {
         if(!selectedDriveExists && !m_deviceManager->selectedDriveName().isEmpty()) // this is bad, very bad, presumably a user just ripped out the SD card.
         {
-            QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory card has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
+            if( !m_isFormatting )
+            {
+                QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory card has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
+            }
         }
 
         deselectDrive();
@@ -346,28 +350,28 @@ void CardPage::formatSelectedDrive(bool retry)
         return;
 #endif
 
-    QInputDialog *dialog = new QInputDialog(this);
-    connect( dialog, &QInputDialog::finished, dialog, &QObject::deleteLater);
-    dialog->setInputMode(QInputDialog::TextInput);
-    dialog->setWindowTitle(tr("Format"));
-    dialog->setLabelText(tr("Please enter the new name for your card"));
-    dialog->setTextValue(selectedDrive);
+    QInputDialog dialog(this);
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setWindowTitle(tr("Format"));
+    dialog.setLabelText(tr("Please enter the new name for your card"));
+    dialog.setTextValue(selectedDrive);
 
-    QLineEdit *lineEdit = dialog->findChild<QLineEdit *>();
+    QLineEdit *lineEdit = dialog.findChild<QLineEdit *>();
     lineEdit->setMaxLength(11);
     lineEdit->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_ ]{1,11}"), lineEdit));
     connect(lineEdit, &QLineEdit::textChanged, this, [=]( QString currentText ){
         lineEdit->setText(currentText.toUpper().replace(" ", "_"));
     });
 
-    if (dialog->exec() == QDialog::Accepted)
+    if (dialog.exec() == QDialog::Accepted)
     {
-        m_deviceManager->formatDrive(this, selectedDrive, dialog->textValue(), passwd);
+        m_isFormatting = true;
+        m_deviceManager->formatDrive(this, selectedDrive, dialog.textValue(), passwd);
     }
 
-    dialog->deleteLater();
-    updateDriveList();
     deselectDrive();
+    updateDriveList();
+    m_isFormatting = false;
 }
 
 void CardPage::ejectDrive()

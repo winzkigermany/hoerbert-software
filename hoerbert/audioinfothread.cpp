@@ -81,10 +81,6 @@ void AudioInfoThread::run()
 
     int counter = 0;
 
-    // create a new process to run the command
-    QProcessPriority * process = new QProcessPriority(this->parent());
-    process->setPriority(QProcessPriority::NormalPriority);
-
     QStringList arguments;
     arguments.append("-i");
     arguments.append("<SOURCE_PATH>");
@@ -102,18 +98,28 @@ void AudioInfoThread::run()
     emit processUpdated(counter);
 
     for (int i = 0; i < m_fileList.size(); i++)
-    {
+    {       
+        QProcess process = QProcess();      // create a new process to run the command
         QFileInfo info = m_fileList.at(i);
 
         arguments.replace(1, info.absoluteFilePath());
 
-        process->start(FFPROBE_PATH, arguments);
-        process->waitForFinished();
+        bool returnValue = false;
+        QEventLoop loop;
+        connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result, QProcess::ExitStatus x){
+            Q_UNUSED(x);
+            returnValue = (result==0);
+            loop.quit();
+        });
+        process.start(FFPROBE_PATH, arguments);
+        loop.exec();
+        process.disconnect();
 
         // parse the output to get desired data
-        QString output = process->readAllStandardOutput();
+        QString output = process.readAllStandardOutput();
 
-        process->close();
+        process.close();
+        process.deleteLater();
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(output.toUtf8());
         QJsonObject jsonObject = jsonDocument.object();
@@ -163,7 +169,6 @@ void AudioInfoThread::run()
         emit processUpdated(counter * 100 / m_fileList.count());
     }
     emit taskCompleted(entry_list);
-    process->deleteLater();
 }
 
 

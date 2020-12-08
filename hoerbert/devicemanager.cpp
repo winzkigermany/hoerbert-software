@@ -305,6 +305,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
             pleaseWait->show();
         }
 
+        setCurrentDrive(QString());
         return SUCCESS;
     }
 #else
@@ -441,29 +442,38 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo( QProcess* theProc
         qDebug() << output;
     });
 
+
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(theProcess, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     theProcess->start(cmd);
+    if (!theProcess->waitForStarted())
+    {
+        qDebug() << "Process failed to start!";
+        ret_code = FAILURE;
+        return std::pair<int, QString>(ret_code, theProcess->readAll());
+    }
+
     if( !showPleaseWaitDialog ){
-        if (!theProcess->waitForStarted())
-        {
-            qDebug() << "Process failed to start!";
-            ret_code = FAILURE;
-            return std::pair<int, QString>(ret_code, theProcess->readAll());
-        }
         theProcess->write(QString("%1\n").arg(passwd).toUtf8().constData());
+    }
+    loop.exec();
 
-        if (!theProcess->waitForFinished(60000))
-        {
-            if (ret_code != PASSWORD_INCORRECT)
-                ret_code = FAILURE;
-            return std::pair<int, QString>(ret_code, theProcess->readAll());
-        }
-        else
-        {
-            if (ret_code != PASSWORD_INCORRECT)
-                ret_code = SUCCESS;
+    if (returnValue)
+    {
+        if (ret_code != PASSWORD_INCORRECT)
+            ret_code = SUCCESS;
 
-            return std::pair<int, QString>(ret_code, theProcess->readAll());
-        }
+        return std::pair<int, QString>(ret_code, theProcess->readAll());
+    }
+    else
+    {
+        if (ret_code != PASSWORD_INCORRECT)
+            ret_code = FAILURE;
+        return std::pair<int, QString>(ret_code, theProcess->readAll());
     }
 
     return std::pair<int, QString>(SUCCESS, "");    // in case we're only starting formatting, there's nothing better we can return (if the process START was successful.)
@@ -660,8 +670,17 @@ QString DeviceManager::getFormatCommand(const QString &root, const QString &driv
 QString DeviceManager::executeCommand(const QString &cmdString)
 {
     QProcess cmdProgress;
+
+    bool returnValue = false;
+    QEventLoop loop;
+    connect(&cmdProgress, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+        returnValue = (result==0);
+        loop.quit();
+    });
     cmdProgress.start(cmdString);
-    cmdProgress.waitForFinished();
+    loop.exec();
+    cmdProgress.disconnect();
+
     return cmdProgress.readAllStandardOutput();
 }
 
