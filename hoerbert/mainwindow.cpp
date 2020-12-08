@@ -253,7 +253,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
     auto dir = tailPath(m_cardPage->currentDrivePath());
     auto sub_dir = QString();
 
-    for (auto i : fixList)
+    for (int i : fixList)       // i is the index of the playlist that needs to be fixed
     {
         sub_dir = dir + QString::number(i);
 
@@ -263,15 +263,15 @@ void MainWindow::makePlausible(std::list <int> fixList)
             m_plausibilityCheckMutex.unlock();
             return;
         }
-        dir.setFilter(QDir::Files | QDir::NoSymLinks);
+        dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
         dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
         dir.setSorting(QDir::Name);
 
         QFileInfoList list = dir.entryInfoList();
 
         // clean up empty files(file size is 0KB)
-        for (const auto &item : list) {
-            if (item.size() == 0) {
+        for( QFileInfo &item : list ) {
+            if (item.size() < 45) {
                 if (QFile::remove(item.absoluteFilePath())) {
                     qDebug() << "Deleted empty file:" << item.absoluteFilePath();
                 } else {
@@ -280,7 +280,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
             }
         }
 
-        list = dir.entryInfoList();
+        list = dir.entryInfoList();         // re-read the directory
 
         std::sort(list.begin(), list.end(), sortByNumber);
 
@@ -294,9 +294,9 @@ void MainWindow::makePlausible(std::list <int> fixList)
         }
     }
 
-    m_cardPage->update();
     sync();
     m_plausibilityCheckMutex.unlock();
+    m_cardPage->update();   // call this after unlocking the mutex, or else we're in a deadlock.
 }
 
 void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index)

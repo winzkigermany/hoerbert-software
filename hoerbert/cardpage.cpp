@@ -667,7 +667,7 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                 deselectDrive();
                 return;
             }
-            dir.setFilter(QDir::Files | QDir::NoSymLinks);
+            dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
             dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
             dir.setSorting(QDir::Name);
 
@@ -676,8 +676,8 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
             std::sort(list.begin(), list.end(), sortByNumber);
             // check plausibility at this point.
             auto index = 0;
-            for (auto item : list) {
-                if (item.fileName().toLower().remove(DEFAULT_DESTINATION_FORMAT.toLower()).toInt() != index) {
+            for (QFileInfo currentFile : list) {
+                if ( currentFile.fileName().toLower().remove(DEFAULT_DESTINATION_FORMAT.toLower()).toInt() != index || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long
                     isPlausible = false;
                     qDebug() << list;
                     plausibilityFixList.push_back(i);
