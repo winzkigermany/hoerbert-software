@@ -170,7 +170,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
 
 
     connect(m_reminderOption, &QCheckBox::clicked, this, [this] (int state) {
-        Q_UNUSED(state);
+        Q_UNUSED(state)
         QSettings settings;
         settings.beginGroup("Global");
         settings.setValue("showBackupReminder", m_reminderOption->isChecked());
@@ -178,7 +178,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     });
 
     connect(m_showLargeDriveCheck, &QCheckBox::stateChanged, this, [this] (int state) {
-        Q_UNUSED(state);
+        Q_UNUSED(state)
         QSettings settings;
         settings.beginGroup("Global");
         settings.setValue("showLargeDrives", m_showLargeDriveCheck->isChecked());
@@ -186,7 +186,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     });
 
     connect(m_regenerateXmlCheck, &QCheckBox::stateChanged, this, [this] (int state) {
-        Q_UNUSED(state);
+        Q_UNUSED(state)
         QSettings settings;
         settings.beginGroup("Global");
         settings.setValue("regenerateHoerbertXml", m_regenerateXmlCheck->isChecked());

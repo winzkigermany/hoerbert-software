@@ -79,7 +79,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     bool returnValue = false;
     QEventLoop loop;
     connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result, QProcess::ExitStatus x){
-        Q_UNUSED(x);
+        Q_UNUSED(x)
         returnValue = (result==0);      // keep in mind that this call will return a non-0 value, because we're just getting info. More parameters are missing!
         loop.quit();
     });

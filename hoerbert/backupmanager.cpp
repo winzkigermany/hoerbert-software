@@ -421,6 +421,7 @@ bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString des
     arguments.append("quiet");
     arguments.append(destPath);
 
+
     bool returnValue = false;
     QEventLoop loop;
     connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
@@ -492,6 +493,6 @@ void BackupManager::OnProcessReadyReadStandardOutput()
 
 void BackupManager::OnProcessStateChanged(QProcess::ProcessState newState)
 {
-    Q_UNUSED(newState);
+    Q_UNUSED(newState)
 //    qDebug() << " + Process state changed to" << newState;
 }

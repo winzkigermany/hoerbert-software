@@ -192,7 +192,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(m_playlistPage, &PlaylistPage::durationChanged, this, [=]( int playlistIndex, quint64 durationInSeconds, bool isEstimation) {
-        Q_UNUSED( isEstimation );
+        Q_UNUSED( isEstimation )
         m_cardPage->updateEstimatedDuration( playlistIndex, durationInSeconds );
     });
 
@@ -344,7 +344,7 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
 
     connect(processor, &HoerbertProcessor::taskCompleted, m_cardPage, [=] (int failCounter, int totalEntryCount) {
         Q_UNUSED(failCounter)
-        Q_UNUSED(totalEntryCount);
+        Q_UNUSED(totalEntryCount)
     }, Qt::UniqueConnection);
 
     connect(processor, &HoerbertProcessor::noSilenceDetected, this, [=] () {

@@ -384,7 +384,7 @@ void PlaylistPage::setDriveSpaceDetails(quint64 used, quint64 total)
 
 void PlaylistPage::contextMenuEvent(QContextMenuEvent *e)
 {
-    Q_UNUSED(e);
+    Q_UNUSED(e)
     ; // there is no context menu, since we don't need it (yet?)
 }
 

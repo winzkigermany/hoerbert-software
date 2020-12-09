@@ -107,7 +107,7 @@ void AudioInfoThread::run()
         bool returnValue = false;
         QEventLoop loop;
         connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result, QProcess::ExitStatus x){
-            Q_UNUSED(x);
+            Q_UNUSED(x)
             returnValue = (result==0);
             loop.quit();
         });
