@@ -613,7 +613,7 @@ void PlaylistView::readEntries(const QFileInfoList &fileInfoList, int rowIndex)
         });
 
         connect(m_ripperThread, &CDRipper::processUpdated, this, [this] (int percentage) {
-            m_progress->setLabelText(tr("Ripping audio tracks... (%1%)").arg(percentage));
+            m_progress->setLabelText(tr("Ripping audio tracks...").arg(percentage));
             m_progress->setValue(percentage);
         });
 
