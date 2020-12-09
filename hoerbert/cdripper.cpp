@@ -124,6 +124,7 @@ void CDRipper::run()
         {
             qDebug() << "Ripper process failed to start";
             emit failed("Ripper process failed to start");
+            m_process->disconnect();
             m_process->close();
             m_process->deleteLater();
             return;
@@ -136,6 +137,7 @@ void CDRipper::run()
 
         if (m_abort)
         {
+            m_process->disconnect();
             m_process->close();
             m_process->deleteLater();
             qDebug() << "Ripper thread aborted";

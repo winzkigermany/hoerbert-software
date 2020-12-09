@@ -357,7 +357,7 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     }, Qt::UniqueConnection);
 
     connect(processor, &QThread::finished, this, [=]() {
-        this->sync();
+        sync();
 
         // enable the button back
         m_cardPage->setButtonEnabled(dir_index, true);
@@ -779,24 +779,19 @@ void MainWindow::sync()
     if (!process.waitForStarted())
     {
         m_dbgDlg->appendLog("- Sync failed. Failed to start.");
-        process.close();
-
+        process.disconnect();
         process.close();
         return;
     }
     loop.exec();
     process.disconnect();
+    process.close();
 
     if (!returnValue)
     {
         m_dbgDlg->appendLog("- Sync failed. Failed to complete.");
-        process.close();
-
-        process.close();
         return;
     }
-
-    process.close();
 
     qDebug() << "Sync is successful!";
 }

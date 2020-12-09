@@ -442,6 +442,7 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo( QProcess* theProc
     {
         qDebug() << "Process failed to start!";
         ret_code = FAILURE;
+        theProcess->disconnect();
         return std::pair<int, QString>(ret_code, theProcess->readAll());
     }
 
@@ -449,6 +450,7 @@ std::pair<int, QString> DeviceManager::executeCommandWithSudo( QProcess* theProc
         theProcess->write(QString("%1\n").arg(passwd).toUtf8().constData());
     }
     loop.exec();
+    theProcess->disconnect();
 
     if (returnValue)
     {
