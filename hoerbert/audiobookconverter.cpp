@@ -39,10 +39,6 @@ AudioBookConverter::AudioBookConverter(const QString &absoluteFilePath)
     m_filePath = absoluteFilePath;
     m_isAborted = false;
 
-    QSettings settings;
-    settings.beginGroup("Global");
-    m_audioVolume = settings.value("volume").toString();
-    settings.endGroup();
     m_maxMetadataLength = METADATA_MAX_LENGTH;
 
     QDir dir(HOERBERT_TEMP_PATH);
@@ -60,6 +56,11 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         emit failed("Cannot find the audio book file!");
         return info_list;
     }
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    m_audioVolume = settings.value("volume").toString();
+    settings.endGroup();
 
     QStringList arguments;
     arguments.append("-i");
@@ -87,6 +88,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     {
         qDebug() << "Failed executing ffmpeg!";
         emit failed( QString("Failed executing ffmpeg: [%1]").arg(arguments.join(",")) );
+        process.disconnect();
         return info_list;
     }
     loop.exec();
@@ -116,8 +118,8 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     arguments.append("1");
     arguments.append("-metadata");
     arguments.append("<METADATA>"); // index = 13
-    arguments.append("-filter:a");
-    arguments.append(QString("volume=%1dB").arg(m_audioVolume));
+    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
+    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
     arguments.append("<OUTPUT_PATH>"); // index = 16
     arguments.append("-y");
     arguments.append("-hide_banner");
@@ -156,6 +158,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         {
             qDebug() << "Failed executing ffmpeg!";
             emit failed("Failed executing ffmpeg!");
+            process.disconnect();
             return info_list;
         }
         loop.exec();
@@ -271,3 +274,39 @@ QStringList AudioBookConverter::parseForChapters(const QString &output)
     return result;
 }
 
+QMap<QString,QString> AudioBookConverter::getFFMpegVolumeSettings()
+{
+    QString volumeCommand;
+    QString volumeParameters;
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    // factory volume level is at -1.5. The user settings are based on that.
+    if( settings.value("volume").toString()=="-1.5")
+    {
+        m_audioVolume = "-3.0";
+    }
+    else if( settings.value("volume").toString()=="-6")
+    {
+        m_audioVolume = "-7.0"; // give a bit more headroom to avoid agc pumping
+    }
+    else
+    {
+        m_audioVolume = "-1.5";
+    }
+    settings.endGroup();
+
+    volumeCommand = "-af";
+    volumeParameters = QString("loudnorm=I=-16:TP=%1:LRA=11").arg(m_audioVolume);
+
+//    arguments.append("-filter:a");
+//    QString arg_volume = QString("volume=%1dB").arg(m_audioVolume);
+//    arguments.append(arg_volume);
+
+    QMap<QString,QString> retVal;
+
+    retVal["volumeCommand"] = volumeCommand;
+    retVal["volumeParameters"] = volumeParameters;
+
+    return retVal;
+}

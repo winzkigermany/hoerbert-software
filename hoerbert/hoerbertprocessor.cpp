@@ -29,6 +29,7 @@
 #include <QFile>
 #include <QDir>
 #include <stdio.h>
+#include <QMap>
 
 #include "functions.h"
 #include "qprocesspriority.h"
@@ -44,10 +45,6 @@ HoerbertProcessor::HoerbertProcessor(const QString &dirPath, int dirNum)
     m_dirPath = dirPath;
     m_dirNum = dirNum;
 
-    QSettings settings;
-    settings.beginGroup("Global");
-    m_audioVolume = settings.value("volume").toString();
-    settings.endGroup();
     m_maxMetadataLength = METADATA_MAX_LENGTH;
     m_split3SegmentLength = QString::number(SPLIT_AUDIO_SEGMENT_LENGTH);
     m_silenceNoise = "-50dB";
@@ -351,6 +348,7 @@ bool HoerbertProcessor::changeEntryMetadata(const AudioEntry &entry)
 
 bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata)
 {
+
     QStringList arguments;
     arguments.append("-i");
     arguments.append(sourceFilePath);
@@ -372,10 +370,8 @@ bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QStrin
     arguments.append("-metadata");
     arguments.append(QString("comment=%1").arg(sourceFilePath));
 
-    arguments.append("-filter:a");
-
-    auto arg_volume = QString("volume=%1dB").arg(m_audioVolume);
-    arguments.append(arg_volume);
+    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
+    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
 
     arguments.append("-y");
     arguments.append("-hide_banner");
@@ -388,6 +384,7 @@ bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QStrin
         returnValue = (result==0);
         loop.quit();
     });
+    qDebug() << QString( "ffmpeg %1" ).arg(arguments.join(" "));
     m_process->start(FFMPEG_PATH, arguments);
     loop.exec();
     m_process->disconnect();
@@ -425,10 +422,8 @@ bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QStri
     arguments.append("-segment_time");
     arguments.append(m_split3SegmentLength);
 
-    arguments.append("-filter:a");
-
-    auto arg_volume = QString("volume=%1dB").arg(m_audioVolume);
-    arguments.append(arg_volume);
+    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
+    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
 
     arguments.append(tailPath(destDir) + QString::number(outfileName) + "-%01d" + DEFAULT_DESTINATION_FORMAT);
     arguments.append("-y");
@@ -582,10 +577,8 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     arguments.append("-metadata");
     arguments.append(QString("comment=%1").arg(metadata.comment));
 
-    arguments.append("-filter:a");
-
-    QString arg_volume = QString("volume=%1dB").arg(m_audioVolume);
-    arguments.append(arg_volume);
+    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
+    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
 
     QString output_filename = destDir + "/" + QString::number(outfileName) + "-0" + DEFAULT_DESTINATION_FORMAT;
     arguments.append(output_filename);
@@ -805,3 +798,35 @@ void HoerbertProcessor::OnProcessStateChanged(QProcess::ProcessState newState)
     qDebug() << "Process state changed to" << newState;
 }
 
+QMap<QString,QString> HoerbertProcessor::getFFMpegVolumeSettings()
+{
+    QString volumeCommand;
+    QString volumeParameters;
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    // factory volume level is at -1.5. The user settings are based on that.
+    if( settings.value("volume").toString()=="-1.5")
+    {
+        m_audioVolume = "-3.0";
+    }
+    else if( settings.value("volume").toString()=="-6")
+    {
+        m_audioVolume = "-7.0"; // give a bit more headroom to avoid agc pumping
+    }
+    else
+    {
+        m_audioVolume = "-1.5";
+    }
+    settings.endGroup();
+
+    volumeCommand = "-af";
+    volumeParameters = QString("loudnorm=I=-16:TP=%1:LRA=11").arg(m_audioVolume);
+
+    QMap<QString,QString> retVal;
+
+    retVal["volumeCommand"] = volumeCommand;
+    retVal["volumeParameters"] = volumeParameters;
+
+    return retVal;
+}

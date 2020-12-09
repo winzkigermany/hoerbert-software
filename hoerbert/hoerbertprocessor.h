@@ -210,6 +210,12 @@ private:
      */
     bool renameSplitFiles(const QString &destDir);
 
+    /**
+     * @brief getFFMpegVolumeSettings
+     * @return the volume setting arguments for ffmpeg
+     */
+    QMap<QString,QString> getFFMpegVolumeSettings();
+
     QProcessPriority *m_process;
     QString m_dirPath;
     int m_dirNum;

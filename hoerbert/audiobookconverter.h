@@ -72,6 +72,13 @@ private:
      */
     QStringList parseForChapters(const QString &output);
 
+    /**
+     * @brief getFFMpegVolumeSettings
+     * @return ffmpeg volume setting parameters
+     * THIS IS DUPLICATE CODE, should be consolidated with the same function in hoerbertprocessor.cpp
+     */
+    QMap<QString,QString> getFFMpegVolumeSettings();
+
     QString m_filePath;
     bool m_isAborted;
 
