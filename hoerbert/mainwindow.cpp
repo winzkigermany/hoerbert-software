@@ -1561,13 +1561,19 @@ void MainWindow::checkForUpdates()
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
+    QMessageBox::StandardButton wantToEject;
+
     if (m_cardPage->isProcessing())
     {
         auto selected = QMessageBox::question(this, "hörbert", QString(tr("Current drive [%1] is being processed.")+"\n\n"+tr("Are you sure you want to close this app?")).arg(m_cardPage->currentDriveName()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
 
         if (selected == QMessageBox::Yes)
         {
-            m_cardPage->ejectDrive();       // this may appear quite brutal, but it keeps unexperienced users from harm. Decision made based on experience.
+            wantToEject = QMessageBox::question(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Do you want to eject the card so you can remove it safely?")), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+            if (wantToEject == QMessageBox::Yes)
+            {
+                m_cardPage->ejectDrive();
+            }
             e->accept();
         }
         else
@@ -1577,7 +1583,11 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
     else
     {
-        m_cardPage->ejectDrive();       // this may appear quite brutal, but it keeps unexperienced users from harm. Decision made based on experience.
+        wantToEject = QMessageBox::question(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Do you want to eject the card so you can remove it safely?")), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+        if (wantToEject == QMessageBox::Yes)
+        {
+            m_cardPage->ejectDrive();
+        }
         e->accept();
     }
 }
