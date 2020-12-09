@@ -43,6 +43,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QLocale>
+#include <QCloseEvent>
 #include "generalexception.h"
 
 
