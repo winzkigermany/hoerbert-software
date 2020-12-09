@@ -244,12 +244,6 @@ public:
     void releaseButtonLock();
 
     /**
-     * @brief isCurrentDriveWritable
-     * @return true if the currently selected drive is writable
-     */
-    bool isDriveWritable( const QString *driveName=NULL );
-
-    /**
      * @brief enable or disable the playlist buttons
      * @param onOff if true, enable the playlist buttons
      */
@@ -260,6 +254,12 @@ public:
      * @return the number of drives in the drop down list
      */
     int getDriveListLength();
+
+    /**
+     * @brief isWorkingOnCustomDirectory
+     * @return true if we're working on a custom directory instead of a memory card.
+     */
+    bool isWorkingOnCustomDirectory();
 
 signals:
 

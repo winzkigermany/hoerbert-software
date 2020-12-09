@@ -1569,10 +1569,13 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
         if (selected == QMessageBox::Yes)
         {
-            wantToEject = QMessageBox::question(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Do you want to eject the card so you can remove it safely?")), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
-            if (wantToEject == QMessageBox::Yes)
+            if( m_cardPage->isDiagnosticsModeEnabled() || (!m_cardPage->currentDriveName().isEmpty() && !m_cardPage->isWorkingOnCustomDirectory()) )
             {
-                m_cardPage->ejectDrive();
+                wantToEject = QMessageBox::question(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Do you want to eject the card so you can remove it safely?")), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+                if (wantToEject == QMessageBox::Yes)
+                {
+                    m_cardPage->ejectDrive();
+                }
             }
             e->accept();
         }
@@ -1583,10 +1586,13 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
     else
     {
-        wantToEject = QMessageBox::question(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Do you want to eject the card so you can remove it safely?")), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
-        if (wantToEject == QMessageBox::Yes)
+        if( m_cardPage->isDiagnosticsModeEnabled() || (!m_cardPage->currentDriveName().isEmpty() && !m_cardPage->isWorkingOnCustomDirectory()) )
         {
-            m_cardPage->ejectDrive();
+            wantToEject = QMessageBox::question(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Do you want to eject the card so you can remove it safely?")), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+            if (wantToEject == QMessageBox::Yes)
+            {
+                m_cardPage->ejectDrive();
+            }
         }
         e->accept();
     }

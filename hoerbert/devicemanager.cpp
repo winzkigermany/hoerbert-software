@@ -566,7 +566,7 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 
 void DeviceManager::setCurrentDrive(const QString &driveName)
 {
-    if( driveName==m_custom_destination_path ){
+    if( !driveName.isEmpty() && driveName==m_custom_destination_path ){
         // from now on, we will work on the custom folder that the user selected.
         m_currentDrive = driveName;
         m_currentDriveName = driveName;

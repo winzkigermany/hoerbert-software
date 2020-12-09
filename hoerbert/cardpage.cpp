@@ -529,6 +529,8 @@ void CardPage::deselectDrive()
 {
     initializePlaylists();
 
+    m_deviceManager->setCurrentDrive("");
+
     m_ejectDriveButton->hide();
     m_ejectButtonLabel->hide();
 
@@ -546,19 +548,21 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         deselectDrive();
         return;
     }
-    m_ejectDriveButton->show();
-    m_ejectButtonLabel->show();
-
-    m_driveList->setEnabled(false);
-    m_selectDriveButton->hide();
 
     m_deviceManager->refresh(driveName);    // refresh the storageInfo object, or else cached info will persist between drive (e.g. memory card) changes
 
     if (m_deviceManager->isWriteProtected(driveName))
     {
-        QMessageBox::information(this, tr("Select drive"), tr("The selected device is write-protected. Please eject the device and remove the write protection, if you want to modify any playlists on it."));
+        QMessageBox::information(this, tr("Select drive"), tr("The selected device is write-protected. Please remove the write protection if you want to modify any playlists on it."));
+        deselectDrive();
         return;
     }
+
+    m_ejectDriveButton->show();
+    m_ejectButtonLabel->show();
+
+    m_driveList->setEnabled(false);
+    m_selectDriveButton->hide();
 
     auto fs = m_deviceManager->getVolumeFileSystem(driveName);
     if (fs != "FAT32" && fs != "msdos" && fs != "vfat")
@@ -976,19 +980,6 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
 }
 
 
-bool CardPage::isDriveWritable( const QString *driveName )
-{
-    QString deviceName = m_driveList->currentText();
-    if( driveName==NULL ){
-        deviceName = QString(*driveName);
-    }
-    if (!deviceName.isEmpty()){
-        return m_deviceManager->isWriteProtected(deviceName);
-    }
-
-    return false;
-}
-
 void CardPage::enableButtons( bool onOff )
 {
     //go through list of buttons an enable/disable them
@@ -1023,4 +1014,9 @@ int CardPage::numberOfTracks()
     }
 
     return trackCount;
+}
+
+bool CardPage::isWorkingOnCustomDirectory()
+{
+    return m_deviceManager->isWorkingOnCustomDirectory();
 }
