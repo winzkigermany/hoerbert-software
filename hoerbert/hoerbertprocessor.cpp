@@ -47,8 +47,8 @@ HoerbertProcessor::HoerbertProcessor(const QString &dirPath, int dirNum)
 
     m_maxMetadataLength = METADATA_MAX_LENGTH;
     m_split3SegmentLength = QString::number(SPLIT_AUDIO_SEGMENT_LENGTH);
-    m_silenceNoise = "-50dB";
-    m_silenceDetectDuration = "1.5";
+    m_silenceNoise = "-30dB";
+    m_silenceDetectDuration = "0.1";
     m_splitOnSilenceSegmentLength = "180";
 
     m_totalEntryCount = 0;
@@ -450,12 +450,14 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     arguments.append(sourceFilePath);
     arguments.append("-af");
 
-    auto arg_audio_volume = "silencedetect=n=" + m_silenceNoise + ":d=" + m_silenceDetectDuration;
+    QString arg_audio_volume = "silencedetect=n=" + m_silenceNoise + ":d=" + m_silenceDetectDuration;
     arguments.append(arg_audio_volume);
     arguments.append("-hide_banner");
     arguments.append("-f");
     arguments.append("null");
     arguments.append("-");
+
+    qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
 
     bool returnValue = false;
     {
@@ -547,7 +549,7 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     }
 
     if (chunk_count == 0) {
-        qDebug() << "No silence detected. No need to split!";
+        qDebug() << "No silence detected. No chance to split!";
         emit noSilenceDetected();
         return true;
     }
