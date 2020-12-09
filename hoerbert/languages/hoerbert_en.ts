@@ -289,22 +289,27 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="569"/>
+        <location filename="../cardpage.cpp" line="556"/>
+        <source>The selected device is write-protected. Please remove the write protection if you want to modify any playlists on it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="573"/>
         <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="569"/>
+        <location filename="../cardpage.cpp" line="573"/>
         <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="575"/>
+        <location filename="../cardpage.cpp" line="579"/>
         <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="575"/>
+        <location filename="../cardpage.cpp" line="579"/>
         <source>Do you you want to format this drive [%1] now?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -319,31 +324,31 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="559"/>
-        <location filename="../cardpage.cpp" line="569"/>
-        <location filename="../cardpage.cpp" line="575"/>
-        <location filename="../cardpage.cpp" line="592"/>
-        <location filename="../cardpage.cpp" line="631"/>
+        <location filename="../cardpage.cpp" line="556"/>
+        <location filename="../cardpage.cpp" line="573"/>
+        <location filename="../cardpage.cpp" line="579"/>
+        <location filename="../cardpage.cpp" line="596"/>
+        <location filename="../cardpage.cpp" line="635"/>
         <source>Select drive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="592"/>
+        <location filename="../cardpage.cpp" line="596"/>
         <source>Volume size is bigger than 32GB. This may not be a memory card at all.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="592"/>
+        <location filename="../cardpage.cpp" line="596"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="631"/>
+        <location filename="../cardpage.cpp" line="635"/>
         <source>This card has never been used with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="631"/>
+        <location filename="../cardpage.cpp" line="635"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -425,11 +430,6 @@ skip this step by ticking the check box below.</source>
     <message>
         <location filename="../cardpage.cpp" line="445"/>
         <source>I only will use my memory cards with this new software from now on.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../cardpage.cpp" line="559"/>
-        <source>The selected device is write-protected. Please eject the device and remove the write protection, if you want to modify any playlists on it.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -519,14 +519,14 @@ This app will not format it for safety reasons.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../mainwindow.cpp" line="1727"/>
-        <location filename="../mainwindow.cpp" line="1728"/>
+        <location filename="../mainwindow.cpp" line="1743"/>
+        <location filename="../mainwindow.cpp" line="1744"/>
         <source>Add title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1733"/>
-        <location filename="../mainwindow.cpp" line="1734"/>
+        <location filename="../mainwindow.cpp" line="1749"/>
+        <location filename="../mainwindow.cpp" line="1750"/>
         <source>Remove title</source>
         <translation type="unfinished"></translation>
     </message>
@@ -729,143 +729,155 @@ Create a backup now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1594"/>
+        <location filename="../mainwindow.cpp" line="1574"/>
+        <location filename="../mainwindow.cpp" line="1591"/>
+        <source>The memory card is still in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1574"/>
+        <location filename="../mainwindow.cpp" line="1591"/>
+        <source>Do you want to eject the card so you can remove it safely?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1610"/>
         <source>This version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1594"/>
+        <location filename="../mainwindow.cpp" line="1610"/>
         <source>Latest available version online: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1598"/>
+        <location filename="../mainwindow.cpp" line="1614"/>
         <source>Download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1658"/>
+        <location filename="../mainwindow.cpp" line="1674"/>
         <source>This will keep you from losing files accidently.
 Do you want to create a backup now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1724"/>
+        <location filename="../mainwindow.cpp" line="1740"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1739"/>
+        <location filename="../mainwindow.cpp" line="1755"/>
         <source>Move to playlist...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1744"/>
+        <location filename="../mainwindow.cpp" line="1760"/>
         <source>Beginning of...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2036"/>
+        <location filename="../mainwindow.cpp" line="2052"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2039"/>
+        <location filename="../mainwindow.cpp" line="2055"/>
         <source>Dark mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2040"/>
+        <location filename="../mainwindow.cpp" line="2056"/>
         <source>Switch on or off dark mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2049"/>
+        <location filename="../mainwindow.cpp" line="2065"/>
         <source>Dark mode switch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2049"/>
+        <location filename="../mainwindow.cpp" line="2065"/>
         <source>Please restart this app to see the change.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2062"/>
+        <location filename="../mainwindow.cpp" line="2078"/>
         <source>Playlist columns...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2065"/>
-        <location filename="../mainwindow.cpp" line="2066"/>
+        <location filename="../mainwindow.cpp" line="2081"/>
+        <location filename="../mainwindow.cpp" line="2082"/>
         <source>Show album column in playlists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2088"/>
-        <location filename="../mainwindow.cpp" line="2089"/>
+        <location filename="../mainwindow.cpp" line="2104"/>
+        <location filename="../mainwindow.cpp" line="2105"/>
         <source>Show comment column in playlists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2112"/>
+        <location filename="../mainwindow.cpp" line="2128"/>
         <source>Extras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2123"/>
+        <location filename="../mainwindow.cpp" line="2139"/>
         <source>Backup...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2167"/>
+        <location filename="../mainwindow.cpp" line="2183"/>
         <source>Select destination manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2176"/>
+        <location filename="../mainwindow.cpp" line="2192"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2179"/>
-        <location filename="../mainwindow.cpp" line="2180"/>
+        <location filename="../mainwindow.cpp" line="2195"/>
+        <location filename="../mainwindow.cpp" line="2196"/>
         <source>About this app</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2185"/>
-        <location filename="../mainwindow.cpp" line="2186"/>
+        <location filename="../mainwindow.cpp" line="2201"/>
+        <location filename="../mainwindow.cpp" line="2202"/>
         <source>Online help and customer service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2188"/>
+        <location filename="../mainwindow.cpp" line="2204"/>
         <source>https://en.hoerbert.com/service/hoerbert-application</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2195"/>
+        <location filename="../mainwindow.cpp" line="2211"/>
         <source>https://en.hoerbert.com/contents/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2206"/>
+        <location filename="../mainwindow.cpp" line="2222"/>
         <source>Service tools...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2209"/>
-        <location filename="../mainwindow.cpp" line="2210"/>
+        <location filename="../mainwindow.cpp" line="2225"/>
+        <location filename="../mainwindow.cpp" line="2226"/>
         <source>Collect data for service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2214"/>
+        <location filename="../mainwindow.cpp" line="2230"/>
         <source>Diagnostics mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2215"/>
+        <location filename="../mainwindow.cpp" line="2231"/>
         <source>Switch card to diagnostics mode and back</source>
         <translation type="unfinished"></translation>
     </message>
@@ -880,28 +892,28 @@ Do you want to create a backup now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1566"/>
+        <location filename="../mainwindow.cpp" line="1568"/>
         <source>Current drive [%1] is being processed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1566"/>
+        <location filename="../mainwindow.cpp" line="1568"/>
         <source>Are you sure you want to close this app?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1604"/>
+        <location filename="../mainwindow.cpp" line="1620"/>
         <source>https://en.hoerbert.com/customer-service/downloads-and-questions-about-transferring-contents/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1608"/>
+        <location filename="../mainwindow.cpp" line="1624"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1228"/>
-        <location filename="../mainwindow.cpp" line="1654"/>
+        <location filename="../mainwindow.cpp" line="1670"/>
         <source>Backup reminder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -998,101 +1010,101 @@ To avoid data loss, please press the eject button before unplugging it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1658"/>
+        <location filename="../mainwindow.cpp" line="1674"/>
         <source>Backup reminder: Don&apos;t forget to backup your memory card to your computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1661"/>
+        <location filename="../mainwindow.cpp" line="1677"/>
         <source>Never remind me again</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1665"/>
+        <location filename="../mainwindow.cpp" line="1681"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1669"/>
+        <location filename="../mainwindow.cpp" line="1685"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1753"/>
-        <location filename="../mainwindow.cpp" line="1768"/>
-        <location filename="../mainwindow.cpp" line="1783"/>
-        <location filename="../mainwindow.cpp" line="1798"/>
-        <location filename="../mainwindow.cpp" line="1813"/>
-        <location filename="../mainwindow.cpp" line="1828"/>
-        <location filename="../mainwindow.cpp" line="1843"/>
-        <location filename="../mainwindow.cpp" line="1858"/>
-        <location filename="../mainwindow.cpp" line="1873"/>
+        <location filename="../mainwindow.cpp" line="1769"/>
+        <location filename="../mainwindow.cpp" line="1784"/>
+        <location filename="../mainwindow.cpp" line="1799"/>
+        <location filename="../mainwindow.cpp" line="1814"/>
+        <location filename="../mainwindow.cpp" line="1829"/>
+        <location filename="../mainwindow.cpp" line="1844"/>
+        <location filename="../mainwindow.cpp" line="1859"/>
+        <location filename="../mainwindow.cpp" line="1874"/>
+        <location filename="../mainwindow.cpp" line="1889"/>
         <source>Move to beginning of playlist %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1888"/>
+        <location filename="../mainwindow.cpp" line="1904"/>
         <source>End of...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1892"/>
-        <location filename="../mainwindow.cpp" line="1907"/>
-        <location filename="../mainwindow.cpp" line="1922"/>
-        <location filename="../mainwindow.cpp" line="1937"/>
-        <location filename="../mainwindow.cpp" line="1952"/>
-        <location filename="../mainwindow.cpp" line="1967"/>
-        <location filename="../mainwindow.cpp" line="1982"/>
-        <location filename="../mainwindow.cpp" line="1997"/>
-        <location filename="../mainwindow.cpp" line="2012"/>
+        <location filename="../mainwindow.cpp" line="1908"/>
+        <location filename="../mainwindow.cpp" line="1923"/>
+        <location filename="../mainwindow.cpp" line="1938"/>
+        <location filename="../mainwindow.cpp" line="1953"/>
+        <location filename="../mainwindow.cpp" line="1968"/>
+        <location filename="../mainwindow.cpp" line="1983"/>
+        <location filename="../mainwindow.cpp" line="1998"/>
+        <location filename="../mainwindow.cpp" line="2013"/>
+        <location filename="../mainwindow.cpp" line="2028"/>
         <source>Move to end of playlist %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="546"/>
-        <location filename="../mainwindow.cpp" line="2115"/>
-        <location filename="../mainwindow.cpp" line="2116"/>
+        <location filename="../mainwindow.cpp" line="2131"/>
+        <location filename="../mainwindow.cpp" line="2132"/>
         <source>Print table of contents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2124"/>
-        <location filename="../mainwindow.cpp" line="2125"/>
+        <location filename="../mainwindow.cpp" line="2140"/>
+        <location filename="../mainwindow.cpp" line="2141"/>
         <source>Backup memory card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2130"/>
-        <location filename="../mainwindow.cpp" line="2131"/>
+        <location filename="../mainwindow.cpp" line="2146"/>
+        <location filename="../mainwindow.cpp" line="2147"/>
         <source>Restore a backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2139"/>
-        <location filename="../mainwindow.cpp" line="2140"/>
+        <location filename="../mainwindow.cpp" line="2155"/>
+        <location filename="../mainwindow.cpp" line="2156"/>
         <source>Format memory card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2160"/>
-        <location filename="../mainwindow.cpp" line="2161"/>
+        <location filename="../mainwindow.cpp" line="2176"/>
+        <location filename="../mainwindow.cpp" line="2177"/>
         <source>Advanced features</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2168"/>
+        <location filename="../mainwindow.cpp" line="2184"/>
         <source>Select mount point of memory card manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2192"/>
-        <location filename="../mainwindow.cpp" line="2193"/>
+        <location filename="../mainwindow.cpp" line="2208"/>
+        <location filename="../mainwindow.cpp" line="2209"/>
         <source>Find music and audio books</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2201"/>
-        <location filename="../mainwindow.cpp" line="2202"/>
+        <location filename="../mainwindow.cpp" line="2217"/>
+        <location filename="../mainwindow.cpp" line="2218"/>
         <source>Check for updates</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1185,6 +1197,7 @@ To avoid data loss, please press the eject button before unplugging it.</source>
     </message>
     <message>
         <location filename="../playlistview.cpp" line="578"/>
+        <location filename="../playlistview.cpp" line="616"/>
         <source>Ripping audio tracks...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1198,11 +1211,6 @@ To avoid data loss, please press the eject button before unplugging it.</source>
         <location filename="../playlistview.cpp" line="596"/>
         <location filename="../playlistview.cpp" line="782"/>
         <source>Aborting...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../playlistview.cpp" line="616"/>
-        <source>Ripping audio tracks... (%1%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
