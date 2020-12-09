@@ -99,7 +99,7 @@ void AudioInfoThread::run()
 
     for (int i = 0; i < m_fileList.size(); i++)
     {       
-        QProcess process(this);      // create a new process to run the command
+        QProcess process;      // create a new process to run the command
         QFileInfo info = m_fileList.at(i);
 
         arguments.replace(1, info.absoluteFilePath());
