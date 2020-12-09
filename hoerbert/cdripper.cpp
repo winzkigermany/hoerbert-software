@@ -82,16 +82,6 @@ void CDRipper::run()
     });
     connect(m_process, &QProcess::stateChanged, [] (QProcess::ProcessState state) {
         qDebug() << "Ripper process state changed to" << state;
-        if (state == QProcess::Starting)
-        {
-            QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-            qApp->processEvents();
-        }
-        else if (state == QProcess::NotRunning)
-        {
-            QApplication::restoreOverrideCursor();
-            qApp->processEvents();
-        }
     });
     connect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [] (int exitCode, QProcess::ExitStatus exitStatus) {
         qDebug() << " - FFmpeg process finished! Exit Code:" << exitCode << ", Exit Status:" << exitStatus;

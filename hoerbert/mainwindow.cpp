@@ -184,9 +184,6 @@ MainWindow::MainWindow(QWidget *parent)
         {
             m_cardPage->initUsedSpace();
         }
-
-        this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
-        qApp->processEvents();
     });
 
     connect(m_playlistPage, &PlaylistPage::errorOccurred, this, [this] (const QString &errorString) {
@@ -308,9 +305,6 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
 {
     m_cardPage->enableButtons(true);
     showHideEditMenuEntries(false);
-
-    this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
-    qApp->processEvents();
 
     if (list.count() == 0) {
         m_cardPage->update();
@@ -559,7 +553,6 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
     connect(thread, &AudioInfoThread::processUpdated, this, [this] (int percent) {
         m_progress->setValue(percent);
         m_progress->setLabelText(tr("Generating table..."));
-        QCoreApplication::processEvents();
     });
     connect(thread, &AudioInfoThread::taskCompleted, this, [this, outputPath, showOnBrowser] (const AudioList &result) {
         printHtml(result, outputPath, showOnBrowser);
@@ -587,7 +580,6 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
     connect(abort_button, &QPushButton::clicked, this, [this, abort_button, thread] () {
         m_progress->setLabelText(tr("Aborting..."));
         m_progress->show();
-        QCoreApplication::processEvents();
         abort_button->setDisabled(true);
 
         thread->quit();
@@ -776,8 +768,6 @@ void MainWindow::sync()
     arguments.append("-r");
     arguments.append(m_cardPage->currentDrivePath().left(1));
 #endif
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
 
     bool returnValue = false;
     QEventLoop loop;
@@ -791,9 +781,6 @@ void MainWindow::sync()
         m_dbgDlg->appendLog("- Sync failed. Failed to start.");
         process.close();
 
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
-
         process.close();
         return;
     }
@@ -805,17 +792,11 @@ void MainWindow::sync()
         m_dbgDlg->appendLog("- Sync failed. Failed to complete.");
         process.close();
 
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
-
         process.close();
         return;
     }
 
     process.close();
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 
     qDebug() << "Sync is successful!";
 }
@@ -863,9 +844,6 @@ void MainWindow::collectInformationForSupport()
     }
 
     qDebug() << "tmp dir: " << tmp_dir.absolutePath();
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
 
     QStringList info_list;
     info_list << "[Operating System]" << QSysInfo::productType() << QSysInfo::productVersion() << QLocale::languageToString(QLocale::system().language()) << "";
@@ -1065,9 +1043,6 @@ void MainWindow::collectInformationForSupport()
     {
         tmp_dir.removeRecursively();
     }
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 }
 
 void MainWindow::backupCard()
@@ -1091,9 +1066,6 @@ void MainWindow::backupCard()
     }
 
     destPath = tailPath(destPath) + backup_dir;
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
 
     printTableOfContent(destPath);
 
@@ -1123,9 +1095,8 @@ void MainWindow::backupCard()
     connect(abort_button, &QPushButton::clicked, this, [this, abort_button] () {
         m_progress->setLabelText(tr("Aborting..."));
         m_progress->show();
-        QCoreApplication::processEvents();
         abort_button->setDisabled(true);
-       m_backupManager->abort();
+        m_backupManager->abort();
     });
 
     m_progress->show();
@@ -1133,7 +1104,6 @@ void MainWindow::backupCard()
     connect(m_backupManager, &BackupManager::processUpdated, this, [this] (int percent) {
        m_progress->setValue(percent);
        m_progress->setLabelText(tr("Copying files..."));
-       QCoreApplication::processEvents();
     });
 
     connect(m_backupManager, &BackupManager::failed, this, [this](const QString &errorString) {
@@ -1150,9 +1120,6 @@ void MainWindow::backupCard()
     sync();
     m_progress->close();
     m_progress->deleteLater();
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 }
 
 void MainWindow::restoreBackupQuestion()
@@ -1180,9 +1147,6 @@ void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
 
     bool restore_only = !doMerge;
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
     QString destPath = m_cardPage->currentDrivePath();
 
     m_backupManager = new BackupManager(sourcePath, destPath, false, restore_only);
@@ -1207,7 +1171,6 @@ void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
     connect(abort_button, &QPushButton::clicked, this, [this, abort_button] () {
         m_progress->setLabelText(tr("Aborting..."));
         m_progress->show();
-        QCoreApplication::processEvents();
         abort_button->setDisabled(true);
         m_backupManager->abort();
     });
@@ -1217,7 +1180,6 @@ void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
     connect(m_backupManager, &BackupManager::processUpdated, this, [this] (int percent) {
         m_progress->setValue(percent);
         m_progress->setLabelText(tr("Restoring files..."));
-        QCoreApplication::processEvents();
     });
 
     connect(m_backupManager, &BackupManager::failed, this, [this](const QString &errorString){
@@ -1234,9 +1196,6 @@ void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
     m_progress->deleteLater();
     m_cardPage->initUsedSpace();
     m_cardPage->update();
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 }
 
 void MainWindow::formatCard()
@@ -1285,8 +1244,6 @@ void MainWindow::switchDiagnosticsMode()
     m_pleaseWaitDialog->setProgressRange( 0, 100 );
     m_pleaseWaitDialog->setValue(0);
     m_pleaseWaitDialog->show();
-
-    QApplication::processEvents();
 
     if (doEnable) // switch to diagnostics mode
     {
@@ -1350,7 +1307,6 @@ void MainWindow::switchDiagnosticsMode()
     }
 
     sync();
-    QApplication::processEvents();
 }
 
 void MainWindow::enterDiagnosticsMode()
@@ -1374,7 +1330,6 @@ void MainWindow::enterDiagnosticsMode()
         }
 
         m_pleaseWaitDialog->setValue(m_pleaseWaitDialog->value() + 5);
-        QApplication::processEvents();
     }
 
     if (dir.exists(HOERBERT_XML))
@@ -1414,7 +1369,6 @@ void MainWindow::enterDiagnosticsMode()
     }
 
     m_pleaseWaitDialog->setValue(m_pleaseWaitDialog->value() + 5);
-    QApplication::processEvents();
 
 #if defined (Q_OS_WIN)
     auto DIAG_FILES_PATH = DIAG_FILES_PATH_WIN;
@@ -1445,7 +1399,6 @@ void MainWindow::enterDiagnosticsMode()
                 }
             }
             m_pleaseWaitDialog->setValue(m_pleaseWaitDialog->value() + 5);
-            QApplication::processEvents();
         }
     }
 
@@ -1462,7 +1415,6 @@ void MainWindow::enterDiagnosticsMode()
     if (m_stackWidget->currentIndex() == 1)
     {
         m_playlistPage->discard();
-        QApplication::processEvents();
     }
 }
 
@@ -1593,18 +1545,12 @@ void MainWindow::about()
 
 void MainWindow::checkForUpdates()
 {
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
     QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkVersion2"));
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
     connect(manager, &QNetworkAccessManager::finished, this, [this] (QNetworkReply *reply) {
         if (reply->error()) {
             qDebug() << "Failed retrieving version code:" << reply->errorString();
-
-            QApplication::setOverrideCursor(Qt::ArrowCursor);
-            qApp->processEvents();
             return;
         }
 
@@ -1612,9 +1558,6 @@ void MainWindow::checkForUpdates()
         QString version = result.section(":", 1);
 
         this->showVersion(version);
-
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
     });
 
     manager->get(request);

@@ -110,7 +110,6 @@ void PieButton::setPercentage(int value)
         m_spinner->start();
 
         update();
-        QApplication::processEvents();
 
         if (m_percentage == 100) {
             emit processCompleted();

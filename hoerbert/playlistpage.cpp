@@ -269,7 +269,6 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
         return;
     }
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
     QString source_dir = QString();
 #ifdef _WIN32
     source_dir = m_dir + QString::number(m_dirNum) + "/";
@@ -332,8 +331,6 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
     {
         m_playlistView->removeRow(index);
     }
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 }
 
 void PlaylistPage::addSilence()
@@ -361,11 +358,7 @@ void PlaylistPage::add()
         file_info_list.append(QFileInfo(file));
     }
 
-    QCoreApplication::processEvents();
-
     m_playlistView->readEntries(file_info_list, m_playlistView->currentRow() + 1);
-
-    //std::sort(file_info_list.begin(), file_info_list.end(), sortByNumber);
 }
 
 void PlaylistPage::remove()

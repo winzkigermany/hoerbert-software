@@ -334,13 +334,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         ret_code = -1;
         output = "";
 
-        QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-        qApp->processEvents();
-
         std::tie(ret_code, output) = executeCommandWithSudo(QString("mkdir \"/media/%1/%2\"").arg(user_name).arg(new_drive_label), deviceName, passwd);
-
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
 
         qDebug() << "mkdir:\n" << output;
         if (ret_code == PASSWORD_INCORRECT) {
@@ -355,13 +349,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         ret_code = -1;
         output = "";
 
-        QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-        qApp->processEvents();
-
         std::tie(ret_code, output) = executeCommandWithSudo(QString("sudo -S mount %1 \"/media/%2/%3\" -o uid=%2 -o gid=%2").arg(root).arg(user_name).arg(new_drive_label), deviceName, passwd);
-
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
 
         qDebug() << "mount:\n" << output;
 
@@ -499,27 +487,13 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 #ifdef _WIN32
     auto driveLetter = diskName.at(0);
   
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
     if ( 0 != EjectDriveWin(driveLetter.unicode()) ){
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
         return FAILURE;
     }
 
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
-
 #elif defined (Q_OS_MACOS)
     // we use the "unmount" command, since it does not ask for admin privileges.
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
     QString output = executeCommand("diskutil unmount " + diskName);               // execute the umount command synchronously.
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 
     if ( !(output.contains("Volume", Qt::CaseInsensitive) && output.contains("unmounted", Qt::CaseInsensitive)) )       // The positive result of "unmount" looks like this: Volume NO NAME on disk2s1 unmounted
     {
@@ -528,13 +502,7 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 #elif defined (Q_OS_LINUX)
     // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
     QString output = executeCommand("udisksctl unmount -b " + diskName);
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 
     if (!output.startsWith("Unmounted ", Qt::CaseInsensitive))
         return FAILURE;
@@ -562,27 +530,13 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 /*
     auto driveLetter = diskName.at(0);
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
     if ( 0 != EjectDriveWin(driveLetter.unicode()) ){
-        QApplication::restoreOverrideCursor();
-        qApp->processEvents();
         return FAILURE;
     }
 
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 */
 #elif defined (Q_OS_MACOS)
-    // we use the "mount" command, since it does not ask for admin privileges.
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
-    QString output = executeCommand("diskutil mount " + diskName);               // execute the umount command synchronously.
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
+    QString output = executeCommand("diskutil mount " + diskName);               // execute the mount command synchronously.
 
     if ( !(output.contains("Volume", Qt::CaseInsensitive) && output.contains("unmounted", Qt::CaseInsensitive)) )       // The positive result of "unmount" looks like this: Volume NO NAME on disk2s1 unmounted
     {
@@ -591,13 +545,7 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 #elif defined (Q_OS_LINUX)
     // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);    // hint to background action
-    qApp->processEvents();
-
     QString output = executeCommand("udisksctl mount -b " + diskName);
-
-    QApplication::restoreOverrideCursor();
-    qApp->processEvents();
 
     if (!output.startsWith("Mounted "))
         return FAILURE;

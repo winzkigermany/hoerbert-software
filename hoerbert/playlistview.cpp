@@ -594,8 +594,6 @@ void PlaylistView::readEntries(const QFileInfoList &fileInfoList, int rowIndex)
         // then define custom connections
         connect(m_abortButton, &QPushButton::clicked, this, [this] () {
             m_progress->setLabelText(tr("Aborting..."));
-            //m_progress->show();
-            QCoreApplication::processEvents();
             m_abortButton->setDisabled(true);
             m_ripperThread->abort();
             m_isAborted = true;
@@ -617,8 +615,6 @@ void PlaylistView::readEntries(const QFileInfoList &fileInfoList, int rowIndex)
         connect(m_ripperThread, &CDRipper::processUpdated, this, [this] (int percentage) {
             m_progress->setLabelText(tr("Ripping audio tracks... (%1%)").arg(percentage));
             m_progress->setValue(percentage);
-            //progress->show();
-            QCoreApplication::processEvents();
         });
 
         connect(m_ripperThread, &CDRipper::failed, this, [this] (const QString &errorString) {
@@ -784,7 +780,6 @@ QFileInfoList PlaylistView::parseAudioBook(const QString &absoluteFilePath)
     // then define custom connections
     connect(m_abortButton, &QPushButton::clicked, this, [this, converter] () {
         m_progress->setLabelText(tr("Aborting..."));
-        QCoreApplication::processEvents();
         m_abortButton->setDisabled(true);
         converter->abort();
         m_isAborted = true;
@@ -792,15 +787,13 @@ QFileInfoList PlaylistView::parseAudioBook(const QString &absoluteFilePath)
 
     m_progress->show();
     m_progress->setValue(0);
-    QCoreApplication::processEvents();
 
     connect(converter, &AudioBookConverter::processUpdated, this, [this] (int percentage) {
         m_progress->setValue(percentage);
-        QCoreApplication::processEvents();
     });
 
     connect(converter, &AudioBookConverter::failed, this, [this] (const QString &errorString) {
-        this->errorOccurred("AudioBookConverter\n" + errorString);
+        errorOccurred("AudioBookConverter\n" + errorString);
     });
 
     QFileInfoList list = converter->convert();

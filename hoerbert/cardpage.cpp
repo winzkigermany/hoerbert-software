@@ -554,9 +554,6 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 
     m_deviceManager->refresh(driveName);    // refresh the storageInfo object, or else cached info will persist between drive (e.g. memory card) changes
 
-    this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
-    qApp->processEvents();
-
     if (m_deviceManager->isWriteProtected(driveName))
     {
         QMessageBox::information(this, tr("Select drive"), tr("The selected device is write-protected. Please eject the device and remove the write protection, if you want to modify any playlists on it."));
@@ -717,9 +714,6 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         initUsedSpace();
     }
     emit driveSelected(driveName);
-
-    this->repaint();        // make sure the GUI is repainted. If not, it just looks ugly.
-    qApp->processEvents();
 }
 
 void CardPage::selectDriveByPath(const QString &path)
