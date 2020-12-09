@@ -129,6 +129,7 @@ void CDRipper::run()
             m_process->deleteLater();
             return;
         }
+        processUpdated(1);      // show at least a bit of progress
         loop.exec();
         m_process->disconnect();
 
