@@ -73,11 +73,11 @@ private:
     QStringList parseForChapters(const QString &output);
 
     /**
-     * @brief getFFMpegVolumeSettings
-     * @return ffmpeg volume setting parameters
-     * THIS IS DUPLICATE CODE, should be consolidated with the same function in hoerbertprocessor.cpp
+     * @brief getVolumeDifference answers the question how much the volume deviates from the destination volume that is set for the app.
+     * @param sourceFilePath source audio file
+     * @return the correction in dB that must be applied to the file
      */
-    QMap<QString,QString> getFFMpegVolumeSettings();
+    double getVolumeDifference(const QString &sourceFilePath);
 
     QString m_filePath;
     bool m_isAborted;

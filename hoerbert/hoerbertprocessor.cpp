@@ -106,7 +106,7 @@ void HoerbertProcessor::run()
     HoerbertProcessor::m_processingMutex.lock();
 
     m_process = new QProcessPriority();
-    m_process->setPriority(QProcessPriority::NormalPriority);
+//    m_process->setPriority(QProcessPriority::NormalPriority);
     m_process->setProcessChannelMode(QProcess::MergedChannels);
 
     connect(m_process, &QProcess::errorOccurred, this, &HoerbertProcessor::OnProcessErrorOccurred);
@@ -370,8 +370,12 @@ bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QStrin
     arguments.append("-metadata");
     arguments.append(QString("comment=%1").arg(sourceFilePath));
 
-    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
-    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
+    double adjustByDb = getVolumeDifference(sourceFilePath);
+    if( qAbs(adjustByDb)>0.1 && qAbs(adjustByDb)<30.0 )
+    {
+        arguments.append("-af");
+        arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
+    }
 
     arguments.append("-y");
     arguments.append("-hide_banner");
@@ -394,6 +398,7 @@ bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QStrin
 
 bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QString &destDir, int outfileName, const MetaData &metadata)
 {
+
     QStringList arguments;
     arguments.append("-i");
     arguments.append(sourceFilePath);
@@ -407,10 +412,6 @@ bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QStri
     arguments.append("-metadata");
     arguments.append(QString("title=%1").arg(metadata.title));
 
-//    auto arg_metadata_title = metadata;
-//    arg_metadata_title.resize(m_maxMetadataLength, ' ');
-//    arguments.append(QString("title=%1").arg(arg_metadata_title.trimmed()));
-
     arguments.append("-metadata");
     arguments.append(QString("album=%1").arg(metadata.album));
 
@@ -422,11 +423,17 @@ bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QStri
     arguments.append("-segment_time");
     arguments.append(m_split3SegmentLength);
 
-    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
-    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
+    double adjustByDb = getVolumeDifference(sourceFilePath);
+    if( qAbs(adjustByDb)>0.1 && qAbs(adjustByDb)<30.0 )
+    {
+        arguments.append("-af");
+        arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
+    }
 
     arguments.append(tailPath(destDir) + QString::number(outfileName) + "-%01d" + DEFAULT_DESTINATION_FORMAT);
     arguments.append("-y");
+
+    qDebug() << QString( "ffmpeg %1" ).arg(arguments.join(" "));
 
     bool returnValue = false;
     QEventLoop loop;
@@ -439,6 +446,96 @@ bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QStri
     m_process->disconnect();
 
     return returnValue;
+}
+
+
+double HoerbertProcessor::getVolumeDifference(const QString &sourceFilePath)
+{
+    QSettings settings;
+    settings.beginGroup("Global");
+    QString volumeString = settings.value("volume").toString();
+    settings.endGroup();
+
+    bool ok;
+    double destinationMaxLevel = volumeString.toDouble(&ok);
+    if( !ok )
+    {
+        destinationMaxLevel = -1.5;   // -1.5 is our fallback. Not to ever ever change.
+    }
+
+    // detect maximum volume
+    QStringList arguments;
+    arguments.append("-i");
+    arguments.append(sourceFilePath);
+    arguments.append("-af");
+    arguments.append("volumedetect");
+    arguments.append("-vn");
+    arguments.append("-sn");
+    arguments.append("-dn");
+    arguments.append("-f");
+    arguments.append("null");
+
+#ifdef Q_OS_WIN
+    arguments.append("NUL");
+#else
+    arguments.append("/dev/null");
+#endif
+
+    qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
+    QProcess process;
+    process.setProcessChannelMode(QProcess::MergedChannels);
+    bool returnValue = false;
+    {
+        QEventLoop loop;
+        connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+            returnValue = (result==0);
+            loop.quit();
+        });
+        process.start(FFMPEG_PATH, arguments);
+        loop.exec();
+        process.disconnect();
+    }
+
+    if (!returnValue)
+    {
+        qDebug() << "Failed to execute ffmpeg command";
+        emit failed("Failed to execute ffmpeg command");
+        return false;
+    }
+
+    QString result_output = process.readAllStandardOutput();
+    process.close();
+    process.disconnect();
+
+    QStringList lines = result_output.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+
+    // extract the maximum volume from ffmpeg output
+    // [Parsed_volumedetect_0 @ 0x7fd4c3604080] n_samples: 89795187
+    // [Parsed_volumedetect_0 @ 0x7fd4c3604080] mean_volume: -16.1 dB
+    // [Parsed_volumedetect_0 @ 0x7fd4c3604080] max_volume: -0.3 dB
+    for (QString line : lines)
+    {
+        line = line.trimmed();
+        if (line.startsWith("[Parsed_volumedetect"))
+        {
+            volumeString = line.section("max_volume:", 1).trimmed();
+            if( !volumeString.isEmpty() )
+            {
+                volumeString = volumeString.replace("dB","").trimmed();
+                break;
+            }
+        }
+    }
+
+    double fileVolume = volumeString.toDouble(&ok);
+    double difference = 0.0;    // fallback: don't report any difference.
+
+    if( ok )
+    {
+        difference = destinationMaxLevel - fileVolume;
+    }
+
+    return difference;
 }
 
 bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QString &destDir, int outfileName, const MetaData &metadata)
@@ -579,8 +676,12 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     arguments.append("-metadata");
     arguments.append(QString("comment=%1").arg(metadata.comment));
 
-    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
-    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
+    double adjustByDb = getVolumeDifference(sourceFilePath);
+    if( qAbs(adjustByDb)>0.1 && qAbs(adjustByDb)<30.0 )
+    {
+        arguments.append("-af");
+        arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
+    }
 
     QString output_filename = destDir + "/" + QString::number(outfileName) + "-0" + DEFAULT_DESTINATION_FORMAT;
     arguments.append(output_filename);
@@ -798,37 +899,4 @@ void HoerbertProcessor::OnProcessReadyReadStandardOutput()
 void HoerbertProcessor::OnProcessStateChanged(QProcess::ProcessState newState)
 {
     qDebug() << "Process state changed to" << newState;
-}
-
-QMap<QString,QString> HoerbertProcessor::getFFMpegVolumeSettings()
-{
-    QString volumeCommand;
-    QString volumeParameters;
-
-    QSettings settings;
-    settings.beginGroup("Global");
-    // factory volume level is at -1.5. The user settings are based on that.
-    if( settings.value("volume").toString()=="-1.5")
-    {
-        m_audioVolume = "-3.0";
-    }
-    else if( settings.value("volume").toString()=="-6")
-    {
-        m_audioVolume = "-7.0"; // give a bit more headroom to avoid agc pumping
-    }
-    else
-    {
-        m_audioVolume = "-1.5";
-    }
-    settings.endGroup();
-
-    volumeCommand = "-af";
-    volumeParameters = QString("loudnorm=I=-16:TP=%1:LRA=11").arg(m_audioVolume);
-
-    QMap<QString,QString> retVal;
-
-    retVal["volumeCommand"] = volumeCommand;
-    retVal["volumeParameters"] = volumeParameters;
-
-    return retVal;
 }

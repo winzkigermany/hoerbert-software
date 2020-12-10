@@ -211,10 +211,11 @@ private:
     bool renameSplitFiles(const QString &destDir);
 
     /**
-     * @brief getFFMpegVolumeSettings
-     * @return the volume setting arguments for ffmpeg
+     * @brief getVolumeDifference answers the question how much the volume deviates from the destination volume that is set for the app.
+     * @param sourceFilePath source audio file
+     * @return the correction in dB that must be applied to the file
      */
-    QMap<QString,QString> getFFMpegVolumeSettings();
+    double getVolumeDifference(const QString &sourceFilePath);
 
     QProcessPriority *m_process;
     QString m_dirPath;

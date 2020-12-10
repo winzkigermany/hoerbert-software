@@ -118,8 +118,14 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     arguments.append("1");
     arguments.append("-metadata");
     arguments.append("<METADATA>"); // index = 13
-    arguments.append( getFFMpegVolumeSettings()["volumeCommand"] );
-    arguments.append( getFFMpegVolumeSettings()["volumeParameters"] );
+
+    double adjustByDb = getVolumeDifference(absoluteFilePath);
+    if( qAbs(adjustByDb)>0.1 && qAbs(adjustByDb)<30.0 )
+    {
+        arguments.append("-af");
+        arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
+    }
+
     arguments.append("<OUTPUT_PATH>"); // index = 16
     arguments.append("-y");
     arguments.append("-hide_banner");
@@ -274,39 +280,92 @@ QStringList AudioBookConverter::parseForChapters(const QString &output)
     return result;
 }
 
-QMap<QString,QString> AudioBookConverter::getFFMpegVolumeSettings()
+// @TODO: the following method is duplicate code. It is found in hoerbertprocessor.cpp, too. Should be de-duplicated.
+double AudioBookConverter::getVolumeDifference(const QString &sourceFilePath)
 {
-    QString volumeCommand;
-    QString volumeParameters;
-
     QSettings settings;
     settings.beginGroup("Global");
-    // factory volume level is at -1.5. The user settings are based on that.
-    if( settings.value("volume").toString()=="-1.5")
-    {
-        m_audioVolume = "-3.0";
-    }
-    else if( settings.value("volume").toString()=="-6")
-    {
-        m_audioVolume = "-7.0"; // give a bit more headroom to avoid agc pumping
-    }
-    else
-    {
-        m_audioVolume = "-1.5";
-    }
+    QString volumeString = settings.value("volume").toString();
     settings.endGroup();
 
-    volumeCommand = "-af";
-    volumeParameters = QString("loudnorm=I=-16:TP=%1:LRA=11").arg(m_audioVolume);
+    bool ok;
+    double destinationMaxLevel = volumeString.toDouble(&ok);
+    if( !ok )
+    {
+        destinationMaxLevel = -1.5;   // -1.5 is our fallback. Not to ever ever change.
+    }
 
-//    arguments.append("-filter:a");
-//    QString arg_volume = QString("volume=%1dB").arg(m_audioVolume);
-//    arguments.append(arg_volume);
+    // detect maximum volume
+    QStringList arguments;
+    arguments.append("-i");
+    arguments.append(sourceFilePath);
+    arguments.append("-af");
+    arguments.append("volumedetect");
+    arguments.append("-vn");
+    arguments.append("-sn");
+    arguments.append("-dn");
+    arguments.append("-f");
+    arguments.append("null");
 
-    QMap<QString,QString> retVal;
+#ifdef Q_OS_WIN
+    arguments.append("NUL");
+#else
+    arguments.append("/dev/null");
+#endif
 
-    retVal["volumeCommand"] = volumeCommand;
-    retVal["volumeParameters"] = volumeParameters;
+    qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
+    QProcess process;
+    process.setProcessChannelMode(QProcess::MergedChannels);
+    bool returnValue = false;
+    {
+        QEventLoop loop;
+        connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
+            returnValue = (result==0);
+            loop.quit();
+        });
+        process.start(FFMPEG_PATH, arguments);
+        loop.exec();
+        process.disconnect();
+    }
 
-    return retVal;
+    if (!returnValue)
+    {
+        qDebug() << "Failed to execute ffmpeg command";
+        emit failed("Failed to execute ffmpeg command");
+        return false;
+    }
+
+    QString result_output = process.readAllStandardOutput();
+    process.close();
+    process.disconnect();
+
+    QStringList lines = result_output.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+
+    // extract the maximum volume from ffmpeg output
+    // [Parsed_volumedetect_0 @ 0x7fd4c3604080] n_samples: 89795187
+    // [Parsed_volumedetect_0 @ 0x7fd4c3604080] mean_volume: -16.1 dB
+    // [Parsed_volumedetect_0 @ 0x7fd4c3604080] max_volume: -0.3 dB
+    for (QString line : lines)
+    {
+        line = line.trimmed();
+        if (line.startsWith("[Parsed_volumedetect"))
+        {
+            volumeString = line.section("max_volume:", 1).trimmed();
+            if( !volumeString.isEmpty() )
+            {
+                volumeString = volumeString.replace("dB","").trimmed();
+                break;
+            }
+        }
+    }
+
+    double fileVolume = volumeString.toDouble(&ok);
+    double difference = 0.0;    // fallback: don't report any difference.
+
+    if( ok )
+    {
+        difference = destinationMaxLevel - fileVolume;
+    }
+
+    return difference;
 }
