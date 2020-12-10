@@ -437,7 +437,7 @@ void CardPage::ejectDrive()
 
         if(doGenerateHoerbertXml)
         {
-            m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer.")+"\n"+tr("If you do not need hoerbert.xml for the old hoerbert app 1.x,\nskip this step by ticking the check box below."));
+            m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer.")+"\n\n"+tr("If you do not need hoerbert.xml for the old hoerbert app 1.x,\nskip this step by ticking the check box below."));
             connect( m_pleaseWaitDialog, &PleaseWaitDialog::checkboxIsClicked, this, [=](bool onOff){
                 QSettings settings;
                 settings.beginGroup("Global");

@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     m_migrationPath = QString("");
+    m_hasBeenRemindedOfBackup = false;
 
     QDesktopWidget dw;
     setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
@@ -94,8 +95,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_cardPage, &CardPage::driveSelected, this, [this] (const QString &driveName) {
         bool remind_backup = false;
 
-        if( driveName.isEmpty() )
+        if( driveName.isEmpty() )   // this is when the drive has been ejected
+        {
+            m_hasBeenRemindedOfBackup = false;  // reset this flag
             m_migrationPath = QString("");
+        }
 
         if (driveName.compare(m_selectedDriveLabel) != 0)
             remind_backup = true;
@@ -138,17 +142,17 @@ MainWindow::MainWindow(QWidget *parent)
             m_selectManually->setEnabled(false);
             m_capBar->setEnabled(true);
 
-            if (remind_backup)
+            if (remind_backup)   // if a differend drive is selected
             {
                 if( m_cardPage->numberOfTracks()>0 )
                 {
-                    this->remindBackup();
+                    remindBackup();
                 }
             }
 
             if (!m_migrationPath.isEmpty())
             {
-                this->migrate(m_migrationPath);
+                migrate(m_migrationPath);
                 m_migrationPath = QString("");
             }
         }
@@ -251,7 +255,10 @@ void MainWindow::makePlausible(std::list <int> fixList)
 
     auto backup_selected = QMessageBox::question(this, tr("Backup"), tr("It is recommended to backup memory card before cleaning up. Do you want to backup now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
     if (backup_selected == QMessageBox::Yes)
+    {
         backupCard();
+    }
+    m_hasBeenRemindedOfBackup = true;
 
     auto dir = tailPath(m_cardPage->currentDrivePath());
     auto sub_dir = QString();
@@ -299,7 +306,6 @@ void MainWindow::makePlausible(std::list <int> fixList)
 
     sync();
     m_plausibilityCheckMutex.unlock();
-    m_cardPage->update();   // call this after unlocking the mutex, or else we're in a deadlock.
 }
 
 void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index)
@@ -1228,7 +1234,11 @@ void MainWindow::switchDiagnosticsMode()
         auto selected = QMessageBox::question(this, tr("Backup reminder"), tr("We recommend to back up your memory card to your computer before switching to diagnostics mode.\n"
                                                                               "Create a backup now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
         if (selected == QMessageBox::Yes)
+        {
             backupCard();
+        }
+
+        m_hasBeenRemindedOfBackup = true;
     }
 
     m_pleaseWaitDialog = new PleaseWaitDialog();
@@ -1643,6 +1653,11 @@ void MainWindow::showVersion(const QString &version)
 
 void MainWindow::remindBackup()
 {
+    if( m_hasBeenRemindedOfBackup ){    // don't nag the user too often
+        return;
+    }
+    m_hasBeenRemindedOfBackup = true;
+
     QSettings settings;
     settings.beginGroup("Global");
     bool is_reminder_enabled = settings.value("showBackupReminder").toBool();

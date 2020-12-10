@@ -141,6 +141,8 @@ private:
 
     QString printButtons(int);
 
+    bool m_hasBeenRemindedOfBackup = false;  // we set this flag once the user has been reminded of a backup for this card. Then we will keep from reminding him unless a new card is selected.
+
     QString m_migrationPath;
     BackupManager *m_backupManager;
     QProgressDialog *m_progress;
