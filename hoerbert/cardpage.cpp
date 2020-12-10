@@ -328,6 +328,9 @@ void CardPage::formatSelectedDrive(bool retry)
         return;
     }
 
+    QString nameProposal = selectedDrive.split(" ").at(0);    // get only the first word up to the first whitespace
+    nameProposal = nameProposal.toUpper().replace(QRegExp("[^A-Z^a-z^0-9^_]{1,11}"), "");
+
     if (!retry)
     {
         QMessageBox msgBox;
@@ -354,24 +357,23 @@ void CardPage::formatSelectedDrive(bool retry)
     dialog.setInputMode(QInputDialog::TextInput);
     dialog.setWindowTitle(tr("Format"));
     dialog.setLabelText(tr("Please enter the new name for your card"));
-    dialog.setTextValue(selectedDrive);
+    dialog.setTextValue(nameProposal);
 
     QLineEdit *lineEdit = dialog.findChild<QLineEdit *>();
     lineEdit->setMaxLength(11);
     lineEdit->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_ ]{1,11}"), lineEdit));
     connect(lineEdit, &QLineEdit::textChanged, this, [=]( QString currentText ){
-        lineEdit->setText(currentText.toUpper().replace(" ", "_"));
+        lineEdit->setText(currentText.replace(" ", "_"));       // intentionally replace spaces by underscores while the user is typing.
     });
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        m_isFormatting = true;
+        m_isFormatting = true;      // set this to false again when the user selects the next card. NOT earlier than that!
         m_deviceManager->formatDrive(this, selectedDrive, dialog.textValue(), passwd);
     }
 
     deselectDrive();
     updateDriveList();
-    m_isFormatting = false;
 }
 
 void CardPage::ejectDrive()
@@ -557,6 +559,8 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         deselectDrive();
         return;
     }
+
+    m_isFormatting = false;
 
     m_ejectDriveButton->show();
     m_ejectButtonLabel->show();
