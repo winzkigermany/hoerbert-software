@@ -57,11 +57,6 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         return info_list;
     }
 
-    QSettings settings;
-    settings.beginGroup("Global");
-    m_audioVolume = settings.value("volume").toString();
-    settings.endGroup();
-
     QStringList arguments;
     arguments.append("-i");
     arguments.append(m_filePath);
@@ -83,6 +78,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         returnValue = (result==0);      // keep in mind that this call will return a non-0 value, because we're just getting info. More parameters are missing!
         loop.quit();
     });
+    qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
     process.start(FFMPEG_PATH, arguments);
     if (!process.waitForStarted())
     {
@@ -118,19 +114,20 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     arguments.append("1");
     arguments.append("-metadata");
     arguments.append("<METADATA>"); // index = 13
+    arguments.append("-y");
+    arguments.append("-hide_banner");
 
-    double adjustByDb = getVolumeDifference(absoluteFilePath);
-    if( qAbs(adjustByDb)>0.1 && qAbs(adjustByDb)<30.0 )
+    double adjustByDb = getVolumeDifference(m_filePath);
+    if( qAbs(adjustByDb)>0.1 && qAbs(adjustByDb)<20.0 )
     {
         arguments.append("-af");
         arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
     }
 
-    arguments.append("<OUTPUT_PATH>"); // index = 16
-    arguments.append("-y");
-    arguments.append("-hide_banner");
+    arguments.append("<OUTPUT_PATH>"); // index = 18 or 16
 
     int counter = 0;
+    int lastArgumentIndex = arguments.count()-1;
 
     for (const auto &chapter : chapters)
     {
@@ -149,7 +146,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         arguments.replace(13, QString("title=%1").arg(metadata.trimmed()));
 
         auto output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DEFAULT_DESTINATION_FORMAT;
-        arguments.replace(16, output_path);
+        arguments.replace(lastArgumentIndex, output_path);
 
         info_list.append(output_path);
 
@@ -159,6 +156,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
             returnValue = (result==0);
             loop.quit();
         });
+        qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
         process.start(FFMPEG_PATH, arguments);
         if (!process.waitForStarted())
         {
@@ -209,7 +207,7 @@ void AudioBookConverter::abort()
 QStringList AudioBookConverter::parseForChapters(const QString &output)
 {
     QStringList result;
-    auto chapters = output.section("Chapter #", 1).section("Stream #", 0, 0).split("Chapter #");
+    QStringList chapters = output.section("Chapter #", 1).section("Stream #", 0, 0).split("Chapter #");
 
     QString start, end, metadata;
 
@@ -304,6 +302,7 @@ double AudioBookConverter::getVolumeDifference(const QString &sourceFilePath)
     arguments.append("-vn");
     arguments.append("-sn");
     arguments.append("-dn");
+    arguments.append("-hide_banner");
     arguments.append("-f");
     arguments.append("null");
 
@@ -365,6 +364,14 @@ double AudioBookConverter::getVolumeDifference(const QString &sourceFilePath)
     if( ok )
     {
         difference = destinationMaxLevel - fileVolume;
+    }
+
+    settings.beginGroup("Global");
+    bool increaseVolume = settings.value("increaseVolume").toBool();
+    settings.endGroup();
+    if( !increaseVolume && difference>0.0 )
+    {
+        difference = 0.0;
     }
 
     return difference;

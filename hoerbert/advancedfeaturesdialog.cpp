@@ -119,6 +119,9 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_optionLayout->addWidget(m_normalVolumeOption);
     m_optionLayout->addWidget(m_maxVolumeOption);
 
+    m_increaseVolumeOption = new QCheckBox(this);
+    m_increaseVolumeOption->setText(tr("Increase volume up to the limit"));
+
     m_reminderOption = new QCheckBox(this);
     m_reminderOption->setText(tr("Remind of backups regularly"));
 
@@ -131,6 +134,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_checkLayout = new QVBoxLayout;
     m_checkLayout->setAlignment(Qt::AlignCenter);
 
+    m_checkLayout->addWidget(m_increaseVolumeOption);
     m_checkLayout->addWidget(m_reminderOption);
     m_checkLayout->addWidget(m_showLargeDriveCheck);
     m_checkLayout->addWidget(m_regenerateXmlCheck);
@@ -168,6 +172,14 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
         writeVolumeSettings("0");
     });
 
+
+    connect(m_increaseVolumeOption, &QCheckBox::clicked, this, [this] (int state) {
+        Q_UNUSED(state)
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("increaseVolume", m_increaseVolumeOption->isChecked());
+        settings.endGroup();
+    });
 
     connect(m_reminderOption, &QCheckBox::clicked, this, [this] (int state) {
         Q_UNUSED(state)
@@ -224,6 +236,9 @@ void AdvancedFeaturesDialog::readSettings()
         m_maxVolumeOption->setChecked(true);
     else
         m_normalVolumeOption->setChecked(true);
+
+    bool increaseVolume = settings.value("increaseVolume").toBool();
+    m_increaseVolumeOption->setChecked(increaseVolume);
 
     bool showReminder = settings.value("showBackupReminder").toBool();
     m_reminderOption->setChecked(showReminder);

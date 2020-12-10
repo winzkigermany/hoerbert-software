@@ -87,6 +87,7 @@ private:
     QRadioButton *m_normalVolumeOption;
     QRadioButton *m_maxVolumeOption;
 
+    QCheckBox *m_increaseVolumeOption;
     QCheckBox *m_reminderOption;
     QCheckBox *m_showLargeDriveCheck;
     QCheckBox *m_regenerateXmlCheck;
