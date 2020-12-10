@@ -29,8 +29,6 @@
 
 #include "define.h"
 
-class QProcessPriority;
-
 const int PROCESS_LIFECYCLE                  = -1; // in msec, -1 means no time out
 const int SPLIT_AUDIO_SEGMENT_LENGTH         = 180; // in seconds
 
@@ -217,7 +215,7 @@ private:
      */
     double getVolumeDifference(const QString &sourceFilePath);
 
-    QProcessPriority *m_process;
+    QProcess *m_process;
     QString m_dirPath;
     int m_dirNum;
     bool m_abort;

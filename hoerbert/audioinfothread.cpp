@@ -29,7 +29,6 @@
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "qprocesspriority.h"
 
 extern QString FFPROBE_PATH;
 

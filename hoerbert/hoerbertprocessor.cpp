@@ -32,7 +32,6 @@
 #include <QMap>
 
 #include "functions.h"
-#include "qprocesspriority.h"
 
 extern QString FFMPEG_PATH;
 extern QString HOERBERT_TEMP_PATH;
@@ -105,8 +104,7 @@ void HoerbertProcessor::run()
 
     HoerbertProcessor::m_processingMutex.lock();
 
-    m_process = new QProcessPriority();
-//    m_process->setPriority(QProcessPriority::NormalPriority);
+    m_process = new QProcess();
     m_process->setProcessChannelMode(QProcess::MergedChannels);
 
     connect(m_process, &QProcess::errorOccurred, this, &HoerbertProcessor::OnProcessErrorOccurred);
