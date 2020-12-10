@@ -127,7 +127,6 @@ PlaylistView::PlaylistView(QWidget *parent)
         if (currentRow != previousRow)
         {
             stopPlayer();
-            updatePlayButton(previousRow, false);
         }
     });
 }
@@ -818,6 +817,8 @@ void PlaylistView::onCellChanged(int row, int col)
 
 void PlaylistView::dragEnterEvent(QDragEnterEvent *event)
 {
+    stopPlayer();
+
     if (event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
     }
