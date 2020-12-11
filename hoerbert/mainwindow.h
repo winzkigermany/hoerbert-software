@@ -154,6 +154,7 @@ private:
     BackupRestoreDialog *m_backupRestoreDialog;
     CardPage *m_cardPage;
     PlaylistPage *m_playlistPage;
+    ProcessExecutor m_processExecutor;
 
     QVBoxLayout *m_layout;
     QHBoxLayout *m_infoLayout;

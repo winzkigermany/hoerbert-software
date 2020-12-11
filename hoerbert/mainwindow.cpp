@@ -450,7 +450,6 @@ void MainWindow::migrate(const QString &dirPath)
             processor->deleteLater();
         });
 
-
         QEventLoop loop;
         connect(processor, &QThread::finished, &loop, &QEventLoop::quit);
         processor->start();
@@ -598,9 +597,7 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
 
     QEventLoop loop;
     connect(thread, &QThread::finished, &loop, &QEventLoop::quit);
-
     thread->start();
-
     loop.exec();
 }
 
@@ -778,25 +775,9 @@ void MainWindow::sync()
     arguments.append(m_cardPage->currentDrivePath().left(1));
 #endif
 
-    bool returnValue = false;
-    QEventLoop loop;
-    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-        returnValue = (result==0);
-        loop.quit();
-    });
-    process.start(SYNC_PATH, arguments);
-    if (!process.waitForStarted())
-    {
-        m_dbgDlg->appendLog("- Sync failed. Failed to start.");
-        process.disconnect();
-        process.close();
-        return;
-    }
-    loop.exec();
-    process.disconnect();
-    process.close();
+    std::pair<int, QString> output = m_processExecutor.executeCommand(SYNC_PATH, arguments);
 
-    if (!returnValue)
+    if (output.first!=0)
     {
         m_dbgDlg->appendLog("- Sync failed. Failed to complete.");
         return;
@@ -975,38 +956,21 @@ void MainWindow::collectInformationForSupport()
         file.close();
     }
 
-    QProcess process;
-    process.setProcessChannelMode(QProcess::MergedChannels);
-
     QStringList arguments;
-    bool processSuccess = true;
-
     if( doOverwrite ){
         QFile::remove( destinationZipFilename );
     }
 
-    process.setWorkingDirectory(HOERBERT_TEMP_PATH);
     QFile::remove( collect_path + ".zip" );         // remove our temp file if it should exist.
 
 #if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
     arguments << "-r" << collect_path + ".zip" << COLLECT_FILE_NAME+"/";
-    qDebug() << "zip" << arguments.join(" ");
 
+    std::pair<int, QString> output = m_processExecutor.executeCommand("/usr/bin/zip", arguments);
 
-    bool returnValue = false;
-    QEventLoop loop;
-    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-        returnValue = (result==0);
-        loop.quit();
-    });
-    process.start("/usr/bin/zip", arguments);
-    loop.exec();
-    process.disconnect();
-
-    if (!returnValue)
+    if (output.first!=0)
     {
         QMessageBox::information(this, tr("Collecting support information"), tr("Failed to create the zip file for support information") );
-        processSuccess = false;
     }
 
 #else
@@ -1014,22 +978,9 @@ void MainWindow::collectInformationForSupport()
     arguments << "-tzip" << "a" << collect_path + ".zip" << tailPath(HOERBERT_TEMP_PATH) + COLLECT_FILE_NAME;
     qDebug() << "7za.exe" << arguments.join(" ");
 
-    bool returnValue = false;
-    QEventLoop loop;
-    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-        returnValue = (result==0);
-        loop.quit();
-    });
-    process.start(ZIP_PATH, arguments);
-    if (!process.waitForStarted())
-    {
-        processSuccess = false;
-        m_dbgDlg->appendLog("- Compressing zip failed. Failed to start.");
-    }
-    loop.exec();
-    process.disconnect();
+    std::pair<int, QString> output = m_processExecutor.executeCommand(ZIP_PATH, arguments);
 
-    if ( processSuccess && !returnValue)
+    if (output.first!=0)
     {
         processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to complete.");
@@ -1037,9 +988,7 @@ void MainWindow::collectInformationForSupport()
 
 #endif
 
-    process.close();
-
-    if ( processSuccess && !QFile::copy( collect_path + ".zip", destinationZipFilename))
+    if ( (output.first==0) && !QFile::copy( collect_path + ".zip", destinationZipFilename))
     {
         perror("File copy");
         QMessageBox::information(this, tr("Collecting support information"), tr("Failed to copy the zip file from [%1] to: [%2]").arg( collect_path+".zip" ).arg( destinationZipFilename ) );

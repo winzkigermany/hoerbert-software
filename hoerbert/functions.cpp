@@ -443,3 +443,4 @@ quint64 secondsToBytes(int seconds)
 {
     return quint64(double(seconds) * 32000 * 2 * 1.05);
 }
+

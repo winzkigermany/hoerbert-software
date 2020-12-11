@@ -26,6 +26,7 @@
 #include <QFileInfoList>
 
 #include "define.h"
+#include "processexecutor.h"
 
 /**
  * @brief The AudioInfoThread class reads audio info from audio files using ffprobe
@@ -105,6 +106,7 @@ private:
     QString m_ffmpegPath;
     int m_flag; // represents entries' status
     int m_IDBeginsFrom;
+    ProcessExecutor m_processExecutor;
 };
 
 #endif // AUDIOINFOTHREAD_H

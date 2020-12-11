@@ -26,7 +26,6 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QDir>
-#include <QEventLoop>
 
 #include "define.h"
 
@@ -62,36 +61,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     arguments.append(m_filePath);
     arguments.append("-hide_banner");
 
-    QProcess process;
-    process.setProcessChannelMode(QProcess::MergedChannels);
-
-    connect(&process, &QProcess::errorOccurred, this, [this, &process] (QProcess::ProcessError error) {
-        qDebug() << "- AudioBookConverter: Error!";
-        emit failed(QString("QProcess error: %1\n%2").arg(PROCESS_ERROR.at(error)).arg(QString(process.readAllStandardOutput())));
-    });
-
-
-    bool returnValue = false;
-    QEventLoop loop;
-    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result, QProcess::ExitStatus x){
-        Q_UNUSED(x)
-        returnValue = (result==0);      // keep in mind that this call will return a non-0 value, because we're just getting info. More parameters are missing!
-        loop.quit();
-    });
-    qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
-    process.start(FFMPEG_PATH, arguments);
-    if (!process.waitForStarted())
-    {
-        qDebug() << "Failed executing ffmpeg!";
-        emit failed( QString("Failed executing ffmpeg: [%1]").arg(arguments.join(",")) );
-        process.disconnect();
-        return info_list;
-    }
-    loop.exec();
-    process.disconnect();
-
-    QString output = process.readAllStandardOutput();
-    process.close();
+    QString output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments).second;
 
     auto chapters = parseForChapters(output);
 
@@ -150,25 +120,8 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
 
         info_list.append(output_path);
 
-        bool returnValue = false;
-        QEventLoop loop;
-        connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-            returnValue = (result==0);
-            loop.quit();
-        });
-        qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
-        process.start(FFMPEG_PATH, arguments);
-        if (!process.waitForStarted())
-        {
-            qDebug() << "Failed executing ffmpeg!";
-            emit failed("Failed executing ffmpeg!");
-            process.disconnect();
-            return info_list;
-        }
-        loop.exec();
-        process.disconnect();
+        QString output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments).second;
 
-        output = process.readAllStandardOutput();
         auto tail = output.right(300);
 
         if (tail.contains("Error", Qt::CaseSensitive) || tail.contains("Invalid", Qt::CaseSensitive))
@@ -313,32 +266,10 @@ double AudioBookConverter::getVolumeDifference(const QString &sourceFilePath)
 #endif
 
     qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
-    QProcess process;
-    process.setProcessChannelMode(QProcess::MergedChannels);
-    bool returnValue = false;
-    {
-        QEventLoop loop;
-        connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-            returnValue = (result==0);
-            loop.quit();
-        });
-        process.start(FFMPEG_PATH, arguments);
-        loop.exec();
-        process.disconnect();
-    }
 
-    if (!returnValue)
-    {
-        qDebug() << "Failed to execute ffmpeg command";
-        emit failed("Failed to execute ffmpeg command");
-        return false;
-    }
+    QString output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments).second;
 
-    QString result_output = process.readAllStandardOutput();
-    process.close();
-    process.disconnect();
-
-    QStringList lines = result_output.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    QStringList lines = output.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
 
     // extract the maximum volume from ffmpeg output
     // [Parsed_volumedetect_0 @ 0x7fd4c3604080] n_samples: 89795187

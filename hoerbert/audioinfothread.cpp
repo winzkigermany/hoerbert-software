@@ -25,7 +25,6 @@
 #include <QFileInfoList>
 #include <QApplication>
 #include <QTime>
-#include <QProcess>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -98,28 +97,10 @@ void AudioInfoThread::run()
 
     for (int i = 0; i < m_fileList.size(); i++)
     {       
-        QProcess process;
-        process.setProcessChannelMode(QProcess::MergedChannels);
         QFileInfo info = m_fileList.at(i);
-
         arguments.replace(1, info.absoluteFilePath());
 
-        bool returnValue = false;
-        QEventLoop loop;
-        connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result, QProcess::ExitStatus x){
-            Q_UNUSED(x)
-            returnValue = (result==0);
-            loop.quit();
-        });
-        process.start(FFPROBE_PATH, arguments);
-        loop.exec();
-        process.disconnect();
-
-        // parse the output to get desired data
-        QString output = process.readAllStandardOutput();
-
-        process.close();
-        process.deleteLater();
+        QString output = m_processExecutor.executeCommand(FFPROBE_PATH, arguments).second;
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(output.toUtf8());
         QJsonObject jsonObject = jsonDocument.object();

@@ -24,8 +24,6 @@
 #include <QDir>
 #include <QDateTime>
 #include <QDebug>
-#include <QEventLoop>
-#include <QProcess>
 
 #include "define.h"
 #include "functions.h"
@@ -392,21 +390,11 @@ bool BackupManager::convertWav2Flac(const QString &sourcePath, const QString des
     arguments.append("flac");
     arguments.append("-y");
     arguments.append("-hide_banner");
-
     arguments.append(destPath);
 
+    std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
 
-    bool returnValue = false;
-    QEventLoop loop;
-    connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-        returnValue = (result==0);
-        loop.quit();
-    });
-    m_process->start(FFMPEG_PATH, arguments);
-    loop.exec();
-    m_process->disconnect();
-
-    return returnValue;
+    return output.first;
 }
 
 bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString destPath)
@@ -421,18 +409,9 @@ bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString des
     arguments.append("quiet");
     arguments.append(destPath);
 
+    std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
 
-    bool returnValue = false;
-    QEventLoop loop;
-    connect(m_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-        returnValue = (result==0);
-        loop.quit();
-    });
-    m_process->start(FFMPEG_PATH, arguments);
-    loop.exec();
-    m_process->disconnect();
-
-    return returnValue;
+    return output.first;
 }
 
 void BackupManager::getFileInfoList(const QString &dirPath, QFileInfoList *fileList)

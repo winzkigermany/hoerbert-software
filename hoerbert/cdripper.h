@@ -26,6 +26,8 @@
 #include <QObject>
 #include <QFileInfoList>
 
+#include "processexecutor.h"
+
 class QProcess;
 
 /**
@@ -86,6 +88,7 @@ private:
     QFileInfoList m_fileList;
     QString m_tmpDir;
     bool m_abort;
+    ProcessExecutor m_processExecutor;
 
 public:
     static int uniqueID;

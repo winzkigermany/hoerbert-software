@@ -29,7 +29,9 @@
 #include <QObject>
 #include <QProcess>
 
+#include "define.h"
 #include "pleasewaitdialog.h"
+#include "processexecutor.h"
 
 class QStorageInfo;
 class PleaseWaitDialog;
@@ -38,14 +40,6 @@ struct VolumeInfo;
 typedef std::shared_ptr<VolumeInfo> VolumeInfo_ptr;
 typedef QStringList ListString;
 typedef std::map<QString, VolumeInfo_ptr> MapString2VolumeInfo;
-
-enum RetCode {
-    SUCCESS,
-    FAILURE,
-    DEVICE_NOT_FOUND,
-    MOUNT_FAILURE,
-    PASSWORD_INCORRECT
-};
 
 const QString DEFAULT_DRIVE_LABEL   = "HOERBERT";
 
@@ -74,13 +68,6 @@ public:
      */
     RetCode formatDrive( QWidget* parentWidget, const QString &driveName, const QString &newLabel = QString(), const QString &passwd = QString());
 
-    /**
-     * @brief executeCommandWithSudo execute command with sudo and automatically interact with password input
-     * @param cmd command to be executed
-     * @param passwd user's password
-     * @return result code and output of command execution
-     */
-    std::pair<int, QString> executeCommandWithSudo( const QString &cmd, const QString &drivePath, const QString &passwd = QString(), QWidget* parentWidget=nullptr );
 
     /**
      * @brief ejectDrive eject given drive (involves unmount and NO power-off)
@@ -230,14 +217,6 @@ protected:
      */
     QString getRoot(const QStorageInfo &info);
 
-    /**
-     * @brief execute a command and return the output
-     * @param cmdString
-     * @return the output of the command
-     */
-    QString executeCommand(const QString &cmdString);
-
-
 private:
     /**
      * @brief a mapping of deviceName->root
@@ -268,6 +247,8 @@ private:
      * @brief formatProcess is a longer running process that shoul not block the main loop
      */
     QProcess formatProcess;        // this is a potentially long running process
+
+    ProcessExecutor m_processExecutor;
 
 };
 

@@ -32,9 +32,7 @@
 #include <QLineEdit>
 #include <QApplication>
 #include <QDirIterator>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QtConcurrent>
+
 
 #ifdef _WIN32
 #include <tchar.h>
@@ -98,12 +96,12 @@ bool DeviceManager::isRemovable(const QString &volumeRoot)
     return (type == DRIVE_REMOVABLE);
 #elif defined (Q_OS_MACOS)
     QString cmd = "diskutil info " + volumeRoot;
-    QString output = executeCommand(cmd);
+    QString output = m_processExecutor.executeCommand(cmd).second;
 
     return output.contains(QRegExp("Removable Media:.*Removable", Qt::CaseInsensitive));
 #elif defined (Q_OS_LINUX)
     QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
-    QString output = executeCommand(cmd);
+    QString output = m_processExecutor.executeCommand(cmd);
 
     return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
 #endif
@@ -117,12 +115,12 @@ bool DeviceManager::isEjectable(const QString &volumeRoot)
     return (type != DRIVE_FIXED);
 #elif defined (Q_OS_MACOS)
     QString cmd = "diskutil info " + volumeRoot;
-    QString output = executeCommand(cmd);
+    QString output = m_processExecutor.executeCommand(cmd).second;
 
     return output.contains(QRegExp("Ejectable", Qt::CaseInsensitive));
 #elif defined (Q_OS_LINUX)
     QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
-    QString output = executeCommand(cmd);
+    QString output = m_processExecutor.executeCommand(cmd);
 
     return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
 #endif
@@ -318,7 +316,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
 
     ejectDrive( driveName );
 
-    std::tie(ret_code, output) = executeCommandWithSudo( QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(deviceName), deviceName, passwd);
+    std::tie(ret_code, output) = m_processExecutor.executeCommandWithSudo( QString("mkfs.vfat -n %1 -I %2").arg(new_drive_label).arg(deviceName), deviceName, passwd);
 
     qDebug() << "mkfs.vfat:\n" << output;
     if (ret_code == PASSWORD_INCORRECT) {
@@ -330,6 +328,8 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
         return FAILURE;
     }
 
+    remountDrive( devicePath );
+
     // sudo should forget password, otherwise the commands will work even with incorrect password within 15 minutes
     executeCommand("sudo -k");
 
@@ -339,90 +339,6 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
 }
 
 
-std::pair<int, QString> DeviceManager::executeCommandWithSudo( const QString &newCmd, const QString &devicePath, const QString &passwd, QWidget* parentWidget)
-{
-    int ret_code = -1;
-    QString cmd = newCmd;
-    if (!cmd.startsWith("sudo -S"))
-    {
-        cmd = "sudo -S " + cmd;
-    }
-
-    qDebug() << QString( "executeCommandWithSudo: %1").arg(cmd);
-    PleaseWaitDialog* pleaseWait;
-    QProcess process;
-
-    QFutureWatcher< std::pair<int, QString> > watcher;
-//    QFuture< std::pair<int, QString> > future;
-
-    pleaseWait = new PleaseWaitDialog();
-    connect( pleaseWait, &QDialog::finished, pleaseWait, &QObject::deleteLater);
-    pleaseWait->setParent( parentWidget );
-    pleaseWait->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    pleaseWait->setWindowTitle(tr("Formatting memory card..."));
-    pleaseWait->setWindowModality(Qt::ApplicationModal);
-    pleaseWait->show();
-
-
-    auto future = QtConcurrent::run([this, pleaseWait, &process, cmd, devicePath, passwd]() -> std::pair<int, QString> {
-        // Code in this block will run in another thread
-        process.setProcessChannelMode(QProcess::MergedChannels);
-
-        connect( &process, &QProcess::readyReadStandardOutput, [&process, pleaseWait, passwd] () {
-            QString output = process.readAllStandardOutput();
-            qDebug() << output;
-
-            if (output.contains("Sorry, try again")) {      //@TODO This is debatable... does it work with other system languages at all?
-                pleaseWait->setResultString( tr("Password is incorrect. Please try again.") );
-            }
-
-            if( output.contains("[sudo]") ){        // This is the prompt: [sudo] password for xyz
-                // send the password to the process
-                process.write(QString("%1\n").arg(passwd).toUtf8().constData());
-            }
-        });
-
-        process.start(cmd);
-        int exitCode = process.waitForFinished(-1);
-
-        if( exitCode==0 )
-        {
-            pleaseWait->setResultString( tr("The memory card has been formatted successfully"));
-        }
-        else
-        {
-            pleaseWait->setResultString( tr("Formatting the memory card failed.") );
-        }
-
-        remountDrive( devicePath );
-
-        QString standardOut = process.readAll();
-        return std::pair<int, QString>(exitCode, standardOut);
-    });
-    watcher.setFuture(future);
-
-    QEventLoop loop;
-    connect( &watcher, &QFutureWatcher<std::pair<int, QString>>::finished, this, [&loop]{   // QFutureWatcher remembers the ::finished signal until we connect to it. THAT saves us from loosing it before connecting to it.
-        loop.quit();
-    });
-    loop.exec();
-
-    std::pair<int, QString> result = future.result();
-
-    if (result.first)
-    {
-        if (ret_code != PASSWORD_INCORRECT)
-            ret_code = SUCCESS;
-
-    }
-    else
-    {
-        if (ret_code != PASSWORD_INCORRECT)
-            ret_code = FAILURE;
-    }
-
-    return std::pair<int, QString>(ret_code, result.second);
-}
 
 RetCode DeviceManager::ejectDrive(const QString &driveName)
 {
@@ -450,7 +366,7 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 
 #elif defined (Q_OS_MACOS)
     // we use the "unmount" command, since it does not ask for admin privileges.
-    QString output = executeCommand("diskutil unmount " + diskName);               // execute the umount command synchronously.
+    QString output = m_processExecutor.executeCommand("diskutil unmount " + diskName).second;               // execute the umount command synchronously.
 
     if ( !(output.contains("Volume", Qt::CaseInsensitive) && output.contains("unmounted", Qt::CaseInsensitive)) )       // The positive result of "unmount" looks like this: Volume NO NAME on disk2s1 unmounted
     {
@@ -459,13 +375,13 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 #elif defined (Q_OS_LINUX)
     // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
 
-    QString output = executeCommand("udisksctl unmount -b " + diskName);
+    QString output = m_processExecutor.executeCommand("udisksctl unmount -b " + diskName);
 
     if (!output.startsWith("Unmounted ", Qt::CaseInsensitive))
         return FAILURE;
 
 // This also turns off my card reader device, we don't want that.
-//    output = executeCommand("udisksctl power-off -b " + diskName);
+//    output = m_processExecutor.executeCommand("udisksctl power-off -b " + diskName);
 //    if (!output.isEmpty())
 //        return FAILURE;
 
@@ -493,7 +409,7 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 
 */
 #elif defined (Q_OS_MACOS)
-    QString output = executeCommand("diskutil mount " + diskName);               // execute the mount command synchronously.
+    QString output = m_processExecutor.executeCommand("diskutil mount " + diskName).second;               // execute the mount command synchronously.
 
     if ( !(output.contains("Volume", Qt::CaseInsensitive) && output.contains("unmounted", Qt::CaseInsensitive)) )       // The positive result of "unmount" looks like this: Volume NO NAME on disk2s1 unmounted
     {
@@ -502,13 +418,13 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 #elif defined (Q_OS_LINUX)
     // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
 
-    QString output = executeCommand("udisksctl mount -b " + diskName);
+    QString output = m_processExecutor.executeCommand("udisksctl mount -b " + diskName);
 
     if (!output.startsWith("Mounted "))
         return FAILURE;
 
 // This also turns off my card reader device, I don't want that.
-//    output = executeCommand("udisksctl power-off -b " + diskName);
+//    output = m_processExecutor.executeCommand("udisksctl power-off -b " + diskName);
 //    if (!output.isEmpty())
 //        return FAILURE;
 
@@ -572,30 +488,6 @@ QString DeviceManager::getFormatCommand(const QString &root, const QString &driv
     return cmd;
 }
 
-QString DeviceManager::executeCommand(const QString &cmdString)
-{
-    qDebug() << QString( "executeCommand: %1").arg(cmdString);
-    QFutureWatcher<QString> watcher;
-    QFuture<QString> future;
-    watcher.setFuture(future);
-
-    future = QtConcurrent::run([cmdString]() {
-        // Code in this block will run in another thread
-        QProcess p;
-        p.start(cmdString);
-        p.waitForFinished(-1);
-        QString standardOut = p.readAllStandardOutput();
-        return standardOut;
-    });
-
-    QEventLoop loop;
-    connect( &watcher, &QFutureWatcher<QString>::finished, this, [&loop]{   // QFutureWatcher remembers the ::finished signal until we connect to it. THAT saves us from loosing it before connecting to it.
-        loop.quit();
-    });
-    loop.exec();
-
-    return future.result();     // this is blocking while waiting for result. That's why we need the QEventLoop above.
-}
 
 qint64 DeviceManager::getVolumeSize(const QString &driveName)
 {

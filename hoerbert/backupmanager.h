@@ -26,6 +26,8 @@
 #include <QProcess>
 #include <QFileInfoList>
 
+#include "processexecutor.h"
+
 /**
  * @brief The BackupManager class handles backup/restore memory card data
  */
@@ -149,6 +151,7 @@ private:
     QStringList m_stamp;
 
     QStringList m_excludeList;
+    ProcessExecutor m_processExecutor;
 
 };
 

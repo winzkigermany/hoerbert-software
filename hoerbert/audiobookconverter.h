@@ -24,6 +24,7 @@
 
 #include <QThread>
 #include <QFileInfoList>
+#include "processexecutor.h"
 
 /**
  * @brief The AudioBookConverter class converts audio book(*.m4b) into several audio files based on chapters in it
@@ -84,6 +85,7 @@ private:
 
     QString m_audioVolume;
     int m_maxMetadataLength;
+    ProcessExecutor m_processExecutor;
 };
 
 #endif // AUDIOBOOKCONVERTER_H

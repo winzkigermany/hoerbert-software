@@ -28,6 +28,7 @@
 #include <QMutex>
 
 #include "define.h"
+#include "processexecutor.h"
 
 const int PROCESS_LIFECYCLE                  = -1; // in msec, -1 means no time out
 const int SPLIT_AUDIO_SEGMENT_LENGTH         = 180; // in seconds
@@ -236,6 +237,7 @@ private:
     int m_splitOffset; // this offset is used to get correct split files while dealing with split files.
 
     static QMutex m_processingMutex;
+    ProcessExecutor m_processExecutor;
 
 };
 

@@ -108,6 +108,13 @@ enum ENTRY_LIST_TYPE {
 };
 Q_DECLARE_METATYPE(ENTRY_LIST_TYPE);
 
+enum RetCode {
+    SUCCESS,
+    FAILURE,
+    DEVICE_NOT_FOUND,
+    MOUNT_FAILURE,
+    PASSWORD_INCORRECT
+};
 
 /*!
  * \brief Path and files
