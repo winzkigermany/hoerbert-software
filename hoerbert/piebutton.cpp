@@ -114,7 +114,6 @@ void PieButton::setPercentage(int value)
         if (m_percentage == 100) {
             emit processCompleted();
             m_percentage = 0;
-            m_spinner->stop();
         }
     }
 }
@@ -256,6 +255,9 @@ void PieButton::enable()
 
 void PieButton::disable()
 {
+    m_spinner->stop();
+    m_spinner->setVisible(true);
+
     m_enabled = false;
     setText(QString());
 

@@ -394,7 +394,7 @@ bool BackupManager::convertWav2Flac(const QString &sourcePath, const QString des
 
     std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
 
-    return output.first;
+    return output.first==0;
 }
 
 bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString destPath)
@@ -411,7 +411,7 @@ bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString des
 
     std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
 
-    return output.first;
+    return output.first==0;
 }
 
 void BackupManager::getFileInfoList(const QString &dirPath, QFileInfoList *fileList)

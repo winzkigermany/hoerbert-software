@@ -19,7 +19,7 @@ public:
      * @param cmdString
      * @return the output of the command
      */
-    std::pair<int, QString> executeCommand(const QString &cmdString, const QStringList& arguments=QStringList());
+    std::pair<int, QString> executeCommand(const QString &cmdString, const QStringList& arguments=QStringList(), const QString& workingDirectory="");
 
 
     /**

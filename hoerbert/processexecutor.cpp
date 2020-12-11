@@ -7,16 +7,20 @@ ProcessExecutor::ProcessExecutor(QObject *parent) : QObject(parent)
 }
 
 
-std::pair<int, QString> ProcessExecutor::executeCommand(const QString &cmdString, const QStringList& arguments)
+std::pair<int, QString> ProcessExecutor::executeCommand(const QString &cmdString, const QStringList& arguments, const QString &workingDirectory)
 {
     qDebug() << QString( "executeCommand: %1 %2").arg(cmdString).arg( arguments.join(" ") );
 
     QFutureWatcher< std::pair<int, QString> > watcher;
 
-    auto future = QtConcurrent::run([cmdString, arguments]() {
+    auto future = QtConcurrent::run([cmdString, arguments, workingDirectory]() {
         // Code in this block will run in another thread
         QProcess p;
         p.setProcessChannelMode(QProcess::MergedChannels);
+        if( !workingDirectory.isEmpty() )
+        {
+            p.setWorkingDirectory( workingDirectory );
+        }
         if( arguments.count()>0 )
         {
             p.start(cmdString, arguments);

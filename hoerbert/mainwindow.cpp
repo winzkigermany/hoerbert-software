@@ -966,7 +966,7 @@ void MainWindow::collectInformationForSupport()
 #if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
     arguments << "-r" << collect_path + ".zip" << COLLECT_FILE_NAME+"/";
 
-    std::pair<int, QString> output = m_processExecutor.executeCommand("/usr/bin/zip", arguments);
+    std::pair<int, QString> output = m_processExecutor.executeCommand("/usr/bin/zip", arguments, HOERBERT_TEMP_PATH);
 
     if (output.first!=0)
     {
