@@ -32,6 +32,8 @@
 #include <QLineEdit>
 #include <QApplication>
 #include <QDirIterator>
+#include <QFuture>
+#include <QtConcurrent>
 
 #ifdef _WIN32
 #include <tchar.h>
@@ -619,19 +621,20 @@ QString DeviceManager::getFormatCommand(const QString &root, const QString &driv
 
 QString DeviceManager::executeCommand(const QString &cmdString)
 {
-    QProcess cmdProgress;
+    qDebug() << QString( "executing %1").arg(cmdString);
 
-    bool returnValue = false;
-    QEventLoop loop;
-    connect(&cmdProgress, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
-        returnValue = (result==0);
-        loop.quit();
+    QFuture<QString> future = QtConcurrent::run([cmdString]() {
+        // Code in this block will run in another thread
+        QProcess p;
+        p.start(cmdString);
+        p.waitForFinished(-1);
+        QString standardOut = p.readAllStandardOutput();
+        return standardOut;
     });
-    cmdProgress.start(cmdString);
-    loop.exec();
-    cmdProgress.disconnect();
 
-    return cmdProgress.readAllStandardOutput();
+    QString result = future.result();
+
+    return result;
 }
 
 qint64 DeviceManager::getVolumeSize(const QString &driveName)
