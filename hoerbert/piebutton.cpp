@@ -29,7 +29,7 @@ PieButton::PieButton(QWidget *parent, int id) : QPushButton(parent)
 #ifdef Q_OS_MACOS
     setFont(QFont(HOERBERT_FONTFAMILY, 21, QFont::DemiBold));
 #elif defined (Q_OS_LINUX)
-    setFont(QFont(HOERBERT_FONTFAMILY, 21, QFont::Normal));
+    setFont(QFont(HOERBERT_FONTFAMILY, 18, QFont::Normal));
 #elif defined(Q_OS_WIN)
     setFont(QFont(HOERBERT_FONTFAMILY, 18, QFont::DemiBold));
 #endif

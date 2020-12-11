@@ -101,7 +101,7 @@ bool DeviceManager::isRemovable(const QString &volumeRoot)
     return output.contains(QRegExp("Removable Media:.*Removable", Qt::CaseInsensitive));
 #elif defined (Q_OS_LINUX)
     QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
-    QString output = m_processExecutor.executeCommand(cmd);
+    QString output = m_processExecutor.executeCommand(cmd).second;
 
     return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
 #endif
@@ -120,7 +120,7 @@ bool DeviceManager::isEjectable(const QString &volumeRoot)
     return output.contains(QRegExp("Ejectable", Qt::CaseInsensitive));
 #elif defined (Q_OS_LINUX)
     QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
-    QString output = m_processExecutor.executeCommand(cmd);
+    QString output = m_processExecutor.executeCommand(cmd).second;
 
     return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
 #endif
@@ -248,7 +248,9 @@ bool DeviceManager::isValidDevice(const QString &device)
 
 RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveName, const QString &newLabel, const QString &passwd )
 {
-#ifndef Q_OS_LINUX
+#ifdef Q_OS_LINUX
+    Q_UNUSED( parentWidget )
+#else
     Q_UNUSED( passwd )
 #endif
 
@@ -324,14 +326,14 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
     }
 
     if (ret_code == FAILURE || output.contains("mkfs.vfat:")) {
-        executeCommand("sudo -k");
+        m_processExecutor.executeCommand("sudo -k");
         return FAILURE;
     }
 
-    remountDrive( devicePath );
+    remountDrive( deviceName );
 
     // sudo should forget password, otherwise the commands will work even with incorrect password within 15 minutes
-    executeCommand("sudo -k");
+    m_processExecutor.executeCommand("sudo -k");
 
     return SUCCESS;
 #endif
@@ -375,7 +377,7 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 #elif defined (Q_OS_LINUX)
     // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
 
-    QString output = m_processExecutor.executeCommand("udisksctl unmount -b " + diskName);
+    QString output = m_processExecutor.executeCommand("udisksctl unmount -b " + diskName).second;
 
     if (!output.startsWith("Unmounted ", Qt::CaseInsensitive))
         return FAILURE;
@@ -418,7 +420,7 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 #elif defined (Q_OS_LINUX)
     // TODO: udisksctl is only for preliminary use, need to replace it with dbus-send and gdbus in the future
 
-    QString output = m_processExecutor.executeCommand("udisksctl mount -b " + diskName);
+    QString output = m_processExecutor.executeCommand("udisksctl mount -b " + diskName).second;
 
     if (!output.startsWith("Mounted "))
         return FAILURE;
@@ -474,6 +476,11 @@ QString DeviceManager::selectedDriveName() const
 
 QString DeviceManager::getFormatCommand(const QString &root, const QString &driveLabel)
 {
+#ifdef Q_OS_LINUX
+    Q_UNUSED( root )
+    Q_UNUSED(driveLabel)
+#endif
+
     QString cmd;
     QString newRoot = "";
     QString systemRoot = "";
