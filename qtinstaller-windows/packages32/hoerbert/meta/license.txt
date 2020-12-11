@@ -35,7 +35,6 @@ ffmpeg https://www.ffmpeg.org
 freac https://www.freac.org
 sox http://sox.sourceforge.net
 wavsilence https://github.com/DOSx86/wavsilence
-QDeviceWatcher https://github.com/wang-bin/qdevicewatcher
 df by Paul Sadowski
 EjectMedia https://www.uwe-sieber.de
 7-Zip https://7-zip.org

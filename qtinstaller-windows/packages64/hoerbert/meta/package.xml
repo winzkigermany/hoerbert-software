@@ -2,8 +2,8 @@
 <Package>
   <DisplayName>hörbert</DisplayName>
   <Description>hörbert Software</Description>
-  <Version>2.0.9</Version>
-  <ReleaseDate>2020-12-04</ReleaseDate>
+  <Version>2.1.0</Version>
+  <ReleaseDate>2020-12-11</ReleaseDate>
   <Name>hörbert</Name>
   <Licenses>
     <License name="GPLv3" file="license.txt" />

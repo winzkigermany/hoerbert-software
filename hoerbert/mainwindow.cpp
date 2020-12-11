@@ -863,6 +863,8 @@ void MainWindow::collectInformationForSupport()
     qDebug() << "tmp dir: " << tmp_dir.absolutePath();
 
     QStringList info_list;
+    info_list << "[Program version]" << QString(VER_PRODUCTVERSION_STR) << "";
+
     info_list << "[Operating System]" << QSysInfo::productType() << QSysInfo::productVersion() << QLocale::languageToString(QLocale::system().language()) << "";
 
     qint64 free_space_of_installation_drive = 0;
