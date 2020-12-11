@@ -124,7 +124,7 @@ win32 {
     CONFIG += embed_manifest_dll
     CONFIG += embed_manifest_exe
 
-    TOOLS.path = ../Build/bin/
+    TOOLS.path = ../../Build/
 
     contains(QMAKE_TARGET.arch, x86_64) {
         message("x86_64 build")
