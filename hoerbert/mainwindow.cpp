@@ -111,7 +111,6 @@ MainWindow::MainWindow(QWidget *parent)
             m_printAction->setEnabled(false);
             m_backupAction->setEnabled(false);
             m_restoreAction->setEnabled(false);
-            m_formatAction->setEnabled(false);
             m_selectManually->setEnabled(true);
 
             if( driveName.isEmpty() )
@@ -128,7 +127,6 @@ MainWindow::MainWindow(QWidget *parent)
                 m_toggleDiagnosticsModeAction->setChecked(true);
                 m_capBar->setEnabled(false);
             }
-
         }
         else
         {
@@ -136,7 +134,6 @@ MainWindow::MainWindow(QWidget *parent)
             m_printAction->setEnabled(true);
             m_backupAction->setEnabled(true);
             m_restoreAction->setEnabled(true);
-            m_formatAction->setEnabled(true);
             m_advancedFeaturesAction->setEnabled(true);
             m_toggleDiagnosticsModeAction->setEnabled(true);
             m_selectManually->setEnabled(false);
@@ -156,6 +153,8 @@ MainWindow::MainWindow(QWidget *parent)
                 m_migrationPath = QString("");
             }
         }
+
+        updateFormatActionAvailability(true);
     });
 
     connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
@@ -165,7 +164,6 @@ MainWindow::MainWindow(QWidget *parent)
         m_shadow->setColor(m_cardPage->getPlaylistColor(dir_num));
 
         showHideEditMenuEntries( true, dir_num );
-
     });
 
     connect(m_cardPage, &CardPage::migrationNeeded, this, [this](const QString &dirPath) {
@@ -233,6 +231,38 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_backupManager = nullptr;
     m_dbgDlg = new DebugDialog(this);
+}
+
+void MainWindow::updateFormatActionAvailability( bool ANDed )
+{
+    if( m_cardPage->getDropDownText().isEmpty() )
+    {
+        m_formatAction->setEnabled(false);
+    }
+    else
+    {
+        if( m_cardPage->isWorkingOnCustomDirectory() || m_cardPage->isDiagnosticsModeEnabled() )
+        {
+            m_formatAction->setEnabled(false);
+        }
+        else
+        {
+            if( m_cardPage->isProcessing() )
+            {
+                m_formatAction->setEnabled(false);
+            }
+            else
+            {
+                if( ANDed ){
+                    m_formatAction->setEnabled(true);
+                }
+                else
+                {
+                    m_formatAction->setEnabled(false);
+                }
+            }
+        }
+    }
 }
 
 MainWindow::~MainWindow()
@@ -385,7 +415,6 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
             m_printAction->setEnabled(true);
             m_backupAction->setEnabled(true);
             m_restoreAction->setEnabled(true);
-            m_formatAction->setEnabled(true);
 
             m_cardPage->setCardManageButtonsEnabled(true);
 
@@ -394,18 +423,21 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
 
     }, Qt::UniqueConnection);
 
+    updateFormatActionAvailability();
     processor->start();
 }
 
 void MainWindow::processorErrorOccurred(const QString &errorString)
 {
     m_dbgDlg->appendLog(errorString);
+    updateFormatActionAvailability();
 }
 
 void MainWindow::taskCompleted(int failCount, int totalCount)
 {
     Q_UNUSED(failCount)
     Q_UNUSED(totalCount)
+    updateFormatActionAvailability();
 }
 
 void MainWindow::migrate(const QString &dirPath)
@@ -1221,7 +1253,6 @@ void MainWindow::switchDiagnosticsMode()
             m_printAction->setEnabled(!doEnable);
             m_backupAction->setEnabled(!doEnable);
             m_restoreAction->setEnabled(!doEnable);
-            m_formatAction->setEnabled(!doEnable);
         }
         catch( const GeneralException& e )
         {
@@ -1251,7 +1282,6 @@ void MainWindow::switchDiagnosticsMode()
             m_printAction->setEnabled(!doEnable);
             m_backupAction->setEnabled(!doEnable);
             m_restoreAction->setEnabled(!doEnable);
-            m_formatAction->setEnabled(!doEnable);
         }
         catch( const GeneralException& e )
         {
@@ -1265,6 +1295,7 @@ void MainWindow::switchDiagnosticsMode()
         }
     }
 
+    updateFormatActionAvailability();
     sync();
 }
 
@@ -2127,17 +2158,8 @@ void MainWindow::createActions()
     m_extrasMenu->addAction(m_formatAction);
 
     connect(m_cardPage, &CardPage::driveListChanged, this, [=](int numberOfListEntries){
-        if( numberOfListEntries>0 )
-        {
-            if( !m_cardPage->isDiagnosticsModeEnabled() )
-            {
-                m_formatAction->setEnabled(true);
-            }
-        }
-        else
-        {
-            m_formatAction->setEnabled(false);
-        }
+        Q_UNUSED(numberOfListEntries)
+        updateFormatActionAvailability();
     });
 
 
@@ -2293,7 +2315,6 @@ void MainWindow::showHideEditMenuEntries( bool showHide, int playlistIndex )
         m_printAction->setEnabled(false);
         m_backupAction->setEnabled(false);
         m_restoreAction->setEnabled(false);
-        m_formatAction->setEnabled(false);
         m_advancedFeaturesAction->setEnabled(false);
         m_toggleDiagnosticsModeAction->setEnabled(false);
 
@@ -2317,11 +2338,15 @@ void MainWindow::showHideEditMenuEntries( bool showHide, int playlistIndex )
         m_printAction->setEnabled(true);
         m_backupAction->setEnabled(true);
         m_restoreAction->setEnabled(true);
-        m_formatAction->setEnabled(true);
         m_advancedFeaturesAction->setEnabled(false);
 
         m_toggleDiagnosticsModeAction->setEnabled(true);
 
+    }
+
+    if( playlistIndex>-1 && playlistIndex<9 )
+    {
+        updateFormatActionAvailability(false);  // force invisible
     }
 }
 

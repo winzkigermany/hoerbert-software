@@ -304,7 +304,7 @@ void CardPage::formatSelectedDrive(bool retry)
     }
 
     QString nameProposal = selectedDrive.split(" ").at(0);    // get only the first word up to the first whitespace
-    nameProposal = nameProposal.toUpper().replace(QRegExp("[^A-Z^a-z^0-9^_]{1,11}"), "");
+    nameProposal = nameProposal.replace(QRegExp("[^A-Z^a-z^0-9^_]{1,11}"), "").toUpper();
 
     if (!retry)
     {
@@ -338,7 +338,7 @@ void CardPage::formatSelectedDrive(bool retry)
     lineEdit->setMaxLength(11);
     lineEdit->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_ ]{1,11}"), lineEdit));
     connect(lineEdit, &QLineEdit::textChanged, this, [=]( QString currentText ){
-        lineEdit->setText(currentText.replace(" ", "_"));       // intentionally replace spaces by underscores while the user is typing.
+        lineEdit->setText(currentText.replace(" ", "_").toUpper());       // intentionally replace spaces by underscores while the user is typing.
     });
 
     if (dialog.exec() == QDialog::Accepted)
@@ -999,4 +999,9 @@ int CardPage::numberOfTracks()
 bool CardPage::isWorkingOnCustomDirectory()
 {
     return m_deviceManager->isWorkingOnCustomDirectory();
+}
+
+QString CardPage::getDropDownText()
+{
+    return m_driveList->currentText();
 }

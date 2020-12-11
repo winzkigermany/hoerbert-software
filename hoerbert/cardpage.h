@@ -257,6 +257,12 @@ public:
      */
     bool isWorkingOnCustomDirectory();
 
+    /**
+     * @brief getDropDownText
+     * @return the text that is currently visible in the dropdown.
+     */
+    QString getDropDownText();
+
 signals:
 
     /**
