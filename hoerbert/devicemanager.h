@@ -80,7 +80,7 @@ public:
      * @param passwd user's password
      * @return result code and output of command execution
      */
-    std::pair<int, QString> executeCommandWithSudo( QProcess* theProcess, const QString &cmd, const QString &drivePath, const QString &passwd = QString(), bool showPleaseWaitDialog=false, QWidget* parentWidget=nullptr );
+    std::pair<int, QString> executeCommandWithSudo( const QString &cmd, const QString &drivePath, const QString &passwd = QString(), QWidget* parentWidget=nullptr );
 
     /**
      * @brief ejectDrive eject given drive (involves unmount and NO power-off)
