@@ -768,6 +768,8 @@ void MainWindow::sync()
     qDebug() << "About to sync disk writing...";
 
     QProcess process;
+    process.setProcessChannelMode(QProcess::MergedChannels);
+
     QStringList arguments;
 
 #ifdef WIN32
@@ -974,6 +976,8 @@ void MainWindow::collectInformationForSupport()
     }
 
     QProcess process;
+    process.setProcessChannelMode(QProcess::MergedChannels);
+
     QStringList arguments;
     bool processSuccess = true;
 

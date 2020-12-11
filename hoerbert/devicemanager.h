@@ -237,6 +237,7 @@ protected:
      */
     QString executeCommand(const QString &cmdString);
 
+
 private:
     /**
      * @brief a mapping of deviceName->root

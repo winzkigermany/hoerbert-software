@@ -471,11 +471,10 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     qDebug() << QString("ffmpeg %1").arg(arguments.join(" "));
 
     QProcess silenceDetectionProcess;
+    silenceDetectionProcess.setProcessChannelMode(QProcess::MergedChannels);
 
     bool returnValue = false;
     {
-        silenceDetectionProcess.setProcessChannelMode(QProcess::MergedChannels);
-
         QEventLoop loop;
         connect(&silenceDetectionProcess, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
             returnValue = (result==0);
@@ -606,10 +605,9 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     arguments.append(output_filename);
 
     QProcess cuttingProcess;
+    cuttingProcess.setProcessChannelMode(QProcess::MergedChannels);
 
     {
-        cuttingProcess.setProcessChannelMode(QProcess::MergedChannels);
-
         QEventLoop loop;
         connect(&cuttingProcess, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, [&returnValue, &loop](int result){
             returnValue = (result==0);

@@ -75,6 +75,7 @@ PlaylistView::PlaylistView(QWidget *parent)
     m_totalSpace = 0;
 
     m_player = new QProcess(this);
+    m_player->setProcessChannelMode(QProcess::MergedChannels);
 
     horizontalHeader()->setMinimumSectionSize(DEFAULT_ROW_HEIGHT);
     horizontalHeader()->hide();

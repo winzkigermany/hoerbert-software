@@ -23,10 +23,6 @@
 #define CARDPAGE_H
 
 
-#if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
-#include <QFileSystemWatcher>
-#endif
-
 #include <list>
 #include <QWidget>
 #include <QMutex>
@@ -59,7 +55,7 @@
 #include "mainwindow.h"
 
 #ifdef Q_OS_WIN
-#include "../libQDeviceWatcher/qdevicewatcher.h"
+#include "windowsdrivelistener.h"
 #endif
 
 class MainWindow;
@@ -340,16 +336,6 @@ private slots:
      */
     void onPlaylistButtonClicked(qint8 dirIndex);
 
-    /**
-     * @brief called when a removable device is added
-     */
-    void onDeviceAdded(const QString &);
-
-    /**
-     * @brief called when a removable device is removed
-     */
-    void onDeviceRemoved(const QString &);
-
 private:
 
     /**
@@ -383,8 +369,9 @@ private:
     bool m_hoerbertXMLIsDirty;
 
     DeviceManager_ptr m_deviceManager;
+
 #ifdef Q_OS_WIN
-    QDeviceWatcher *m_deviceWatcher;
+    WindowsDriveListener* m_windowsDriveListener ;
 #else
     QFileSystemWatcher m_watcher;
 #endif

@@ -203,18 +203,14 @@ CardPage::CardPage(QWidget *parent)
     });
 
 #if defined (Q_OS_WIN)
-    m_deviceWatcher = new QDeviceWatcher;
-    m_deviceWatcher->appendEventReceiver(this);
-
-    connect(m_deviceWatcher, SIGNAL(deviceAdded(const QString&)), this, SLOT(onDeviceAdded(const QString&)), Qt::DirectConnection);
-    connect(m_deviceWatcher, SIGNAL(deviceRemoved(const QString&)), this, SLOT(onDeviceRemoved(const QString&)), Qt::DirectConnection);
-    m_deviceWatcher->start();
+    m_windowsDriveListener = new WindowsDriveListener();
+    connect(m_windowsDriveListener, &WindowsDriveListener::drivesHaveChanged, this, &CardPage::updateDriveList, Qt::QueuedConnection);
 #elif defined (Q_OS_MACOS)
     m_watcher.addPath("/Volumes");
     connect(&m_watcher, &QFileSystemWatcher::directoryChanged, [this] (const QString &path) {
         Q_UNUSED(path)
         qDebug() << "Volume change detected!";
-        QTimer::singleShot(MOUNT_VOLUME_DELAY * 1000, this, &CardPage::updateDriveList);
+        QTimer::singleShot(MOUNT_VOLUME_DELAY * 600, this, &CardPage::updateDriveList);
     });
 #elif defined (Q_OS_LINUX)
     QString user_name = qgetenv("USER");
@@ -224,7 +220,7 @@ CardPage::CardPage(QWidget *parent)
         connect(&m_watcher, &QFileSystemWatcher::directoryChanged, [this] (const QString &path) {
             Q_UNUSED(path)
             qDebug() << "Volume change detected!";
-            QTimer::singleShot(MOUNT_VOLUME_DELAY * 1000, this, &CardPage::updateDriveList);
+            QTimer::singleShot(MOUNT_VOLUME_DELAY * 600, this, &CardPage::updateDriveList);
         });
     }
 #endif
@@ -246,31 +242,8 @@ CardPage::~CardPage()
         delete m_verticalGridSpacer1;
         delete m_verticalGridSpacer2;
     }
-#if defined (Q_OS_WIN)
-    m_deviceWatcher->stop();
-    m_deviceWatcher->deleteLater();
-#endif
 }
 
-void CardPage::onDeviceAdded(const QString &dev)
-{
-    Q_UNUSED(dev)
-#if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
-        QTimer::singleShot(MOUNT_VOLUME_DELAY * 1000, [this, dev] () {
-            m_deviceManager->getDeviceList();
-            if (m_deviceManager->isValidDevice(dev))
-                updateDriveList();
-        });
-#else
-        updateDriveList();
-#endif
-}
-
-void CardPage::onDeviceRemoved(const QString &dev)
-{
-    Q_UNUSED(dev)
-    updateDriveList();
-}
 
 void CardPage::updateDriveList()
 {
@@ -291,11 +264,12 @@ void CardPage::updateDriveList()
         }
     }
 
+/*
     if (!selectedDriveExists || m_deviceManager->selectedDrive().isEmpty())
     {
         if(!selectedDriveExists && !m_deviceManager->selectedDriveName().isEmpty()) // this is bad, very bad, presumably a user just ripped out the SD card.
         {
-            if( !m_isFormatting )
+            if( !m_isFormatting && isHoerbertXMLDirty() )
             {
                 QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory card has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
             }
@@ -303,6 +277,7 @@ void CardPage::updateDriveList()
 
         deselectDrive();
     }
+*/
 
     if (m_driveList->count() > 0)
     {
@@ -423,9 +398,8 @@ void CardPage::ejectDrive()
 
     if (result == SUCCESS)
     {
-        updateDriveList();
-        deselectDrive();
         m_pleaseWaitDialog->setWindowTitle(tr("Finished"));
+        deselectDrive();
 
         bool doGenerateHoerbertXml = false;
         {
@@ -532,6 +506,8 @@ void CardPage::deselectDrive()
     initializePlaylists();
 
     m_deviceManager->setCurrentDrive("");
+
+    setHoerbertXMLDirty( false );
 
     m_ejectDriveButton->hide();
     m_ejectButtonLabel->hide();

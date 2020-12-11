@@ -25,19 +25,12 @@ TEMPLATE = subdirs
 
 hoerbert.subdir = hoerbert
 
-SUBDIRS += \
-            hoerbert
+SUBDIRS += hoerbert
 
 mac|linux {
-
 }
 
 win32 {
-        SUBDIRS += \
-            libQDeviceWatcher
-
-	libQDeviceWatcher.subdir = libQDeviceWatcher
-	hoerbert.depends = libQDeviceWatcher
 }
 
 

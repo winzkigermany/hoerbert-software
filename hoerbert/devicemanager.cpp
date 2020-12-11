@@ -632,7 +632,7 @@ QString DeviceManager::executeCommand(const QString &cmdString)
         return standardOut;
     });
 
-    QString result = future.result();
+    QString result = future.result();   // this is blocking while waiting for result
 
     return result;
 }

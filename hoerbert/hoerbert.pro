@@ -21,7 +21,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui xml network
+QT       += core gui xml network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,10 +29,6 @@ TARGET = hoerbert
 TEMPLATE = app
 CONFIG += QMAKE_LFLAGS_WINDOWS
 DESTDIR = ../../Build
-
-win32 {
-    include(../libQDeviceWatcher/libQDeviceWatcher.pri)
-}
 
 win32:!wince*:LIBS += -lUser32
 
@@ -80,6 +76,7 @@ SOURCES += \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         waitingspinnerwidget.cpp \
+        windowsdrivelistener.cpp \
         xmlmetadatareader.cpp \
         xmlwriter.cpp
 
@@ -113,6 +110,7 @@ HEADERS += \
         triplecheckboxwidget.h \
         version.h \
         waitingspinnerwidget.h \
+        windowsdrivelistener.h \
         xmlmetadatareader.h \
         xmlwriter.h
 
