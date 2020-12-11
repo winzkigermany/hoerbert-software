@@ -26,12 +26,3 @@ TEMPLATE = subdirs
 hoerbert.subdir = hoerbert
 
 SUBDIRS += hoerbert
-
-mac|linux {
-}
-
-win32 {
-}
-
-
-

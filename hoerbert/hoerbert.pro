@@ -118,13 +118,15 @@ HEADERS += \
 
 win32 {
     LIBS += -lhid -lsetupapi -lgdi32
+    INCLUDEPATH += $$(QTDIR)/include/
 
     ICON = hoerbert.ico
     RC_FILE = app.rc
     CONFIG += embed_manifest_dll
     CONFIG += embed_manifest_exe
 
-    TOOLS.path = ../../Build/
+    DESTDIR = ../Build/bin/
+    TOOLS.path = ../Build/bin/
 
     contains(QMAKE_TARGET.arch, x86_64) {
         message("x86_64 build")
@@ -203,4 +205,3 @@ TRANSLATIONS = \
     languages/hoerbert_en.ts \
     languages/hoerbert_de.ts \
     languages/hoerbert_fr.ts
-
