@@ -12,8 +12,10 @@ std::pair<int, QString> ProcessExecutor::executeCommand(const QString &cmdString
     qDebug() << QString( "executeCommand: %1 %2").arg(cmdString).arg( arguments.join(" ") );
 
     QFutureWatcher< std::pair<int, QString> > watcher;
+    QFuture< std::pair<int, QString>> future;
+    watcher.setFuture(future);
 
-    auto future = QtConcurrent::run([cmdString, arguments, workingDirectory]() {
+    future = QtConcurrent::run([cmdString, arguments, workingDirectory]() {
         // Code in this block will run in another thread
         QProcess p;
         p.setProcessChannelMode(QProcess::MergedChannels);
@@ -34,7 +36,6 @@ std::pair<int, QString> ProcessExecutor::executeCommand(const QString &cmdString
         QString standardOut = p.readAllStandardOutput();
         return std::pair<int, QString>(exitCode, standardOut);
     });
-    watcher.setFuture(future);
 
     QEventLoop loop;
     connect( &watcher, &QFutureWatcher<QString>::finished, this, [&loop]{   // QFutureWatcher remembers the ::finished signal until we connect to it. THAT saves us from loosing it before connecting to it.
@@ -63,6 +64,8 @@ std::pair<int, QString> ProcessExecutor::executeCommandWithSudo( const QString &
     QProcess process;
 
     QFutureWatcher< std::pair<int, QString> > watcher;
+    QFuture< std::pair<int, QString>> future;
+    watcher.setFuture(future);
 
     pleaseWait = new PleaseWaitDialog();
     connect( pleaseWait, &QDialog::finished, pleaseWait, &QObject::deleteLater);
@@ -73,7 +76,7 @@ std::pair<int, QString> ProcessExecutor::executeCommandWithSudo( const QString &
     pleaseWait->show();
 
 
-    auto future = QtConcurrent::run([this, &process, pleaseWait, cmd, devicePath, passwd]() -> std::pair<int, QString> {
+    future = QtConcurrent::run([this, &process, pleaseWait, cmd, devicePath, passwd]() -> std::pair<int, QString> {
         // Code in this block will run in another thread
         process.setProcessChannelMode(QProcess::MergedChannels);
 
@@ -109,7 +112,6 @@ std::pair<int, QString> ProcessExecutor::executeCommandWithSudo( const QString &
         QString standardOut = process.readAll();
         return std::pair<int, QString>(exitCode, standardOut);
     });
-    watcher.setFuture(future);
 
     QEventLoop loop;
     connect( &watcher, &QFutureWatcher<std::pair<int, QString>>::finished, this, [&loop]{   // QFutureWatcher remembers the ::finished signal until we connect to it. THAT saves us from loosing it before connecting to it.
