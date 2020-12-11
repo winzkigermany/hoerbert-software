@@ -1014,7 +1014,6 @@ void MainWindow::collectInformationForSupport()
 
     if (output.first!=0)
     {
-        processSuccess = false;
         m_dbgDlg->appendLog("- Compressing zip failed. Failed to complete.");
     }
 

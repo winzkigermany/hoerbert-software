@@ -5,6 +5,7 @@
 #include <QStorageInfo>
 #include <QList>
 #include <QTimer>
+#include <QMutex>
 
 class WindowsDriveListener : public QObject
 {
