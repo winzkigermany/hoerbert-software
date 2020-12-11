@@ -21,7 +21,6 @@ public:
      */
     std::pair<int, QString> executeCommand(const QString &cmdString, const QStringList& arguments=QStringList(), const QString& workingDirectory="");
 
-
     /**
      * @brief executeCommandWithSudo execute command with sudo and automatically interact with password input
      * @param cmd command to be executed
@@ -31,7 +30,10 @@ public:
     std::pair<int, QString> executeCommandWithSudo( const QString &cmd, const QString &drivePath, const QString &passwd = QString(), QWidget* parentWidget=nullptr );
 
 signals:
-
+    /**
+     * @brief kill We may try, but we may not succeed.
+     */
+    void kill();
 };
 
 #endif // PROCESSEXECUTOR_H

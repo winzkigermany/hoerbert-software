@@ -73,9 +73,11 @@ std::pair<int, QString> ProcessExecutor::executeCommandWithSudo( const QString &
     pleaseWait->show();
 
 
-    auto future = QtConcurrent::run([pleaseWait, &process, cmd, devicePath, passwd]() -> std::pair<int, QString> {
+    auto future = QtConcurrent::run([this, &process, pleaseWait, cmd, devicePath, passwd]() -> std::pair<int, QString> {
         // Code in this block will run in another thread
         process.setProcessChannelMode(QProcess::MergedChannels);
+
+        connect( this, &ProcessExecutor::kill, &process, &QProcess::kill);
 
         connect( &process, &QProcess::readyReadStandardOutput, [&process, pleaseWait, passwd] () {
             QString output = process.readAllStandardOutput();
@@ -131,3 +133,5 @@ std::pair<int, QString> ProcessExecutor::executeCommandWithSudo( const QString &
 
     return std::pair<int, QString>(ret_code, result.second);
 }
+
+
