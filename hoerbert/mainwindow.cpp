@@ -235,7 +235,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::updateFormatActionAvailability( bool ANDed )
 {
-    if( m_cardPage->getDropDownText().isEmpty() )
+    if( m_cardPage->getSelectedDrive().isEmpty() )
     {
         m_formatAction->setEnabled(false);
     }

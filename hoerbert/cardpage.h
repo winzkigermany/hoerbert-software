@@ -112,11 +112,6 @@ public:
     void recreateXml();
 
     /**
-     * @brief select a memory card to work on
-     */
-    void selectDrive();
-
-    /**
      * @brief get the color for a given playlist number
      * @param id
      * @return color of the given playlist number
@@ -261,7 +256,7 @@ public:
      * @brief getDropDownText
      * @return the text that is currently visible in the dropdown.
      */
-    QString getDropDownText();
+    QString getSelectedDrive();
 
 signals:
 
