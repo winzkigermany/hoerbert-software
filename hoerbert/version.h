@@ -19,7 +19,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+#ifndef _WIN32
 #include <QtGlobal>
+#endif
 
 #ifndef VERSION_H
 #define VERSION_H
@@ -38,7 +40,7 @@
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_PRODUCTNAME_STR         "h\303\266rbert Software"
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     #define VER_ORIGINALFILENAME_STR    "h\303\266rbert.exe"
 #elif defined Q_OS_MACOS
     #define VER_ORIGINALFILENAME_STR    "h\303\266rbert.app"

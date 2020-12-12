@@ -132,24 +132,12 @@ public:
     void setCurrentDrive(const QString &driveName);
 
     /**
-     * @brief selectedDrive
-     * @return current drive letter i.e (win32: <H:/>, mac: )
-     */
-    QString selectedDrive() const;
-
-    /**
-     * @brief DeviceManager::selectedDriveName
-     * @return current drive name i.e (win32: <UNTITLED H:/>, mac: )
-     */
-    QString selectedDriveName() const;
-
-    /**
      * @brief DeviceManager::getDrivePath
      * @return path of given drive on system. If no drive is given, return the path of the current drive.
      *
      * If no drive is given, return the full drive path of the current drive.
      */
-    QString getDrivePath(const QString &driveName=nullptr) const;
+    QString getDrivePath(const QString &driveName) const;
 
     /**
      * @brief getDriveName
@@ -161,7 +149,7 @@ public:
     /**
      * @brief refresh the underlying StorageObject
      */
-    void refresh( const QString &driveName=NULL );
+    void refresh( const QString &driveName );
 
     /**
      * @brief isWorkingOnCustomDirectory
@@ -227,11 +215,6 @@ private:
      * @brief the currently selected drive
      */
     QString m_currentDrive;
-
-    /**
-     * @brief the drive name of the currently selected drive
-     */
-    QString m_currentDriveName;
 
     /**
      * @brief a custom path that was selected by the user manually

@@ -57,7 +57,6 @@ struct VolumeInfo{
 DeviceManager::DeviceManager()
 {
     m_currentDrive = "";
-    m_currentDriveName = "";
     // Get the list of available drives right from the start.
     getDeviceList();
 }
@@ -66,13 +65,9 @@ void DeviceManager::refresh( const QString &driveName )
 {
     if( isWorkingOnCustomDirectory() ){
         QStorageInfo qsi;
-        if( driveName!=NULL )
+        if( driveName!=NULL && !driveName.isEmpty() )
         {
             qsi.setPath( driveName );
-        }
-        else
-        {
-            qsi.setPath( m_currentDriveName );
         }
         qsi.refresh();
 
@@ -80,10 +75,9 @@ void DeviceManager::refresh( const QString &driveName )
     }
 
     std::map<QString, VolumeInfo_ptr>::const_iterator ret;
-    if( driveName != NULL ){
+    if( driveName!=NULL && !driveName.isEmpty() )
+    {
         ret = _deviceName2Root.find(driveName);
-    } else {
-        ret = _deviceName2Root.find(m_currentDriveName);
     }
     ret->second->storageInfo.refresh();
 }
@@ -148,19 +142,19 @@ ListString DeviceManager::getDeviceList()
             QString volume = diskName + " (" + root + ")";
             driveList.push_back(volume);
 
-			VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,v);
+            VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,v);
             _deviceName2Root.emplace(volume,vol);
-      }
-  }
+        }
+    }
 
-  if( isWorkingOnCustomDirectory() ){
-      QStorageInfo qsi(m_custom_destination_path);
-      QString root = getRoot( qsi );
-      driveList.push_back(m_custom_destination_path);
+    if( isWorkingOnCustomDirectory() ){
+        QStorageInfo qsi(m_custom_destination_path);
+        QString root = getRoot( qsi );
+        driveList.push_back(m_custom_destination_path);
 
-      VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,qsi);
-      _deviceName2Root.emplace(m_custom_destination_path, vol);
-  }
+        VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,qsi);
+        _deviceName2Root.emplace(m_custom_destination_path, vol);
+    }
 
   return driveList;
 }
@@ -180,17 +174,14 @@ QString DeviceManager::getDrivePath(const QString &driveName) const
         return m_custom_destination_path;
     }
 
-    QString path = QString("");
-    if (m_currentDriveName.isEmpty())
-        return path;
-
-    QString theDriveName = m_currentDriveName;
-    if( driveName!=nullptr ){
-        theDriveName = driveName;
+    if( driveName.isEmpty() )
+    {
+        return "";
     }
-    auto drive = _deviceName2Root.find(theDriveName);
 
-    path = drive->second->storageInfo.rootPath();
+    auto drive = _deviceName2Root.find(driveName);
+
+    QString path = drive->second->storageInfo.rootPath();
     return path;
 }
 
@@ -308,7 +299,7 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
             pleaseWait->show();
         }
 
-        setCurrentDrive(QString());
+        setCurrentDrive("");
         return SUCCESS;
     }
 #else
@@ -347,7 +338,6 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
     if( isWorkingOnCustomDirectory() ){ // we're working on a custom directory, not a drive that's ejectable.
         m_custom_destination_path = QString();
         m_currentDrive = QString();
-        m_currentDriveName = QString();
         return SUCCESS;
     }
 
@@ -390,7 +380,7 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 #endif
 
     m_currentDrive = QString();
-    m_currentDriveName = QString();
+    m_custom_destination_path = QString();
     return SUCCESS;
 }
 
@@ -433,7 +423,6 @@ RetCode DeviceManager::remountDrive(const QString &driveName)
 #endif
 
     m_currentDrive = QString();
-    m_currentDriveName = QString();
     return SUCCESS;
 }
 
@@ -442,7 +431,6 @@ void DeviceManager::setCurrentDrive(const QString &driveName)
     if( !driveName.isEmpty() && driveName==m_custom_destination_path ){
         // from now on, we will work on the custom folder that the user selected.
         m_currentDrive = driveName;
-        m_currentDriveName = driveName;
         qDebug() << "working on custom directory: " << m_custom_destination_path;
         return;
     }
@@ -459,19 +447,6 @@ void DeviceManager::setCurrentDrive(const QString &driveName)
         return;
     }
     m_currentDrive = ret->second->name;
-    m_currentDriveName = driveName;
-
-    qDebug() << m_currentDrive << m_currentDriveName;
-}
-
-QString DeviceManager::selectedDrive() const
-{
-    return m_currentDrive;
-}
-
-QString DeviceManager::selectedDriveName() const
-{
-    return m_currentDriveName;
 }
 
 QString DeviceManager::getFormatCommand(const QString &root, const QString &driveLabel)

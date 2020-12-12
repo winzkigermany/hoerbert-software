@@ -45,6 +45,8 @@ CardPage::CardPage(QWidget *parent)
     m_cardMngLayout->setSpacing(10);
 
     m_driveList = new QComboBox(this);
+    QStringListModel* cbModel = new QStringListModel();
+    m_driveList->setModel(cbModel);
     m_driveList->setObjectName("DriveComboBox");
     m_driveList->setEditable(false);
     m_driveList->setToolTip(tr("Shows available memory cards or drives of this computer"));
@@ -123,7 +125,7 @@ CardPage::CardPage(QWidget *parent)
         connect(shortcut, &QShortcut::activated, this, [this, dir_button] () {
             if (dir_button->percentage() > 0)
                 return;
-            if (!m_deviceManager->selectedDrive().isEmpty())
+            if (!getSelectedDrive().isEmpty())
                 this->onPlaylistButtonClicked(dir_button->ID());
         });
     }
@@ -188,7 +190,7 @@ CardPage::CardPage(QWidget *parent)
         connect(m_dirs.value(key), &QPushButton::clicked, [this, key] (){
             if (m_dirs[key]->percentage() > 0)
                 return;
-            if (!m_deviceManager->selectedDrive().isEmpty())
+            if (!getSelectedDrive().isEmpty())
                 this->onPlaylistButtonClicked(static_cast<qint8>(key));
         });
     }
@@ -247,37 +249,54 @@ CardPage::~CardPage()
 
 void CardPage::updateDriveList()
 {
-    m_driveList->clear();
-    m_driveList->setCurrentText(QString());
-    m_driveList->addItems(m_deviceManager->getDeviceList());
+    QString currentlySelectedDriveBeforeUpdatingList = getSelectedDrive();
+    m_driveList->blockSignals(true);
 
-    bool selectedDriveExists = false;
-    if (!m_deviceManager->selectedDriveName().isEmpty())
+    ListString newDriveList = m_deviceManager->getDeviceList();
+
+    for (int i=m_driveList->count(); i>=0; i-- )
     {
-        for (const auto& drive : m_deviceManager->getDeviceList())
+        QString currentNewDriveString = "";
+        QString comboBoxString = m_driveList->itemText(i);
+
+        bool existsInNewDriveList = false;
+        for (const QString& newDrive : newDriveList)
         {
-            if (drive.compare(m_deviceManager->selectedDriveName()) == 0)
+            if (comboBoxString == newDrive)
             {
-                selectedDriveExists = true;
-                m_driveList->setCurrentText(m_deviceManager->selectedDriveName());
+                existsInNewDriveList = true;
+                currentNewDriveString = newDrive;
+                break;
             }
+        }
+
+        if( !existsInNewDriveList )
+        {
+            m_driveList->removeItem(i);     // the drive does not exist in the new list
+        }
+        else
+        {
+            newDriveList.removeOne( currentNewDriveString );     // the drive already exists in our old list
         }
     }
 
-/*
-    if (!selectedDriveExists || m_deviceManager->selectedDrive().isEmpty())
+    // here, the newDriveList only contains drives that are not in our old list.
+    if( newDriveList.count()>0 )
     {
-        if(!selectedDriveExists && !m_deviceManager->selectedDriveName().isEmpty()) // this is bad, very bad, presumably a user just ripped out the SD card.
-        {
-            if( !m_isFormatting && isHoerbertXMLDirty() )
-            {
-                QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory card has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
-            }
-        }
+        m_driveList->addItems( newDriveList );
+    }
 
+    if( !currentlySelectedDriveBeforeUpdatingList.isEmpty() && -1==m_driveList->findText(currentlySelectedDriveBeforeUpdatingList) )
+    {
+        // the currently selected drive has vanished.
         deselectDrive();
+
+        if( !m_isFormatting )
+        {
+            QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory card has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
+        }
+
     }
-*/
 
     if (m_driveList->count() > 0)
     {
@@ -355,7 +374,7 @@ void CardPage::ejectDrive()
 {
     if (m_isProcessing)
     {
-        auto selected = QMessageBox::question(this, tr("Eject"), QString(tr("Current drive [%1] is being processed.")+"\n\n"+tr("Are you sure you want to eject the drive?")).arg(m_deviceManager->selectedDriveName()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
+        auto selected = QMessageBox::question(this, tr("Eject"), QString(tr("Current drive [%1] is being processed.")+"\n\n"+tr("Are you sure you want to eject the drive?")).arg(getSelectedDrive()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
 
         if (selected == QMessageBox::No)
             return;
@@ -364,8 +383,6 @@ void CardPage::ejectDrive()
     QString currentDevice = m_driveList->currentText();
     if (currentDevice.isEmpty())
     {
-        updateDriveList();
-        deselectDrive();
         return;
     }
 
@@ -496,10 +513,6 @@ void CardPage::initializePlaylists()
     }
 }
 
-void CardPage::selectDrive()
-{
-    selectDrive(m_driveList->currentText(), false);
-}
 
 void CardPage::deselectDrive()
 {
@@ -516,7 +529,7 @@ void CardPage::deselectDrive()
     m_selectDriveButton->show();
 
     emit driveCapacityUpdated(0, 0);
-    emit driveSelected(QString());
+    emit driveSelected("");
 }
 
 void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
@@ -712,7 +725,7 @@ void CardPage::selectDriveByPath(const QString &path)
 
 void CardPage::update()
 {
-    selectDrive();
+    selectDrive(m_driveList->currentText(), false);
 }
 
 void CardPage::updateButtons()
@@ -755,10 +768,10 @@ void CardPage::updateButtons()
 
 void CardPage::initUsedSpace()
 {
-    m_deviceManager->refresh();
-    m_total_bytes = m_deviceManager->getVolumeSize(m_deviceManager->selectedDriveName());
+    m_deviceManager->refresh(getSelectedDrive());
+    m_total_bytes = m_deviceManager->getVolumeSize(getSelectedDrive());   // @TODO: does this still work?
 
-    quint64 availableBytes = m_deviceManager->getAvailableSize(m_deviceManager->selectedDriveName());
+    quint64 availableBytes = m_deviceManager->getAvailableSize(getSelectedDrive());   // @TODO: does this still work?
     quint64 used_bytes = 0;
     if( availableBytes>m_total_bytes )
     {
@@ -829,8 +842,6 @@ void CardPage::switchDiagnosticsMode(bool enabled)
         return;
 
     m_stackWidget->setCurrentIndex(enabled ? 1 : 0);
-    if (!enabled)
-        selectDrive();
 }
 
 bool CardPage::isDiagnosticsModeEnabled()
@@ -878,12 +889,12 @@ void CardPage::setButtonEnabled(int buttonIndex, bool isEnabled)
 
 QString CardPage::currentDrivePath()
 {
-    return tailPath(m_deviceManager->getDrivePath());
+    return tailPath(m_deviceManager->getDrivePath(getSelectedDrive()));
 }
 
 QString CardPage::currentDriveName()
 {
-    return m_deviceManager->selectedDriveName();
+    return getSelectedDrive();  // @TODO: only return the drive name??
 }
 
 void CardPage::setIsProcessing(bool flag)
@@ -920,7 +931,7 @@ QColor CardPage::getPlaylistColor(quint8 id)
 
 void CardPage::onPlaylistButtonClicked(qint8 dir_num)
 {
-    if (m_deviceManager->selectedDrive().isEmpty())
+    if (getSelectedDrive().isEmpty())
         return;
 
     enableButtons(false);
@@ -941,7 +952,7 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
     if (list.isEmpty())
     {
         AudioList empty_list;
-        emit playlistChanged(dir_num, m_deviceManager->getDrivePath(), empty_list);
+        emit playlistChanged(dir_num, m_deviceManager->getDrivePath(getSelectedDrive()), empty_list);
         return;
     }
     std::sort(list.begin(), list.end(), sortByNumber);
@@ -952,7 +963,7 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
     });
     connect(thread, &AudioInfoThread::taskCompleted, this, [this, dir_num] (const AudioList &result) {
         m_dirs[dir_num]->setPercentage(100);
-        emit playlistChanged(dir_num, m_deviceManager->getDrivePath(), result);
+        emit playlistChanged(dir_num, m_deviceManager->getDrivePath(getSelectedDrive()), result);
     });
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
@@ -1001,7 +1012,13 @@ bool CardPage::isWorkingOnCustomDirectory()
     return m_deviceManager->isWorkingOnCustomDirectory();
 }
 
-QString CardPage::getDropDownText()
+QString CardPage::getSelectedDrive()
 {
-    return m_driveList->currentText();
+    if( !m_driveList->isEnabled() )
+    {
+        QString driveName = m_driveList->currentText().section(" ",0).trimmed();
+        return driveName;
+    }
+
+    return "";
 }
