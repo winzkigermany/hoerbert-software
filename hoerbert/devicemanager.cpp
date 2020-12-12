@@ -148,19 +148,19 @@ ListString DeviceManager::getDeviceList()
             QString volume = diskName + " (" + root + ")";
             driveList.push_back(volume);
 
-			VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,v);
+            VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,v);
             _deviceName2Root.emplace(volume,vol);
-      }
-  }
+        }
+    }
 
-  if( isWorkingOnCustomDirectory() ){
-      QStorageInfo qsi(m_custom_destination_path);
-      QString root = getRoot( qsi );
-      driveList.push_back(m_custom_destination_path);
+    if( isWorkingOnCustomDirectory() ){
+        QStorageInfo qsi(m_custom_destination_path);
+        QString root = getRoot( qsi );
+        driveList.push_back(m_custom_destination_path);
 
-      VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,qsi);
-      _deviceName2Root.emplace(m_custom_destination_path, vol);
-  }
+        VolumeInfo_ptr vol=std::make_shared<VolumeInfo>(root,qsi);
+        _deviceName2Root.emplace(m_custom_destination_path, vol);
+    }
 
   return driveList;
 }
@@ -391,6 +391,7 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
 
     m_currentDrive = QString();
     m_currentDriveName = QString();
+    m_custom_destination_path = QString();
     return SUCCESS;
 }
 
