@@ -1584,7 +1584,10 @@ void MainWindow::closeEvent(QCloseEvent *e)
             auto wantToEject = QMessageBox::question(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Do you want to eject the card so you can remove it safely?")), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
             if (wantToEject == QMessageBox::Yes)
             {
-                m_cardPage->ejectDrive();
+                if( !m_cardPage->ejectDrive() )
+                {
+                    QMessageBox::warning(this, "hörbert", QString(tr("The memory card is still in use.")+"\n"+tr("Please try again or try to remove it with your operating system")), QMessageBox::Ok );
+                }
             }
         }
         e->accept();

@@ -370,20 +370,21 @@ void CardPage::formatSelectedDrive(bool retry)
     updateDriveList();
 }
 
-void CardPage::ejectDrive()
+bool CardPage::ejectDrive()
 {
+    bool success = true;
     if (m_isProcessing)
     {
         auto selected = QMessageBox::question(this, tr("Eject"), QString(tr("Current drive [%1] is being processed.")+"\n\n"+tr("Are you sure you want to eject the drive?")).arg(getSelectedDrive()), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
 
         if (selected == QMessageBox::No)
-            return;
+            return false;
     }
 
     QString currentDevice = m_driveList->currentText();
     if (currentDevice.isEmpty())
     {
-        return;
+        return false;
     }
 
     m_pleaseWaitDialog = new PleaseWaitDialog();
@@ -442,14 +443,18 @@ void CardPage::ejectDrive()
             m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer."));
         }
         switchDiagnosticsMode( false );
+        success = true;
     }
     else
     {
         m_pleaseWaitDialog->setResultString( tr("Failed to eject the memory card [%1].").arg(currentDevice)+"\n"+tr("Please try again or try to remove it with your operating system") );
+        success = false;
     }
 
     updateDriveList();
     m_hasFat32WarningShown = false;
+
+    return success;
 }
 
 void CardPage::recreateXml()

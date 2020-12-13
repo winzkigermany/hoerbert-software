@@ -104,7 +104,7 @@ public:
     /**
      * @brief eject a memory card
      */
-    void ejectDrive();
+    bool ejectDrive();
 
     /**
      * @brief recreate hoerbert.xml

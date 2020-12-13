@@ -47,6 +47,7 @@ QString SYNC_PATH;
 
 #if defined (Q_OS_WIN)
 QString ZIP_PATH;
+QString EJECT_DRIVE_PATH;
 #endif
 
 QString HOERBERT_TEMP_PATH;
@@ -112,6 +113,8 @@ int main(int argc, char *argv[])
         FREAC_PATH   = QCoreApplication::applicationDirPath() + FREAC_PATH_WIN + "freaccmd.exe";
 
         SYNC_PATH    = QCoreApplication::applicationDirPath() + "/Sync/sync64.exe";
+
+        EJECT_DRIVE_PATH = QCoreApplication::applicationDirPath() + "/EjectMedia/EjectMedia.exe";
 #else
         FFMPEG_PATH = QCoreApplication::applicationDirPath() + FFMPEG_PATH_WIN + "ffmpeg32.exe";
 
@@ -122,6 +125,8 @@ int main(int argc, char *argv[])
         FREAC_PATH = QCoreApplication::applicationDirPath() + FREAC_PATH_WIN + "freaccmd.exe";
 
         SYNC_PATH    = QCoreApplication::applicationDirPath() + "/Sync/sync.exe";
+
+        EJECT_DRIVE_PATH = QCoreApplication::applicationDirPath() + "/EjectMedia/EjectMedia.exe";
 #endif
 
         HOERBERT_TEMP_PATH = tailPath(QStandardPaths::writableLocation(QStandardPaths::TempLocation));

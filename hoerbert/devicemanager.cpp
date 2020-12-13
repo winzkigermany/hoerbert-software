@@ -35,13 +35,12 @@
 
 
 #ifdef _WIN32
+extern QString EJECT_DRIVE_PATH;
 #include <tchar.h>
-#include <windows.h>
+#include <Windows.h>
 #include <direct.h>
-#include <shlobj.h>
-#include "helper.h"
+#include <ShlObj.h>
 #endif
-
 
 struct VolumeInfo{
 
@@ -339,11 +338,19 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
     QString diskName=ret->second->name;
 
 #ifdef _WIN32
-    auto driveLetter = diskName.at(0);
-  
-    if ( 0 != EjectDriveWin(driveLetter.unicode()) ){
+    QString driveLetter = diskName.at(0);
+    driveLetter = driveLetter.replace("/", "");
+
+    QStringList arguments;
+    arguments << diskName << "-na" << "-a";
+
+    std::pair<int, QString> output = m_processExecutor.executeCommand(EJECT_DRIVE_PATH, arguments);
+
+    qDebug() << output.second;
+
+    if( output.first!=0 || output.second.isEmpty() )
         return FAILURE;
-    }
+
 
 #elif defined (Q_OS_MACOS)
     // we use the "unmount" command, since it does not ask for admin privileges.
@@ -468,7 +475,7 @@ qint64 DeviceManager::getVolumeSize(const QString &driveName)
     {
         return 0;
     }
-    quint64 b = ret->second->storageInfo.bytesTotal()-KEEP_FREE_FOR_DIAGNOSTICS_MODE;
+    qint64 b = ret->second->storageInfo.bytesTotal()-KEEP_FREE_FOR_DIAGNOSTICS_MODE;
     return b;
 }
 
@@ -495,7 +502,7 @@ qint64 DeviceManager::getAvailableSize(const QString &driveName)
         return 0;
     }
 
-    quint64 b = ret->second->storageInfo.bytesAvailable();
+    qint64 b = ret->second->storageInfo.bytesAvailable();
     return b;
 }
 

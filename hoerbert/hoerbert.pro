@@ -62,7 +62,6 @@ SOURCES += \
         dpiscale.cpp \
         functions.cpp \
         generalexception.cpp \
-        helper.cpp \
         hoerbertprocessor.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -96,7 +95,6 @@ HEADERS += \
         dpiscale.h \
         functions.h \
         generalexception.h \
-        helper.h \
         define.h \
         hoerbertprocessor.h \
         mainwindow.h \
@@ -137,6 +135,7 @@ win32 {
                 $$PWD/tools/windows/64/freac \
                 $$PWD/tools/windows/64/Sync \
                 $$PWD/tools/windows/64/7z \
+                $$PWD/tools/windows/64/EjectMedia \
                 $$PWD/tools/diagnostics
 
     } else {
@@ -148,6 +147,7 @@ win32 {
                 $$PWD/tools/windows/32/freac \
                 $$PWD/tools/windows/32/Sync \
                 $$PWD/tools/windows/32/7z \
+                $$PWD/tools/windows/32/EjectMedia \
                 $$PWD/tools/diagnostics
 
     }
