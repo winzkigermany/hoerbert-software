@@ -1022,7 +1022,7 @@ bool CardPage::isWorkingOnCustomDirectory()
     return m_deviceManager->isWorkingOnCustomDirectory();
 }
 
-QString CardPage::getSelectedDrive()
+QString CardPage::getSelectedDrive()    // this IS the drive that the user wants to use and is currently working on.
 {
     if( !m_driveList->isEnabled() )
     {
@@ -1031,4 +1031,9 @@ QString CardPage::getSelectedDrive()
     }
 
     return "";
+}
+
+QString CardPage::getDisplayedDrive()
+{
+    return m_driveList->currentText();  // this is NOT neccessarily the drive that the user wants to use!! (see getSelectedDrive() for that)
 }

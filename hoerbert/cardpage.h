@@ -258,6 +258,12 @@ public:
      */
     QString getSelectedDrive();
 
+    /**
+     * @brief getDisplayedDrive
+     * @return the drive that is currently visible in the comboBox.
+     */
+    QString getDisplayedDrive();
+
 signals:
 
     /**

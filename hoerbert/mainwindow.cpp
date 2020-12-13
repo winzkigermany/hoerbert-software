@@ -235,34 +235,24 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::updateFormatActionAvailability( bool ANDed )
 {
-    if( m_cardPage->getSelectedDrive().isEmpty() )
+    bool isVisible = true;
+
+    if( m_cardPage->getDisplayedDrive().isEmpty() )
     {
-        m_formatAction->setEnabled(false);
+       isVisible = false;
     }
-    else
+
+    if( m_cardPage->isWorkingOnCustomDirectory() || m_cardPage->isDiagnosticsModeEnabled() )
     {
-        if( m_cardPage->isWorkingOnCustomDirectory() || m_cardPage->isDiagnosticsModeEnabled() )
-        {
-            m_formatAction->setEnabled(false);
-        }
-        else
-        {
-            if( m_cardPage->isProcessing() )
-            {
-                m_formatAction->setEnabled(false);
-            }
-            else
-            {
-                if( ANDed ){
-                    m_formatAction->setEnabled(true);
-                }
-                else
-                {
-                    m_formatAction->setEnabled(false);
-                }
-            }
-        }
+        isVisible = false;
     }
+
+    if( m_cardPage->isProcessing() )
+    {
+        isVisible = false;
+    }
+
+    m_formatAction->setEnabled(isVisible & ANDed);
 }
 
 MainWindow::~MainWindow()
