@@ -448,6 +448,7 @@ void CardPage::ejectDrive()
         m_pleaseWaitDialog->setResultString( tr("Failed to eject the memory card [%1].").arg(currentDevice)+"\n"+tr("Please try again or try to remove it with your operating system") );
     }
 
+    updateDriveList();
     m_hasFat32WarningShown = false;
 }
 
@@ -717,10 +718,13 @@ void CardPage::selectDriveByPath(const QString &path)
 {
     m_deviceManager->addCustomPath( path );
     m_deviceManager->getDeviceList();
+
     QString driveName = m_deviceManager->getDriveName(path);
-    selectDrive(driveName);
+    selectDrive(driveName, false);
     m_driveList->addItems(m_deviceManager->getDeviceList());
     m_driveList->setCurrentText(driveName);
+
+    initUsedSpace();
 }
 
 void CardPage::update()
@@ -768,10 +772,11 @@ void CardPage::updateButtons()
 
 void CardPage::initUsedSpace()
 {
-    m_deviceManager->refresh(getSelectedDrive());
-    m_total_bytes = m_deviceManager->getVolumeSize(getSelectedDrive());   // @TODO: does this still work?
+    QString selectedDrive = getSelectedDrive();
+    m_deviceManager->refresh(selectedDrive);
+    m_total_bytes = m_deviceManager->getVolumeSize(selectedDrive);
 
-    quint64 availableBytes = m_deviceManager->getAvailableSize(getSelectedDrive());   // @TODO: does this still work?
+    quint64 availableBytes = m_deviceManager->getAvailableSize(selectedDrive);
     quint64 used_bytes = 0;
     if( availableBytes>m_total_bytes )
     {

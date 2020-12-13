@@ -63,23 +63,12 @@ DeviceManager::DeviceManager()
 
 void DeviceManager::refresh( const QString &driveName )
 {
-    if( isWorkingOnCustomDirectory() ){
-        QStorageInfo qsi;
-        if( driveName!=NULL && !driveName.isEmpty() )
-        {
-            qsi.setPath( driveName );
-        }
-        qsi.refresh();
-
-        return;
-    }
-
     std::map<QString, VolumeInfo_ptr>::const_iterator ret;
-    if( driveName!=NULL && !driveName.isEmpty() )
+    if( !driveName.isEmpty() )
     {
         ret = _deviceName2Root.find(driveName);
+        ret->second->storageInfo.refresh();
     }
-    ret->second->storageInfo.refresh();
 }
 
 bool DeviceManager::isRemovable(const QString &volumeRoot)
@@ -336,8 +325,8 @@ RetCode DeviceManager::formatDrive(QWidget* parentWidget, const QString &driveNa
 RetCode DeviceManager::ejectDrive(const QString &driveName)
 {
     if( isWorkingOnCustomDirectory() ){ // we're working on a custom directory, not a drive that's ejectable.
-        m_custom_destination_path = QString();
-        m_currentDrive = QString();
+        m_custom_destination_path = "";
+        m_currentDrive = "";
         return SUCCESS;
     }
 
@@ -478,7 +467,8 @@ qint64 DeviceManager::getVolumeSize(const QString &driveName)
     {
         return 0;
     }
-    return ret->second->storageInfo.bytesTotal()-KEEP_FREE_FOR_DIAGNOSTICS_MODE;
+    quint64 b = ret->second->storageInfo.bytesTotal()-KEEP_FREE_FOR_DIAGNOSTICS_MODE;
+    return b;
 }
 
 qint64 DeviceManager::getPlaylistSize(const QString playlistPath)
@@ -503,7 +493,9 @@ qint64 DeviceManager::getAvailableSize(const QString &driveName)
     {
         return 0;
     }
-    return ret->second->storageInfo.bytesAvailable();
+
+    quint64 b = ret->second->storageInfo.bytesAvailable();
+    return b;
 }
 
 QString DeviceManager::getVolumeFileSystem(const QString &driveName)
