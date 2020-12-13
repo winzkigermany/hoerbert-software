@@ -44,10 +44,10 @@ QString FFPROBE_PATH;
 QString FFPLAY_PATH;
 QString FREAC_PATH;
 QString SYNC_PATH;
+QString EJECT_DRIVE_PATH;
 
 #if defined (Q_OS_WIN)
 QString ZIP_PATH;
-QString EJECT_DRIVE_PATH;
 #endif
 
 QString HOERBERT_TEMP_PATH;
