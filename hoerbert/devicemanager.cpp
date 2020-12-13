@@ -426,7 +426,8 @@ void DeviceManager::setCurrentDrive(const QString &driveName)
 
     if (driveName.isEmpty())
     {
-        m_currentDrive = driveName;
+        m_currentDrive = "";
+        m_custom_destination_path = "";
         return;
     }
     auto ret = _deviceName2Root.find(driveName);

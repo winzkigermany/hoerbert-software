@@ -517,9 +517,13 @@ void CardPage::initializePlaylists()
 
 void CardPage::deselectDrive()
 {
-    initializePlaylists();
-
     m_deviceManager->setCurrentDrive("");
+    if( isWorkingOnCustomDirectory() )  // we need to throw out our manually selected directory
+    {
+        updateDriveList();
+    }
+
+    initializePlaylists();
 
     setHoerbertXMLDirty( false );
 
@@ -725,6 +729,7 @@ void CardPage::selectDriveByPath(const QString &path)
     m_driveList->setCurrentText(driveName);
 
     initUsedSpace();
+    setCardManageButtonsEnabled(true);
 }
 
 void CardPage::update()
