@@ -146,7 +146,7 @@ private:
     /**
      * @brief updateFormatActionAvailability The format action needs special care as of when to enable or disable it.
      */
-    void updateFormatActionAvailability( bool ANDed = true );
+    void updateActionAvailability( bool ANDed = true );
 
     QString m_migrationPath;
     BackupManager *m_backupManager;

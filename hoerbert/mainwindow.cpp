@@ -111,7 +111,6 @@ MainWindow::MainWindow(QWidget *parent)
             m_printAction->setEnabled(false);
             m_backupAction->setEnabled(false);
             m_restoreAction->setEnabled(false);
-            m_selectManually->setEnabled(true);
 
             if( driveName.isEmpty() )
             {
@@ -136,7 +135,6 @@ MainWindow::MainWindow(QWidget *parent)
             m_restoreAction->setEnabled(true);
             m_advancedFeaturesAction->setEnabled(true);
             m_toggleDiagnosticsModeAction->setEnabled(true);
-            m_selectManually->setEnabled(false);
             m_capBar->setEnabled(true);
 
             if (remind_backup)   // if a differend drive is selected
@@ -154,7 +152,7 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
 
-        updateFormatActionAvailability(true);
+        updateActionAvailability(true);
     });
 
     connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
@@ -233,10 +231,11 @@ MainWindow::MainWindow(QWidget *parent)
     m_dbgDlg = new DebugDialog(this);
 }
 
-void MainWindow::updateFormatActionAvailability( bool ANDed )
+void MainWindow::updateActionAvailability( bool ANDed )
 {
     bool isVisible = true;
 
+    // FIRST: The "format" action
     if( m_cardPage->getDisplayedDrive().isEmpty() )
     {
        isVisible = false;
@@ -253,6 +252,15 @@ void MainWindow::updateFormatActionAvailability( bool ANDed )
     }
 
     m_formatAction->setEnabled(isVisible & ANDed);
+
+
+    // SECOND: The "select drive manually" action
+    isVisible = true;
+    if( !m_cardPage->getSelectedDrive().isEmpty() )
+    {
+        isVisible = false;
+    }
+    m_selectManually->setEnabled(isVisible & ANDed);
 }
 
 MainWindow::~MainWindow()
@@ -413,21 +421,21 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
 
     }, Qt::UniqueConnection);
 
-    updateFormatActionAvailability();
+    updateActionAvailability();
     processor->start();
 }
 
 void MainWindow::processorErrorOccurred(const QString &errorString)
 {
     m_dbgDlg->appendLog(errorString);
-    updateFormatActionAvailability();
+    updateActionAvailability();
 }
 
 void MainWindow::taskCompleted(int failCount, int totalCount)
 {
     Q_UNUSED(failCount)
     Q_UNUSED(totalCount)
-    updateFormatActionAvailability();
+    updateActionAvailability();
 }
 
 void MainWindow::migrate(const QString &dirPath)
@@ -1199,6 +1207,8 @@ void MainWindow::selectDestinationManually()
     if (!dest_path.isEmpty()) {
         m_cardPage->selectDriveByPath( dest_path );
     }
+
+    updateActionAvailability();
 }
 
 void MainWindow::switchDiagnosticsMode()
@@ -1286,7 +1296,7 @@ void MainWindow::switchDiagnosticsMode()
         }
     }
 
-    updateFormatActionAvailability();
+    updateActionAvailability();
     sync();
     m_cardPage->update();
 }
@@ -2143,7 +2153,7 @@ void MainWindow::createActions()
 
     connect(m_cardPage, &CardPage::driveListChanged, this, [=](int numberOfListEntries){
         Q_UNUSED(numberOfListEntries)
-        updateFormatActionAvailability();
+        updateActionAvailability();
     });
 
 
@@ -2208,6 +2218,8 @@ void MainWindow::createActions()
     m_toggleDiagnosticsModeAction->setChecked(false);
     connect(m_toggleDiagnosticsModeAction, &QAction::triggered, this, &MainWindow::switchDiagnosticsMode);
     m_serviceToolsMenu->addAction(m_toggleDiagnosticsModeAction);
+
+    updateActionAvailability();
 }
 
 
@@ -2330,7 +2342,7 @@ void MainWindow::showHideEditMenuEntries( bool showHide, int playlistIndex )
 
     if( playlistIndex>-1 && playlistIndex<9 )
     {
-        updateFormatActionAvailability(false);  // force invisible
+        updateActionAvailability(false);  // force invisible
     }
 }
 
