@@ -1314,6 +1314,7 @@ void MainWindow::enterDiagnosticsMode()
     {
         QString srcDirName = drive_path + QString::number(i);
         QString dstDirName = drive_path + DIAGMODE_ORIGINALS_DIR +"/"+ QString::number(i);
+        qApp->processEvents();
 
         if( !moveDirectory( srcDirName, dstDirName, true ) )        // overwriting move operation
         {
@@ -1326,6 +1327,7 @@ void MainWindow::enterDiagnosticsMode()
 
     if (dir.exists(HOERBERT_XML))
     {
+        qApp->processEvents();
         if (!moveFile(drive_path + HOERBERT_XML, tailPath(drive_path + DIAGMODE_ORIGINALS_DIR) + HOERBERT_XML))
         {
             qDebug() << "Failed moving hoerbert xml file";
@@ -1335,6 +1337,7 @@ void MainWindow::enterDiagnosticsMode()
 
     if (dir.exists(HOERBERT_XML_BACKUP))
     {
+        qApp->processEvents();
         if (!moveFile(drive_path + HOERBERT_XML_BACKUP, tailPath(drive_path + DIAGMODE_ORIGINALS_DIR) + HOERBERT_XML_BACKUP))
         {
             qDebug() << "Failed moving hoerbert xml backup file";
@@ -1382,6 +1385,7 @@ void MainWindow::enterDiagnosticsMode()
         {
             if (diag_dir.exists(QString::number(i)))
             {
+                qApp->processEvents();
                 auto src = tailPath(diag_dir.absolutePath()) + QString::number(i);
                 auto dest = drive_path + QString::number(i);
                 if (!copyRecursively(src, dest))
@@ -1422,6 +1426,7 @@ void MainWindow::exitDiagnosticsMode( bool rollbackMode )
     {
         for (int i = 0; i < 9; i++)
         {
+            qApp->processEvents();
             QDir sub_dir(tailPath(card_dir.absolutePath()) + QString::number(i));
             if (sub_dir.exists())
             {
@@ -1479,6 +1484,7 @@ void MainWindow::exitDiagnosticsMode( bool rollbackMode )
     {
         if (dir.exists(QString::number(i)))
         {
+            qApp->processEvents();
             moveDirectory( dir.absoluteFilePath(QString::number(i)), drive_path+QString::number(i), true );     // yes, drive_path ends with a slash "/".
         }
         m_pleaseWaitDialog->setValue(10 * (i + 1));
@@ -1486,6 +1492,7 @@ void MainWindow::exitDiagnosticsMode( bool rollbackMode )
 
     if (dir.exists(HOERBERT_XML))
     {
+        qApp->processEvents();
         if (!moveFile(tailPath(original_path) + HOERBERT_XML, drive_path + HOERBERT_XML))
         {
             qDebug() << "Failed moving hoerbert xml file";
@@ -1495,6 +1502,7 @@ void MainWindow::exitDiagnosticsMode( bool rollbackMode )
 
     if (dir.exists(HOERBERT_XML_BACKUP))
     {
+        qApp->processEvents();
         if (!moveFile(tailPath(original_path) + HOERBERT_XML_BACKUP, drive_path + HOERBERT_XML_BACKUP))
         {
             qDebug() << "Failed moving hoerbert xml backup file";
