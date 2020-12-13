@@ -1298,6 +1298,7 @@ void MainWindow::switchDiagnosticsMode()
 
     updateFormatActionAvailability();
     sync();
+    m_cardPage->update();
 }
 
 void MainWindow::enterDiagnosticsMode()
