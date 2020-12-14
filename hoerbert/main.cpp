@@ -33,6 +33,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QTextCodec>
+#include <QSslSocket> //To use QSslSocket Class
 
 #include "define.h"
 #include "functions.h"
@@ -290,6 +291,7 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType <AudioList> ("AudioList");
 
+    qDebug()<<QSslSocket::supportsSsl() << QSslSocket::sslLibraryBuildVersionString() << QSslSocket::sslLibraryVersionString();
 
     RunGuard guard( "winzki_hoerbert_app_running" );
     if ( !guard.tryToRun() )
