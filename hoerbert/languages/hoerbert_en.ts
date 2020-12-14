@@ -319,6 +319,11 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>The memory card has disappeared</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../cardpage.cpp" line="353"/>
         <source>Please enter the new name for your card</source>
         <translation type="unfinished"></translation>
@@ -384,15 +389,22 @@ please format the memory card in terminal with the following command:</source>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="296"/>
-        <source>Danger of corrupting the card</source>
+        <source>The memory card has suddenly disappeared.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="296"/>
-        <source>DANGER of corrupting the card.
-The memory card has disappeared suddenly.
-NEVER simply pull the card,
-ALWAYS press the eject button of this app before!</source>
+        <source>This is only OK if you have ejected it properly with the operating system&apos;s eject function.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>Always eject memory cards using the eject button of this app or the operating system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>Never pull the card from the computer without ejecting it first. Doing so may cause data loss.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

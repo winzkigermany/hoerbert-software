@@ -479,9 +479,8 @@ veuillez formater la carte mémoire dans le terminal avec la commande suivante :
         <translation type="vanished">Rendre cette carte compatible avec l&apos;ancien logiciel hoerbert V1.x</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="296"/>
         <source>Danger of corrupting the card</source>
-        <translation>Risque d&apos;endommagement de la carte mémoire</translation>
+        <translation type="vanished">Risque d&apos;endommagement de la carte mémoire</translation>
     </message>
     <message>
         <source>DANGER of corrupting the card.
@@ -494,15 +493,48 @@ Ne tirez JAMAIS simplement sur la carte,
 Appuyez TOUJOURS sur le bouton d&apos;éjection de cette application avant !</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="296"/>
         <source>DANGER of corrupting the card.
 The memory card has disappeared suddenly.
 NEVER simply pull the card,
 ALWAYS press the eject button of this app before!</source>
-        <translation>DANGER de corrompre la carte.
+        <translation type="vanished">DANGER de corrompre la carte.
 La carte mémoire a disparu soudainement.
 Ne tirez JAMAIS simplement sur la carte,
 Appuyez TOUJOURS sur le bouton d&apos;éjection de cet logiciel avant !</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>The memory card has disappeared</source>
+        <translation>La carte mémoire a disparu</translation>
+    </message>
+    <message>
+        <source>The memory card has suddenly disappeared.
+
+This is only OK if you have ejected it properly with the operating system&apos;s eject function.
+
+Always eject memory cards using the eject button of this app or the operating system.
+Never pull the card from the computer without ejecting it first. Doing so may cause data loss.</source>
+        <translation type="vanished">La carte mémoire a soudainement disparu.\n\nCeci n&apos;est acceptable que si vous l&apos;avez éjecté correctement en utilisant la fonction &quot;Eject&quot; du système d&apos;exploitation.\n\nEjectez toujours les cartes mémoire en utilisant le bouton d&apos;éjection de cette application ou du système d&apos;exploitation.\nNe retirez jamais la carte de l&apos;ordinateur sans l&apos;avoir éjectée au préalable. Cela pourrait entraîner la perte de données.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>The memory card has suddenly disappeared.</source>
+        <translation>La carte mémoire a soudainement disparu.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>This is only OK if you have ejected it properly with the operating system&apos;s eject function.</source>
+        <translation>Ceci n&apos;est acceptable que si vous l&apos;avez éjecté correctement en utilisant la fonction &quot;Eject&quot; du système d&apos;exploitation.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>Always eject memory cards using the eject button of this app or the operating system.</source>
+        <translation>Ejectez toujours les cartes mémoire en utilisant le bouton d&apos;éjection de cette application ou du système d&apos;exploitation.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>Never pull the card from the computer without ejecting it first. Doing so may cause data loss.</source>
+        <translation>Ne retirez jamais la carte de l&apos;ordinateur sans l&apos;avoir éjectée au préalable. Cela pourrait entraîner la perte de données.</translation>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="332"/>
