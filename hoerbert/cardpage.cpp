@@ -415,6 +415,8 @@ bool CardPage::ejectDrive()
     m_pleaseWaitDialog->setWaitMessage(tr("Waiting for all write operations to finish."));
     m_pleaseWaitDialog->show();
 
+    qApp->processEvents();
+
     // no need to sync here, because the operating system will do that before ejecting the drive.
     // syncing here may even break the ejection process.
     auto result = m_deviceManager->ejectDrive(currentDevice);
