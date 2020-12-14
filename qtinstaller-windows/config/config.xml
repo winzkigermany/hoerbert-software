@@ -6,11 +6,11 @@
   <Publisher>WINZKI GmbH &amp; Co. KG</Publisher>
   <ProductUrl>https://www.hoerbert.com</ProductUrl>
   <InstallerWindowIcon>@InstallerFilePath@/hoerbert.iconset/icon_512x512.png</InstallerWindowIcon>
-  <StartMenuDir>hörbert</StartMenuDir>
   <TargetDir>@ApplicationsDirX64@/hoerbert</TargetDir>
   <RunProgram>@TargetDir@/hoerbert.exe</RunProgram>
   <AllowSpaceInPath>true</AllowSpaceInPath>
   <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
   <SupportsModify>false</SupportsModify>
   <MaintenanceToolName>hoerbert_install</MaintenanceToolName>
+  <RemoveTargetDir>false</RemoveTargetDir>
 </Installer>
