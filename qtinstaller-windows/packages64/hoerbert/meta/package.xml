@@ -2,7 +2,7 @@
 <Package>
   <DisplayName>hörbert</DisplayName>
   <Description>hörbert Software</Description>
-  <Version>2.1.1</Version>
+  <Version>2.1.2</Version>
   <ReleaseDate>2020-12-14</ReleaseDate>
   <Name>hörbert</Name>
   <Licenses>
