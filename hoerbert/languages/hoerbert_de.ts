@@ -505,20 +505,52 @@ formatiere die Speicherkarte im Terminal bitte mit folgendem Befehl:</translatio
         <translation type="vanished">Mache diese Karte kompatibel zur alten hörbert-Software V1.x</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="296"/>
         <source>Danger of corrupting the card</source>
-        <translation>Gefahr der Beschädigung der Karte</translation>
+        <translation type="vanished">Gefahr der Beschädigung der Karte</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="296"/>
         <source>DANGER of corrupting the card.
 The memory card has disappeared suddenly.
 NEVER simply pull the card,
 ALWAYS press the eject button of this app before!</source>
-        <translation>GEFAHR des Datenverlusts.
+        <translation type="vanished">GEFAHR des Datenverlusts.
 Die Speicherkarte ist plötzlich verschwunden.
 Ziehe die Karte NIEMALS einfach heraus,
 klicke IMMER vorher auf den Auswurfknopf dieser App!</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>The memory card has disappeared</source>
+        <translation>Die Speicherkarte ist verschwunden</translation>
+    </message>
+    <message>
+        <source>The memory card has suddenly disappeared.
+
+This is only OK if you have ejected it properly with the operating system&apos;s eject function.
+
+Always eject memory cards using the eject button of this app or the operating system.
+Never pull the card from the computer without ejecting it first. Doing so may cause data loss.</source>
+        <translation type="vanished">Die Speicherkarte ist plötzlich verschwunden.\n\nDas ist nur OK, wenn Du sie mit der &apos;Auswerfen&apos;-Funktion des Betriebssystems richtig ausgeworfen hast.\n\nWirf Speicherkarten immer mit der &apos;Auswerfen&apos;-Funktion dieser App oder des Betriebssystems aus.\nNiemals die Karte aus dem Computer ziehen, ohne sie vorher auszuwerfen.  Dadurch kann es zu Datenverlusten kommen.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>The memory card has suddenly disappeared.</source>
+        <translation>Die Speicherkarte ist plötzlich verschwunden.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>This is only OK if you have ejected it properly with the operating system&apos;s eject function.</source>
+        <translation>Das ist nur OK, wenn Du sie mit der &apos;Auswerfen&apos;-Funktion des Betriebssystems richtig ausgeworfen hast.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>Always eject memory cards using the eject button of this app or the operating system.</source>
+        <translation>Wirf Speicherkarten immer mit der &apos;Auswerfen&apos;-Funktion dieser App oder des Betriebssystems aus.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="296"/>
+        <source>Never pull the card from the computer without ejecting it first. Doing so may cause data loss.</source>
+        <translation>Ziehe niemals die Karte aus dem Computer, ohne sie vorher auszuwerfen. Dadurch kann es zu Datenverlust kommen.</translation>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="332"/>

@@ -293,7 +293,7 @@ void CardPage::updateDriveList()
 
         if( !m_isFormatting )
         {
-            QMessageBox::critical( this, tr("Danger of corrupting the card"), tr("DANGER of corrupting the card.\nThe memory card has disappeared suddenly.\nNEVER simply pull the card,\nALWAYS press the eject button of this app before!"), QMessageBox::Ok, QMessageBox::Ok );
+            QMessageBox::critical( this, tr("The memory card has disappeared"), tr("The memory card has suddenly disappeared.")+"\n\n"+tr("This is only OK if you have ejected it properly with the operating system's eject function.")+"\n\n"+tr("Always eject memory cards using the eject button of this app or the operating system.")+"\n"+tr("Never pull the card from the computer without ejecting it first. Doing so may cause data loss."), QMessageBox::Ok, QMessageBox::Ok );
         }
 
     }
