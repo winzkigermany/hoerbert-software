@@ -443,7 +443,7 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     arguments.append("-hide_banner");
     arguments.append("-f");
     arguments.append("null");
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     arguments.append("NUL");
 #else
     arguments.append("/dev/null");
@@ -626,7 +626,7 @@ double HoerbertProcessor::getVolumeDifference(const QString &sourceFilePath)
     arguments.append("-f");
     arguments.append("null");
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     arguments.append("NUL");
 #else
     arguments.append("/dev/null");

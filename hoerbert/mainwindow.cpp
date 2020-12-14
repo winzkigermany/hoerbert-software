@@ -995,7 +995,7 @@ void MainWindow::collectInformationForSupport()
 
     QFile::remove( collect_path + ".zip" );         // remove our temp file if it should exist.
 
-#if defined (Q_OS_MAC) || defined (Q_OS_LINUX)
+#if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
     arguments << "-r" << collect_path + ".zip" << COLLECT_FILE_NAME+"/";
 
     std::pair<int, QString> output = m_processExecutor.executeCommand("/usr/bin/zip", arguments, HOERBERT_TEMP_PATH);
@@ -1198,7 +1198,7 @@ void MainWindow::advancedFeatures()
 void MainWindow::selectDestinationManually()
 {
     QString default_path = QString();
-#if defined (Q_OS_MAC)
+#if defined (Q_OS_MACOS)
     default_path = "/Volumes";
 #elif defined (Q_OS_LINUX)
     default_path = "/media";
@@ -1545,7 +1545,13 @@ void MainWindow::about()
 
 void MainWindow::checkForUpdates()
 {
-    QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkVersion2"));
+#if defined (Q_OS_MACOS)
+    QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkMacVersion2"));
+#elif defined (_WIN32)
+    QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkWindowsVersion2"));
+#else
+    QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkLinuxVersion2"));
+#endif
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
     connect(manager, &QNetworkAccessManager::finished, this, [this] (QNetworkReply *reply) {
@@ -1557,7 +1563,7 @@ void MainWindow::checkForUpdates()
         QString result = reply->readAll();
         QString version = result.section(":", 1);
 
-        this->showVersion(version);
+        showVersion(version);
     });
 
     manager->get(request);
@@ -1599,45 +1605,30 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
 void MainWindow::showVersion(const QString &version)
 {
+
+
     QDialog *dlg = new QDialog();
     connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
 
     dlg->setModal(true);
     dlg->setFixedSize(320, 198);
 
-    QLabel *label = new QLabel(dlg);
-    label->setText(tr("This version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version));
-    label->setAlignment(Qt::AlignCenter);
+    QString infoText = tr("This version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version);
+    if( compareVersionWithThisApp(version)<0 )
+    {
+        infoText += "\n\n"+tr("There is a never version of this app available. Do you want do download it?");
+        auto selected = QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes  );
+        if (selected == QMessageBox::Yes)
+        {
+            QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/customer-service/downloads-and-questions-about-transferring-contents/")));
+        }
+    }
+    else
+    {
+        infoText += "\n\n"+tr("There is no never version of this app available.");
+        QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+    }
 
-    QPushButton *download_button = new QPushButton(dlg);
-    download_button->setText(tr("Download"));
-    download_button->setDefault(false);
-
-    connect(download_button, &QPushButton::clicked, this, [dlg] () {
-        dlg->hide();
-        dlg->deleteLater();
-        QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/customer-service/downloads-and-questions-about-transferring-contents/")));
-    });
-
-    QPushButton *cancel_button = new QPushButton(dlg);
-    cancel_button->setText(tr("Cancel"));
-    cancel_button->setDefault(true);
-
-    connect(cancel_button, &QPushButton::clicked, [dlg] () {
-        dlg->hide();
-        dlg->deleteLater();
-    });
-
-    QVBoxLayout *vlay = new QVBoxLayout(dlg);
-
-    QHBoxLayout *button_layout = new QHBoxLayout;
-    button_layout->addWidget(download_button);
-    button_layout->addWidget(cancel_button);
-
-    vlay->addWidget(label);
-    vlay->addLayout(button_layout);
-
-    dlg->show();
 }
 
 void MainWindow::remindBackup()
@@ -2357,3 +2348,27 @@ void MainWindow::showHideEditMenuEntries( bool showHide, int playlistIndex )
     }
 }
 
+
+int MainWindow::compareVersionWithThisApp( const QString& onlineVersionString)
+{
+    QString thisAppVersion = QString(VER_PRODUCTVERSION_STR);
+
+    if(onlineVersionString.isEmpty())
+        return 1;
+
+    if( thisAppVersion==onlineVersionString )
+        return 0;
+
+    QStringList thisParts = thisAppVersion.split(".");
+    QStringList thatParts = onlineVersionString.split(".");
+    int length = std::max(thisParts.count(), thatParts.count());
+    for(int i = 0; i < length; i++) {
+        int thisPart = i < thisParts.count() ? thisParts[i].toInt() : 0;
+        int thatPart = i < thatParts.count() ? thatParts[i].toInt() : 0;
+        if(thisPart < thatPart)
+            return -1;
+        if(thisPart > thatPart)
+            return 1;
+    }
+    return 0;
+}

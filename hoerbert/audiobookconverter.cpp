@@ -259,7 +259,7 @@ double AudioBookConverter::getVolumeDifference(const QString &sourceFilePath)
     arguments.append("-f");
     arguments.append("null");
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     arguments.append("NUL");
 #else
     arguments.append("/dev/null");

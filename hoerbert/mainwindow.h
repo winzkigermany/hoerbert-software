@@ -148,6 +148,12 @@ private:
      */
     void updateActionAvailability( bool ANDed = true );
 
+    /**
+     * @brief isNewerThanThisApp compares the given string to the internal version number string.
+     * @return 0 if the same, -1 if app version is lower than the online version, +1 if app version is higher than the online version
+     */
+    int compareVersionWithThisApp( const QString& onlineVersionString );
+
     QString m_migrationPath;
     BackupManager *m_backupManager;
     QProgressDialog *m_progress;
