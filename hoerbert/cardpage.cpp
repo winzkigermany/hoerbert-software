@@ -215,6 +215,9 @@ CardPage::CardPage(QWidget *parent)
         QTimer::singleShot(MOUNT_VOLUME_DELAY * 600, this, &CardPage::updateDriveList);
     });
 #elif defined (Q_OS_LINUX)
+    m_windowsDriveListener = new WindowsDriveListener();
+    connect(m_windowsDriveListener, &WindowsDriveListener::drivesHaveChanged, this, &CardPage::updateDriveList, Qt::QueuedConnection);
+/*
     QString user_name = qgetenv("USER");
     if (!user_name.isEmpty())
     {
@@ -225,6 +228,7 @@ CardPage::CardPage(QWidget *parent)
             QTimer::singleShot(MOUNT_VOLUME_DELAY * 600, this, &CardPage::updateDriveList);
         });
     }
+*/
 #endif
 }
 
