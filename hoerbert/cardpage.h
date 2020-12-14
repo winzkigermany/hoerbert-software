@@ -54,7 +54,7 @@
 #include "devicemanager.h"
 #include "mainwindow.h"
 
-#ifdef Q_OS_WIN
+#ifndef Q_OS_MACOS
 #include "windowsdrivelistener.h"
 #endif
 
@@ -377,7 +377,7 @@ private:
 
     DeviceManager_ptr m_deviceManager;
 
-#ifdef Q_OS_WIN
+#ifndef Q_OS_MACOS
     WindowsDriveListener* m_windowsDriveListener ;
 #else
     QFileSystemWatcher m_watcher;
