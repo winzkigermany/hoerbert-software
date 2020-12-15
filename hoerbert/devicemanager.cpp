@@ -342,7 +342,7 @@ RetCode DeviceManager::ejectDrive(const QString &driveName)
     driveLetter = driveLetter.replace("/", "");
 
     QStringList arguments;
-    arguments << diskName << "-na" << "-a";
+    arguments << diskName << "-na" << "-l";
 
     std::pair<int, QString> output = m_processExecutor.executeCommand(EJECT_DRIVE_PATH, arguments);
 
