@@ -33,17 +33,17 @@
 #define VER_PRODUCTVERSION_STR      "2.1.2\0"
 
 #define VER_COMPANYNAME_STR         "WINZKI GmbH & CO. KG"
-#define VER_FILEDESCRIPTION_STR     "h\303\266rbert Software"
-#define VER_INTERNALNAME_STR        "h\303\266rbert Software"
 #define VER_LEGALCOPYRIGHT_STR      "Copyright 2019 WINZKI GmbH & Co. KG"
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
-#define VER_PRODUCTNAME_STR         "h\303\266rbert Software"
+//directly set in app.rc because of utf-8 problems: #define VER_PRODUCTNAME_STR         "hörbert Software"
+//directly set in app.rc because of utf-8 problems: #define VER_FILEDESCRIPTION_STR     "hörbert Software"
+//directly set in app.rc because of utf-8 problems: #define VER_INTERNALNAME_STR        "hörbert Software"
 
 #ifdef _WIN32
-    #define VER_ORIGINALFILENAME_STR    "h\303\266rbert.exe"
+    #define VER_ORIGINALFILENAME_STR    "hoerbert.exe"
 #elif defined Q_OS_MACOS
-    #define VER_ORIGINALFILENAME_STR    "h\303\266rbert.app"
+    #define VER_ORIGINALFILENAME_STR    "hoerbert.app"
 #else
     #define VER_ORIGINALFILENAME_STR    "hoerbert.AppImage"
 #endif

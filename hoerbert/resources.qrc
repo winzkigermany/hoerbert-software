@@ -45,5 +45,6 @@
         <file>languages/qtbase_de.qm</file>
         <file>languages/qtbase_en.qm</file>
         <file>languages/qtbase_fr.qm</file>
+        <file>app.rc</file>
     </qresource>
 </RCC>
