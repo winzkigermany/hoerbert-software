@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 You will find the source code of this program here:
-https://github.com/winzkigermany/hoerbert
+https://github.com/winzkigermany/hoerbert-software
 
 This program makes use of other code from other good people, namely
 ffmpeg https://www.ffmpeg.org
