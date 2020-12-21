@@ -6,11 +6,14 @@
   <Publisher>WINZKI GmbH &amp; Co. KG</Publisher>
   <ProductUrl>https://www.hoerbert.com</ProductUrl>
   <InstallerWindowIcon>@InstallerFilePath@/hoerbert.iconset/icon_512x512.png</InstallerWindowIcon>
-  <TargetDir>@ApplicationsDirX64@/hoerbert</TargetDir>
+  <TargetDir>@ApplicationsDir@/hoerbert</TargetDir>
+  <RemoteRepositories>
+      <Repository>
+          <Url>https://www.hoerbert.com/downloads/software-repository/</Url>
+      </Repository>
+  </RemoteRepositories>
   <RunProgram>@TargetDir@/hoerbert.exe</RunProgram>
   <AllowSpaceInPath>true</AllowSpaceInPath>
   <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
-  <SupportsModify>false</SupportsModify>
-  <MaintenanceToolName>hoerbert_install</MaintenanceToolName>
-  <RemoveTargetDir>false</RemoveTargetDir>
+  <ControlScript>control.qs</ControlScript>
 </Installer>

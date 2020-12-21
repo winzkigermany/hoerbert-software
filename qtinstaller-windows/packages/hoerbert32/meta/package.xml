@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+  <DisplayName>hörbert</DisplayName>
+  <Description>hörbert Software, 32 Bit</Description>
+  <Version>2.1.2</Version>
+  <ReleaseDate>2020-12-14</ReleaseDate>
+  <Name>hoerbert32</Name>
+  <Default>false</Default>
+  <Script>installscript.qs</Script>
+  <Licenses>
+    <License name="GPLv3" file="license.txt" />
+  </Licenses>
+</Package>
