@@ -55,7 +55,7 @@ AboutDialog::AboutDialog(QWidget* parent)
                           + tr("You should have received a copy of the GNU General Public License along with this program. If not, see")
                           + " "+"<a href='http://www.gnu.org/licenses/'>http://www.gnu.org/licenses/</a></p><p>"
                           + tr("You will find the source code of this program here:")
-                          + " "+"<a href='https://github.com/winzkigermany/hoerbert'>https://github.com/winzkigermany/hoerbert</a></p><p>"
+                          + " "+"<a href='https://github.com/winzkigermany/hoerbert-software'>https://github.com/winzkigermany/hoerbert-software</a></p><p>"
                           + tr("This program makes use of other code from other good people, namely")
                           + "<br>ffmpeg <a href='https://www.ffmpeg.org'>https://www.ffmpeg.org</a><br>freac <a href='https://www.freac.org'>https://www.freac.org</a><br>sox <a href='http://sox.sourceforge.net'>http://sox.sourceforge.net</a><br>wavsilence <a href='https://github.com/DOSx86/wavsilence'>https://github.com/DOSx86/wavsilence</a><br>QtWaitingSpinner <a href='https://github.com/snowwlex/QtWaitingSpinner'>https://github.com/snowwlex/QtWaitingSpinner</a><br>df by Paul Sadowski<br>EjectMedia <a href='https://www.uwe-sieber.de'>https://www.uwe-sieber.de</a><br>7-Zip <a href='https://7-zip.org'>https://7-Zip.org</a><br>OpenClipart.org <a href='https://www.openclipart.org'>https://OpenClipart.org</a></p></body></html>");
 
