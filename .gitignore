@@ -64,5 +64,8 @@ macdeployqtfix.log
 # packaging files
 qtinstaller-windows/packages32/hoerbert/data/*
 qtinstaller-windows/packages64/hoerbert/data/*
+qtinstaller-windows/packages/hoerbert32/data/*
+qtinstaller-windows/packages/hoerbert64/data/*
+qtinstaller-windows/repository/*
 *.AppImage
 *.AppImage.sig
