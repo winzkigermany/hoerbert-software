@@ -250,17 +250,23 @@ void MainWindow::updateActionAvailability( bool ANDed )
     {
         isVisible = false;
     }
-
     m_formatAction->setEnabled(isVisible & ANDed);
 
-
-    // SECOND: The "select drive manually" action
+    // The "select drive manually" action
     isVisible = true;
     if( !m_cardPage->getSelectedDrive().isEmpty() )
     {
         isVisible = false;
     }
     m_selectManually->setEnabled(isVisible & ANDed);
+
+
+    // The print contents action and the backup action
+    if( m_cardPage->getDisplayedDrive().isEmpty() || m_cardPage->isProcessing() )
+    {
+        m_printAction->setEnabled(false);
+        m_backupAction->setEnabled(false);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -340,6 +346,7 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
 {
     m_cardPage->enableButtons(true);
     showHideEditMenuEntries(false);
+    updateActionAvailability(false);
 
     if (list.count() == 0) {
         m_cardPage->update();
@@ -421,7 +428,6 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
 
     }, Qt::UniqueConnection);
 
-    updateActionAvailability();
     processor->start();
 }
 
