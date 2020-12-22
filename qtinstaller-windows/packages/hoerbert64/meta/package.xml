@@ -2,8 +2,8 @@
 <Package>
   <DisplayName>hörbert</DisplayName>
   <Description>hörbert Software, 64 Bit</Description>
-  <Version>2.1.2</Version>
-  <ReleaseDate>2020-12-14</ReleaseDate>
+  <Version>2.1.3</Version>
+  <ReleaseDate>2020-12-22</ReleaseDate>
   <Name>hoerbert64</Name>
   <Default>false</Default>
   <Script>installscript.qs</Script>
