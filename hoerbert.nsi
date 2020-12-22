@@ -9,9 +9,7 @@ ManifestDPIAware true
 
 !include "UMUI.nsh"
 !include "x64.nsh"
-
-
-; First is default
+!include LogicLib.nsh
 
 # If you change the names "app.exe", "logo.ico", or "license.rtf" you should do a search and replace - they
 # show up in a few places.
@@ -29,7 +27,7 @@ ManifestDPIAware true
 !define UPDATEURL "https://www.hoerbert.com/software_update" # "Product Updates" link
 !define ABOUTURL "http://www.hoerbert.com/" # "Publisher" link
 # This is the size (in kB) of all the files copied into "Program Files"
-!define INSTALLSIZE 153600
+!define INSTALLSIZE 170000  #~166 MB
 !define UMUI_SKIN SoftBrown
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE 1
 !define UMUI_LEFTIMAGE_BMP "Left_hoerbert.bmp"
@@ -38,16 +36,14 @@ ManifestDPIAware true
 
 RequestExecutionLevel admin ;Require admin rights on NT6+ (When UAC is turned on)
  
-InstallDir "$PROGRAMFILES\hoerbert\${APPNAME}"
+InstallDir "$PROGRAMFILES\${APPNAME}"
 SetCompressor lzma
  
 # rtf or txt file - remember if it is txt, it must be in the DOS text format (\r\n)
 # This will be in the installer/uninstaller's title bar
 Name "${APPNAME}"
  
-!include LogicLib.nsh
- 
-# Just three pages - license agreement, install location, and installation
+# Just 4 pages - license agreement, install location, installation, and finish
 !insertmacro MUI_PAGE_LICENSE "License.txt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES 
@@ -60,6 +56,7 @@ Name "${APPNAME}"
 	!insertmacro MUI_UNPAGE_FINISH
 !endif
 
+; first language is the default
 !insertmacro MUI_LANGUAGE "English"
 !insertmacro MUI_LANGUAGE "German"
 !insertmacro MUI_LANGUAGE "French"
@@ -90,9 +87,9 @@ ${EndIf}
   !system 'set __COMPAT_LAYER=RunAsInvoker&"$%TEMP%\tempinstaller.exe"' = 2
  
   ; That will have written an uninstaller binary for us.  Now we sign it with your favorite code signing tool.
-  !system "${SIGNTOOLEXE} sign $%TEMP%\uninstaller.exe" = 0
-  !system "${SIGNTOOLEXE} timestamp /t http://timestamp.comodoca.com $%TEMP%\uninstaller.exe" = 0
-  !system "${SIGNTOOLEXE} verify /pa /d /v $%TEMP%\uninstaller.exe" = 0
+  !system "${SIGNTOOLEXE} sign $%TEMP%\Uninstall.exe" = 0
+  !system "${SIGNTOOLEXE} timestamp /t http://timestamp.comodoca.com $%TEMP%\Uninstall.exe" = 0
+  !system "${SIGNTOOLEXE} verify /pa /d /v $%TEMP%\Uninstall.exe" = 0
  
   ; Good.  Now we can carry on writing the real installer.
   OutFile "..\Build32\hoerbert-installer.exe"
@@ -106,7 +103,7 @@ function .onInit
 	  ; the uninstaller.  This is better than processing a command line option as it means
 	  ; this entire code path is not present in the final (real) installer.
 	  SetSilent silent
-	  WriteUninstaller "$%TEMP%\uninstaller.exe"
+	  WriteUninstaller "$%TEMP%\Uninstall.exe"
 	  Quit  ; just bail out quickly when running the "inner" installer
 	!endif
 
@@ -114,7 +111,7 @@ function .onInit
 	!insertmacro VerifyUserIsAdmin
  
 	${If} ${RunningX64}
-		StrCpy $INSTDIR "$PROGRAMFILES64\hoerbert\${APPNAME}"	# Set "Program Files" as destination under X64
+		StrCpy $INSTDIR "$PROGRAMFILES64\${APPNAME}"	# Set "Program Files" as destination under X64
 	${EndIf}
 
 functionEnd
@@ -137,17 +134,17 @@ section "install"
 	#writeUninstaller "$INSTDIR\uninstall.exe"
 	!ifndef INNER
 	  ; this packages the signed uninstaller	 
-	  File $%TEMP%\uninstaller.exe
+	  File $%TEMP%\Uninstall.exe
 	!endif	
  
 	# Start Menu
-	createDirectory "$SMPROGRAMS\${APPNAME}"
-	createShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\hoerbert.exe" "" "$INSTDIR\hoerbert.ico"
+#	createDirectory "$SMPROGRAMS\${APPNAME}"
+	createShortCut "$SMPROGRAMS\${APPNAME}.lnk" "$INSTDIR\hoerbert.exe" "" "$INSTDIR\hoerbert.ico"
  
 	# Registry information for add/remove programs
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "QuietUninstallString" "$\"$INSTDIR\Uninstall.exe$\" /S"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "InstallLocation" "$\"$INSTDIR$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayIcon" "$\"$INSTDIR\hoerbert.ico$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "Publisher" "$\"${COMPANYNAME}$\""
@@ -176,23 +173,17 @@ sectionEnd
 	# Uninstaller
 	function un.onInit
 		SetShellVarContext all
-	 
-		#Verify the uninstaller - last chance to back out
-	#	MessageBox MB_OKCANCEL "Permanently remove ${APPNAME}?" IDOK next
-	#		Abort
-	#	next:
 		!insertmacro VerifyUserIsAdmin
 	functionEnd 
 
 	; your normal uninstaller section is only needed in the "inner" installer and not needed in the "outer"
   	; installer where it would just cause warnings because there is no WriteUninstaller command in the outer installer
 
-	section "uninstall"
-	 
+	section "uninstall" 
 		# Remove Start Menu launcher
-		delete "$SMPROGRAMS\hörbert\${APPNAME}.lnk"
+		delete "$SMPROGRAMS\${APPNAME}.lnk"
 		# Try to remove the Start Menu folder - this will only happen if it is empty
-		rmDir "$SMPROGRAMS\hörbert"
+#		rmDir "$SMPROGRAMS\${APPNAME}"
 	 
 		# Remove files
 		delete "$INSTDIR\7z\*.*"
@@ -241,12 +232,36 @@ sectionEnd
 		rmdir "$INSTDIR\Sync"
 		delete "$INSTDIR\translations\*.*"
 		rmdir "$INSTDIR\translations"
-		delete "$INSTDIR\*.*"
+		delete "$INSTDIR\hoerbert.exe"
+		delete "$INSTDIR\concrt140.dll"
+		delete "$INSTDIR\libcrypto-1_1-x64.dll"
+		delete "$INSTDIR\libcrypto-1_1.dll"
+		delete "$INSTDIR\libEGL.dll"
+		delete "$INSTDIR\libGLESV2.dll"
+		delete "$INSTDIR\libssl-1_1-x64.dll"
+		delete "$INSTDIR\libssl-1_1.dll"
+		delete "$INSTDIR\msvcp140.dll"
+		delete "$INSTDIR\msvcp140_1.dll"
+		delete "$INSTDIR\msvcp140_2.dll"
+		delete "$INSTDIR\msvcp140_codecvt_ids.dll"
+		delete "$INSTDIR\opengl32sw.dll"
+		delete "$INSTDIR\Qt5Concurrent.dll"
+		delete "$INSTDIR\Qt5Core.dll"
+		delete "$INSTDIR\Qt5Gui.dll"
+		delete "$INSTDIR\Qt5Network.dll"
+		delete "$INSTDIR\Qt5Svg.dll"
+		delete "$INSTDIR\Qt5Widgets.dll"
+		delete "$INSTDIR\Qt5Xml.dll"
+		delete "$INSTDIR\vccorlib140.dll"
+		delete "$INSTDIR\vcruntime140.dll"
+		delete "$INSTDIR\vcruntime140_1.dll"
+		delete "$INSTDIR\hoerbert.ico"
 	 
 		# Always delete uninstaller as the last action
-		delete $INSTDIR\uninstaller.exe
+		delete "$INSTDIR\Uninstall.exe"		
 	 
 		# Try to remove the install directory - this will only happen if it is empty
+		SetOutPath $TEMP
 		rmDir $INSTDIR
 	 
 		# Remove uninstaller information from the registry
