@@ -580,66 +580,66 @@ Never pull the card from the computer without ejecting it first. Doing so may ca
         <translation>Warte auf das Ende aller Schreibvorgänge.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="424"/>
+        <location filename="../cardpage.cpp" line="426"/>
         <source>Finished</source>
         <translation>Fertiggestellt</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="437"/>
-        <location filename="../cardpage.cpp" line="448"/>
+        <location filename="../cardpage.cpp" line="439"/>
+        <location filename="../cardpage.cpp" line="450"/>
         <source>[%1] has been ejected.</source>
         <translation>[%1] wurde ausgeworfen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="437"/>
-        <location filename="../cardpage.cpp" line="448"/>
+        <location filename="../cardpage.cpp" line="439"/>
+        <location filename="../cardpage.cpp" line="450"/>
         <source>It is now safe to remove it from your computer.</source>
         <translation>Jetzt darf die Karte vom Computer getrennt werden.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="437"/>
+        <location filename="../cardpage.cpp" line="439"/>
         <source>If you do not need hoerbert.xml for the old hoerbert app 1.x,
 skip this step by ticking the check box below.</source>
         <translation>Wenn Du hoerbert.xml für die alte hoerbert app 1.x nicht mehr benötigst,
 überspringe diesen Schritt, indem Du das Kontrollkästchen unten ankreuzt.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="444"/>
+        <location filename="../cardpage.cpp" line="446"/>
         <source>I only will use my memory cards with this new software from now on.</source>
         <translation>Ich werde meine Karten ab jetzt nur noch mit dieser neuen Software verwenden.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="455"/>
+        <location filename="../cardpage.cpp" line="457"/>
         <source>Failed to eject the memory card [%1].</source>
         <translation>Die Speicherkarte [%1] konnte nicht ausgeworfen werden.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="455"/>
+        <location filename="../cardpage.cpp" line="457"/>
         <source>Please try again or try to remove it with your operating system</source>
         <translation>Bitte noch einmal versuchen - oder die Karte mit den Funktionen des Betriebssystems auswerfen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="562"/>
+        <location filename="../cardpage.cpp" line="564"/>
         <source>The selected device is write-protected. Please remove the write protection if you want to modify any playlists on it.</source>
         <translation>Das ausgewählte Gerät ist schreibgeschützt. Bitte entferne den Schreibschutz, wenn Du darauf Playlists bearbeiten möchtest.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="581"/>
+        <location filename="../cardpage.cpp" line="583"/>
         <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
         <translation>Das gewählte Ziel ist nicht FAT32 formatiert. Es muss FAT32-formatiert sein, damit hörbert die Daten lesen kann.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="581"/>
+        <location filename="../cardpage.cpp" line="583"/>
         <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
         <translation>Bitte stelle sicher, dass das Ziel FAT32-formatiert ist.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="587"/>
+        <location filename="../cardpage.cpp" line="589"/>
         <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
         <translation>Die gewählte Speicherkarte ist nicht im FAT32-Format formatiert. Sie muss richtig formatiert werden, dadurch werden alle Daten auf der Karte gelöscht.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="587"/>
+        <location filename="../cardpage.cpp" line="589"/>
         <source>Do you you want to format this drive [%1] now?</source>
         <translation>Soll das Laufwerk [%1] jetzt formatiert werden?</translation>
     </message>
@@ -682,11 +682,11 @@ skip this step by ticking the check box below.</source>
         <translation type="vanished">Wird abgebrochen...</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="562"/>
-        <location filename="../cardpage.cpp" line="581"/>
-        <location filename="../cardpage.cpp" line="587"/>
-        <location filename="../cardpage.cpp" line="604"/>
-        <location filename="../cardpage.cpp" line="643"/>
+        <location filename="../cardpage.cpp" line="564"/>
+        <location filename="../cardpage.cpp" line="583"/>
+        <location filename="../cardpage.cpp" line="589"/>
+        <location filename="../cardpage.cpp" line="606"/>
+        <location filename="../cardpage.cpp" line="645"/>
         <source>Select drive</source>
         <translation>Laufwerk auswählen</translation>
     </message>
@@ -695,22 +695,22 @@ skip this step by ticking the check box below.</source>
         <translation type="vanished">Die ausgewählte Speicherkarte wurde nicht im Format FAT32 formatiert.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="604"/>
+        <location filename="../cardpage.cpp" line="606"/>
         <source>Volume size is bigger than 32GB. This may not be a memory card at all.</source>
         <translation>Die Größe der Speicherkarte is größer als 32GB. Ist das überhaupt eine Speicherkarte?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="604"/>
+        <location filename="../cardpage.cpp" line="606"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation>Soll wirklich auf diesem Laufwerk [%1] gearbeitet werden?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="643"/>
+        <location filename="../cardpage.cpp" line="645"/>
         <source>This card has never been used with hörbert.</source>
         <translation>Diese Karte wurde noch nie mit hörbert verwendet.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="643"/>
+        <location filename="../cardpage.cpp" line="645"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation>Möchtest Du sie für die Verwendung mit hörbert vorbereiten?</translation>
     </message>
@@ -2056,42 +2056,42 @@ Möchtest Du alle Änderungen verwerfen?</translation>
         <translation>USB Laufwerk</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="179"/>
+        <location filename="../main.cpp" line="180"/>
         <source>Cannot find ffmpeg binary. Please reinstall this app.</source>
         <translation>Kann das ffmpeg Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="187"/>
+        <location filename="../main.cpp" line="188"/>
         <source>Cannot find ffprobe binary. Please reinstall this app.</source>
         <translation>Kann das ffprobe Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="195"/>
+        <location filename="../main.cpp" line="196"/>
         <source>Cannot find ffplay binary. Please reinstall this app.</source>
         <translation>Kann das ffplay Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="203"/>
+        <location filename="../main.cpp" line="204"/>
         <source>Cannot find freac binary. Please reinstall this app.</source>
         <translation>Kann das freac Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="211"/>
+        <location filename="../main.cpp" line="212"/>
         <source>Cannot find sync binary. Please reinstall this app.</source>
         <translation>Kann das sync Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="220"/>
+        <location filename="../main.cpp" line="221"/>
         <source>Cannot find 7zip binary. Please reinstall this app.</source>
         <translation>Kann das 7zip Tool nicht finden. Bitte diese App neu installieren.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="298"/>
+        <location filename="../main.cpp" line="300"/>
         <source>Already running</source>
         <translation>Läuft bereits</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="298"/>
+        <location filename="../main.cpp" line="300"/>
         <source>This app is already running. It can not be started twice.</source>
         <translation>Diese App läuft bereits. Sie kann nicht zweimal gestartet werden.</translation>
     </message>
@@ -2101,6 +2101,21 @@ Möchtest Du alle Änderungen verwerfen?</translation>
     <message>
         <source>3</source>
         <translation type="vanished">3</translation>
+    </message>
+    <message>
+        <location filename="../triplecheckbox.cpp" line="87"/>
+        <source>Cut up at silence or in 3-minute-chunks?</source>
+        <translation>Zerteilen bei Stille oder in 3-Minuten-häppchen?</translation>
+    </message>
+    <message>
+        <location filename="../triplecheckbox.cpp" line="92"/>
+        <source>Cut at silent parts, at most every 3 minutes</source>
+        <translation>Aufteilen bei Stille, höchstens alle 3 Minuten</translation>
+    </message>
+    <message>
+        <location filename="../triplecheckbox.cpp" line="97"/>
+        <source>Cut in chunks of 3 minutes</source>
+        <translation>In 3-Minuten-Stücke zerteilen</translation>
     </message>
 </context>
 </TS>

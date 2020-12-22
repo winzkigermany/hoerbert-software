@@ -267,49 +267,49 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="437"/>
-        <location filename="../cardpage.cpp" line="448"/>
+        <location filename="../cardpage.cpp" line="439"/>
+        <location filename="../cardpage.cpp" line="450"/>
         <source>[%1] has been ejected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="437"/>
-        <location filename="../cardpage.cpp" line="448"/>
+        <location filename="../cardpage.cpp" line="439"/>
+        <location filename="../cardpage.cpp" line="450"/>
         <source>It is now safe to remove it from your computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="455"/>
+        <location filename="../cardpage.cpp" line="457"/>
         <source>Failed to eject the memory card [%1].</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="455"/>
+        <location filename="../cardpage.cpp" line="457"/>
         <source>Please try again or try to remove it with your operating system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="562"/>
+        <location filename="../cardpage.cpp" line="564"/>
         <source>The selected device is write-protected. Please remove the write protection if you want to modify any playlists on it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="581"/>
+        <location filename="../cardpage.cpp" line="583"/>
         <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="581"/>
+        <location filename="../cardpage.cpp" line="583"/>
         <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="587"/>
+        <location filename="../cardpage.cpp" line="589"/>
         <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="587"/>
+        <location filename="../cardpage.cpp" line="589"/>
         <source>Do you you want to format this drive [%1] now?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -329,31 +329,31 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="562"/>
-        <location filename="../cardpage.cpp" line="581"/>
-        <location filename="../cardpage.cpp" line="587"/>
-        <location filename="../cardpage.cpp" line="604"/>
-        <location filename="../cardpage.cpp" line="643"/>
+        <location filename="../cardpage.cpp" line="564"/>
+        <location filename="../cardpage.cpp" line="583"/>
+        <location filename="../cardpage.cpp" line="589"/>
+        <location filename="../cardpage.cpp" line="606"/>
+        <location filename="../cardpage.cpp" line="645"/>
         <source>Select drive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="604"/>
+        <location filename="../cardpage.cpp" line="606"/>
         <source>Volume size is bigger than 32GB. This may not be a memory card at all.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="604"/>
+        <location filename="../cardpage.cpp" line="606"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="643"/>
+        <location filename="../cardpage.cpp" line="645"/>
         <source>This card has never been used with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="643"/>
+        <location filename="../cardpage.cpp" line="645"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -434,18 +434,18 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="424"/>
+        <location filename="../cardpage.cpp" line="426"/>
         <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="437"/>
+        <location filename="../cardpage.cpp" line="439"/>
         <source>If you do not need hoerbert.xml for the old hoerbert app 1.x,
 skip this step by ticking the check box below.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="444"/>
+        <location filename="../cardpage.cpp" line="446"/>
         <source>I only will use my memory cards with this new software from now on.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1285,43 +1285,61 @@ To avoid data loss, please press the eject button before unplugging it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="179"/>
+        <location filename="../main.cpp" line="180"/>
         <source>Cannot find ffmpeg binary. Please reinstall this app.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="187"/>
+        <location filename="../main.cpp" line="188"/>
         <source>Cannot find ffprobe binary. Please reinstall this app.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="195"/>
+        <location filename="../main.cpp" line="196"/>
         <source>Cannot find ffplay binary. Please reinstall this app.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="203"/>
+        <location filename="../main.cpp" line="204"/>
         <source>Cannot find freac binary. Please reinstall this app.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="211"/>
+        <location filename="../main.cpp" line="212"/>
         <source>Cannot find sync binary. Please reinstall this app.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="220"/>
+        <location filename="../main.cpp" line="221"/>
         <source>Cannot find 7zip binary. Please reinstall this app.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="298"/>
+        <location filename="../main.cpp" line="300"/>
         <source>Already running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="298"/>
+        <location filename="../main.cpp" line="300"/>
         <source>This app is already running. It can not be started twice.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TripleCheckBox</name>
+    <message>
+        <location filename="../triplecheckbox.cpp" line="87"/>
+        <source>Cut up at silence or in 3-minute-chunks?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../triplecheckbox.cpp" line="92"/>
+        <source>Cut at silent parts, at most every 3 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../triplecheckbox.cpp" line="97"/>
+        <source>Cut in chunks of 3 minutes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
