@@ -84,14 +84,17 @@ void TripleCheckBox::paintEvent(QPaintEvent *e)
     switch (m_state)
     {
     case 0:
+        this->setToolTip(tr("Cut up at silence or in 3-minute-chunks?"));
         break;
     case 1:
         painter.setPen(QPen(Qt::black, 3, Qt::SolidLine));
         painter.drawPath(checkPath);
+        this->setToolTip(tr("Cut at silent parts, at most every 3 minutes"));
         break;
     case 2:
         painter.setPen(QColor(255, 0, 0));
         painter.drawText(QRectF(0, 0, 30, 30), Qt::AlignCenter, "3");
+        this->setToolTip(tr("Cut in chunks of 3 minutes"));
         break;
     }
 }
