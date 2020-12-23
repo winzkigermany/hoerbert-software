@@ -24,7 +24,7 @@ BackupRestoreDialog::BackupRestoreDialog(QDialog *parent) : QDialog(parent)
     m_buttonGroup->setLayout(m_buttonVLayout);
 
     m_buttonsLabel = new QLabel(this);
-    m_buttonsLabel->setText(tr("Please choose to merge or replace the contents of the current card."));
+    m_buttonsLabel->setText(tr("Please choose: Merge or replace the contents of the current card?"));
     m_buttonsLabel->setAlignment(Qt::AlignCenter);
     m_buttonVLayout->addWidget(m_buttonsLabel);
 
