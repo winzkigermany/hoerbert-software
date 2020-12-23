@@ -6,7 +6,7 @@
     <dependentAssembly>
       <assemblyIdentity type="win32"
                         name="Winzki.hoerbert.playlist-manager"
-                        version="2.1.1.0"
+                        version="2.1.4.0"
                         processorArchitecture="*"
                         language="*" />
     </dependentAssembly>
