@@ -600,8 +600,8 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         }
     }
 
-    auto size_in_bytes = m_deviceManager->getVolumeSize(driveName);
-    if ( static_cast<int>(size_in_bytes / pow(2, 30)) > VOLUME_SIZE_LIMIT)
+    qint64 size_in_bytes = m_deviceManager->getVolumeSize(driveName);
+    if ( size_in_bytes > (qint64(VOLUME_SIZE_LIMIT)*qint64(1073741824)+1024) )
     {
         auto selected = QMessageBox::question(this, tr("Select drive"), tr("Volume size is bigger than 32GB. This may not be a memory card at all.")+"\n"+tr("Are you sure you want to work on this drive? [%1]").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
         if (selected == QMessageBox::No)

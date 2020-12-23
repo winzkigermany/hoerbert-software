@@ -233,6 +233,11 @@ private:
 
     ProcessExecutor m_processExecutor;
 
+    /**
+     * @brief is the given number of bytes accepted as a drive size for this app?
+     */
+    bool isAcceptableDriveSize( qint64 size );
+
 };
 
 

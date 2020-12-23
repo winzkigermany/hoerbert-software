@@ -119,7 +119,7 @@ ListString DeviceManager::getDeviceList()
     {
         QString root = getRoot(v);
 
-        if(v.isValid() && v.isReady() && isRemovable(root))
+        if(v.isValid() && v.isReady() && isRemovable(root) && isAcceptableDriveSize(v.bytesTotal()) )
         {
             QString diskName = QObject::tr("USB Drive");
             if (v.name() != "")
@@ -181,7 +181,7 @@ QString DeviceManager::getDriveName(const QString &drivePath)
     {
         auto root = getRoot(v);
 
-        if(v.isValid() && v.isReady() && isRemovable(root) && v.rootPath().compare(drivePath) == 0)
+        if(v.isValid() && v.isReady() && isRemovable(root) && isAcceptableDriveSize(v.bytesTotal()) && v.rootPath().compare(drivePath) == 0 )
         {
             QString diskName = QObject::tr("USB Drive");
             if (v.name() != "")
@@ -199,6 +199,25 @@ QString DeviceManager::getDriveName(const QString &drivePath)
     m_custom_destination_path = drivePath;
 
     return m_custom_destination_path;
+}
+
+bool DeviceManager::isAcceptableDriveSize( qint64 size )
+{
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool showLarge = settings.value("showLargeDrives").toBool();
+    settings.endGroup();
+
+    if( showLarge )
+    {
+        return true;
+    }
+    else if( size<VOLUME_SIZE_LIMIT*qint64(1073741824)+1024 )
+    {
+        return true;
+    }
+
+    return false;
 }
 
 #if defined (Q_OS_MACOS) || defined (Q_OS_LINUX)
