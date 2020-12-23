@@ -963,7 +963,7 @@ void MainWindow::collectInformationForSupport()
         }
         else
         {
-            info_list << "No info.xml was found in the card root directory. That means that this card has never been backed up using hoerbert.app 2.x";
+            info_list << "No info.xml was found in the card root directory.";
         }
 
         printTableOfContent(collect_path);
