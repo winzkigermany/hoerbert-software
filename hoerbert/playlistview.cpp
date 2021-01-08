@@ -195,7 +195,7 @@ void PlaylistView::insertBatchAt(const AudioList &list, int index, bool readFrom
 bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=false)
 {
     if (!readFromDrive) {
-        quint64 expectedFileSizeInBytes = WAV_HEADER_SIZE_IN_BYTES + (entry.duration * 32000 * 16 / 8) + MEMORY_SPARE_SPACE_IN_BYTES;
+        quint64 expectedFileSizeInBytes = WAV_HEADER_SIZE_IN_BYTES + (((quint64)entry.duration) * 32000 * 16 / 8) + MEMORY_SPARE_SPACE_IN_BYTES;
 
         qDebug() << expectedFileSizeInBytes << bytesToSeconds(m_totalSpace);
         if ( expectedFileSizeInBytes > (m_totalSpace-m_usedSpace) ) {
