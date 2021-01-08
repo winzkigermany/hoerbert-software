@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export PATH="$HOME/Qt/5.14.1/gcc_64/bin/:$PATH"
-export VERSION="2.1.4"	#linuxdeployqt uses this for the app name
+export VERSION="2.1.5"	#linuxdeployqt uses this for the app name
 
 cp ./hoerbert/hoerbert.png ../Build
 cp ./hoerbert/hoerbert.desktop ../Build
