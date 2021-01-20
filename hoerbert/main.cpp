@@ -145,7 +145,14 @@ int main(int argc, char *argv[])
 
         FFPLAY_PATH  = QCoreApplication::applicationDirPath() + FFMPEG_PATH_MAC + "ffplay";
 
-        FREAC_PATH   = QCoreApplication::applicationDirPath() + FREAC_PATH_MAC + "freaccmd";
+        if( QSysInfo::productVersion().startsWith("11") )
+        {
+            FREAC_PATH   = QCoreApplication::applicationDirPath() + FREAC_PATH_MAC11 + "freaccmd";
+        }
+        else
+        {
+            FREAC_PATH   = QCoreApplication::applicationDirPath() + FREAC_PATH_MAC10 + "freaccmd";
+        }
 
         SYNC_PATH    = "/bin/sync";
 

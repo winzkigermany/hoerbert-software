@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Aften A/52 (AC-3) Encoder</name>
+  <version>1.0</version>
+  <id>aften-enc</id>
+  <type>encoder</type>
+  <replace>ffmpeg-ac3-enc</replace>
+  <format>
+    <name>AC-3 Files</name>
+    <extension>ac3</extension>
+  </format>
+  <input channels="1-6"/>
+  <external>
+    <command>aften</command>
+    <arguments>%OPTIONS %INFILE %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+  </external>
+</component>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM "http://www.freac.org/boca/component.dtd">
+<component>
+  <name>Windows Media Audio Encoder</name>
+  <version>1.0</version>
+  <id>ffmpeg-wma-enc</id>
+  <type>encoder</type>
+  <format>
+    <name>Windows Media Audio Files</name>
+    <extension>wma</extension>
+    <tag id="wma-tag" mode="other">WMA Metadata</tag>
+  </format>
+  <external>
+    <command>ffmpeg</command>
+    <arguments>-f wav -i %INFILE -acodec wmav2 %OPTIONS -y %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Bitrate" argument="-b:a %VALUE000" default="192" enabled="true" step="4">
+	<min alias="%1 kbps">24</min>
+	<max alias="%1 kbps">320</max>
+      </range>
+    </parameters>
+  </external>
+  <external>
+    <command>avconv</command>
+    <arguments>-f wav -i %INFILE -c:a wmav2 %OPTIONS -y %OUTFILE</arguments>
+    <mode>file</mode>
+    <informat>wave</informat>
+    <parameters>
+      <range name="Bitrate" argument="-b:a %VALUE000" default="192" enabled="true" step="4">
+	<min alias="%1 kbps">24</min>
+	<max alias="%1 kbps">320</max>
+      </range>
+    </parameters>
+  </external>
+</component>

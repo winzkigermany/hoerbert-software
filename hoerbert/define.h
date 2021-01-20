@@ -128,7 +128,8 @@ const QString FFMPEG_PATH_MAC                = "/../Resources/ffmpeg/";
 const QString FFMPEG_PATH_LINUX              = "/ffmpeg/";
 
 const QString FREAC_PATH_WIN                 = "/freac/";
-const QString FREAC_PATH_MAC                 = "/../Resources/freac/MacOS/";
+const QString FREAC_PATH_MAC10               = "/../Resources/freac/osx10/MacOS/";
+const QString FREAC_PATH_MAC11               = "/../Resources/freac/osx11/MacOS/";
 const QString FREAC_PATH_LINUX               = "/freac/";
 
 const QString DIAG_FILES_PATH_WIN            = "/diagnostics/";
