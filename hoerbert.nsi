@@ -25,7 +25,7 @@ ManifestDPIAware true
 # It is possible to use "mailto:" links in here to open the email client
 !define HELPURL "https://www.hoerbert.com/service/" # "Support Information" link
 !define UPDATEURL "https://www.hoerbert.com/software_update" # "Product Updates" link
-!define ABOUTURL "http://www.hoerbert.com/" # "Publisher" link
+!define ABOUTURL "https://www.hoerbert.com/" # "Publisher" link
 # This is the size (in kB) of all the files copied into "Program Files"
 !define INSTALLSIZE 170000  #~166 MB
 !define UMUI_SKIN SoftBrown
