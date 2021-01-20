@@ -163,7 +163,6 @@ CardPage::CardPage(QWidget *parent)
     m_diagModeHint->setObjectName("diagModeHintLabel");
     m_diagModeHint->setStyleSheet("#diagModeHintLabel {color:#353535;}");   // always: dark text on wooden background
     m_diagModeHint->setText(tr("This memory card is in diagnostics mode."));
-    m_diagModeHint->setFont(QFont("Console", 12, 50));
 
     m_return2Normal = new QPushButton(m_diagWidget);
     m_return2Normal->setText(tr("Return to normal mode"));
