@@ -53,10 +53,7 @@
 #include "pleasewaitdialog.h"
 #include "devicemanager.h"
 #include "mainwindow.h"
-
-#ifndef Q_OS_MACOS
-#include "windowsdrivelistener.h"
-#endif
+#include "removabledrivelistener.h"
 
 class MainWindow;
 
@@ -377,11 +374,7 @@ private:
 
     DeviceManager_ptr m_deviceManager;
 
-#ifndef Q_OS_MACOS
-    WindowsDriveListener* m_windowsDriveListener ;
-#else
-    QFileSystemWatcher m_watcher;
-#endif
+    RemovableDriveListener* m_windowsDriveListener ;
 
     QWidget *m_cardMngContainer;
     QComboBox *m_driveList;

@@ -72,11 +72,11 @@ SOURCES += \
         playsymbolbutton.cpp \
         pleasewaitdialog.cpp \
         processexecutor.cpp \
+        removabledrivelistener.cpp \
         runguard.cpp \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         waitingspinnerwidget.cpp \
-        windowsdrivelistener.cpp \
         xmlmetadatareader.cpp \
         xmlwriter.cpp
 
@@ -105,12 +105,12 @@ HEADERS += \
         playsymbolbutton.h \
         pleasewaitdialog.h \
         processexecutor.h \
+        removabledrivelistener.h \
         runguard.h \
         triplecheckbox.h \
         triplecheckboxwidget.h \
         version.h \
         waitingspinnerwidget.h \
-        windowsdrivelistener.h \
         xmlmetadatareader.h \
         xmlwriter.h
 

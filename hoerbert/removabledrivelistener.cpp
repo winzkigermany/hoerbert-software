@@ -1,19 +1,19 @@
-#include "windowsdrivelistener.h"
+#include "removabledrivelistener.h"
 
-QMutex WindowsDriveListener::m_checkingMutex;
+QMutex RemovableDriveListener::m_checkingMutex;
 
-WindowsDriveListener::WindowsDriveListener(QObject *parent) : QObject(parent)
+RemovableDriveListener::RemovableDriveListener(QObject *parent) : QObject(parent)
 {    
     m_timer = new QTimer(this);
-    connect(m_timer, &QTimer::timeout, this, &WindowsDriveListener::update);
+    connect(m_timer, &QTimer::timeout, this, &RemovableDriveListener::update);
     m_timer->start(800);    // msec
 }
 
 
-void WindowsDriveListener::update()
+void RemovableDriveListener::update()
 {
 
-    if( !WindowsDriveListener::m_checkingMutex.tryLock() ){
+    if( !RemovableDriveListener::m_checkingMutex.tryLock() ){
         return;
     }
 
@@ -21,7 +21,7 @@ void WindowsDriveListener::update()
     QList<QStorageInfo> newDrivesCopy = newDrives;
 
     if( m_availableDrives==newDrives ){
-        WindowsDriveListener::m_checkingMutex.unlock();
+        RemovableDriveListener::m_checkingMutex.unlock();
         return;
     }
 
@@ -29,7 +29,7 @@ void WindowsDriveListener::update()
     {
         m_availableDrives = newDrives;
         emit drivesHaveChanged();
-        WindowsDriveListener::m_checkingMutex.unlock();
+        RemovableDriveListener::m_checkingMutex.unlock();
         return;
     }
 
@@ -60,7 +60,7 @@ void WindowsDriveListener::update()
 
     if( currentDrives.count()==0 && newDrives.count()==0 )     // all existing drives are still there and no new drive has appeared
     {
-        WindowsDriveListener::m_checkingMutex.unlock();
+        RemovableDriveListener::m_checkingMutex.unlock();
         return;
     }
 
@@ -68,7 +68,7 @@ void WindowsDriveListener::update()
     {
         m_availableDrives = newDrivesCopy;
         emit drivesHaveChanged();
-        WindowsDriveListener::m_checkingMutex.unlock();
+        RemovableDriveListener::m_checkingMutex.unlock();
         return;
     }
 
@@ -76,7 +76,7 @@ void WindowsDriveListener::update()
     {
         m_availableDrives = newDrivesCopy;
         emit drivesHaveChanged();
-        WindowsDriveListener::m_checkingMutex.unlock();
+        RemovableDriveListener::m_checkingMutex.unlock();
         return;
     }
 
@@ -84,7 +84,7 @@ void WindowsDriveListener::update()
     {
         m_availableDrives = newDrivesCopy;
         emit drivesHaveChanged();
-        WindowsDriveListener::m_checkingMutex.unlock();
+        RemovableDriveListener::m_checkingMutex.unlock();
         return;
     }
 

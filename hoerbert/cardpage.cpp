@@ -203,32 +203,8 @@ CardPage::CardPage(QWidget *parent)
         toggleDiagnosticsMode();
     });
 
-#if defined (Q_OS_WIN)
-    m_windowsDriveListener = new WindowsDriveListener();
-    connect(m_windowsDriveListener, &WindowsDriveListener::drivesHaveChanged, this, &CardPage::updateDriveList, Qt::QueuedConnection);
-#elif defined (Q_OS_MACOS)
-    m_watcher.addPath("/Volumes");
-    connect(&m_watcher, &QFileSystemWatcher::directoryChanged, [this] (const QString &path) {
-        Q_UNUSED(path)
-        qDebug() << "Volume change detected!";
-        QTimer::singleShot(MOUNT_VOLUME_DELAY * 600, this, &CardPage::updateDriveList);
-    });
-#elif defined (Q_OS_LINUX)
-    m_windowsDriveListener = new WindowsDriveListener();
-    connect(m_windowsDriveListener, &WindowsDriveListener::drivesHaveChanged, this, &CardPage::updateDriveList, Qt::QueuedConnection);
-/*
-    QString user_name = qgetenv("USER");
-    if (!user_name.isEmpty())
-    {
-        m_watcher.addPath(QString("/media/%1").arg(user_name));
-        connect(&m_watcher, &QFileSystemWatcher::directoryChanged, [this] (const QString &path) {
-            Q_UNUSED(path)
-            qDebug() << "Volume change detected!";
-            QTimer::singleShot(MOUNT_VOLUME_DELAY * 600, this, &CardPage::updateDriveList);
-        });
-    }
-*/
-#endif
+    m_windowsDriveListener = new RemovableDriveListener();
+    connect(m_windowsDriveListener, &RemovableDriveListener::drivesHaveChanged, this, &CardPage::updateDriveList, Qt::QueuedConnection);
 }
 
 CardPage::~CardPage()

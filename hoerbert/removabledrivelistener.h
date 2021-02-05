@@ -1,5 +1,5 @@
-#ifndef WINDOWSDRIVELISTENER_H
-#define WINDOWSDRIVELISTENER_H
+#ifndef REMOVABLEDRIVELISTENER_H
+#define REMOVABLEDRIVELISTENER_H
 
 #include <QObject>
 #include <QStorageInfo>
@@ -7,11 +7,11 @@
 #include <QTimer>
 #include <QMutex>
 
-class WindowsDriveListener : public QObject
+class RemovableDriveListener : public QObject
 {
     Q_OBJECT
 public:
-    explicit WindowsDriveListener(QObject *parent = nullptr);
+    explicit RemovableDriveListener(QObject *parent = nullptr);
 
 signals:
     /**
@@ -31,4 +31,4 @@ private slots:
     void update();
 };
 
-#endif // WINDOWSDRIVELISTENER_H
+#endif // REMOVABLEDRIVELISTENER_H
