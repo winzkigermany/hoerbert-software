@@ -132,6 +132,9 @@ void AudioInfoThread::run()
         }
 
         metadata_title = metadata_title.trimmed();
+        if( metadata_title.length() > 80 ){
+            metadata_title = "..."+metadata_title.right(77);
+        }
 
         // build audio entry from the information
         entry.id = m_IDBeginsFrom++;

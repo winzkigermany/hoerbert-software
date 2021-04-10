@@ -49,6 +49,7 @@
 #include "functions.h"
 
 int CDRipper::uniqueID = 0;
+#define TABLE_MAX_COLS 8
 
 using namespace std;
 
@@ -97,7 +98,7 @@ PlaylistView::PlaylistView(QWidget *parent)
     horizontalHeader()->setStretchLastSection(true);
 
 
-    setColumnCount(8);
+    setColumnCount(TABLE_MAX_COLS);
     hideColumn(ID_COLUMN_INDEX);
 
     setColumnWidth(SCISSORS_COLUMN_INDEX, DEFAULT_ROW_HEIGHT + 10);
@@ -108,6 +109,9 @@ PlaylistView::PlaylistView(QWidget *parent)
     setColumnWidth(DURATION_COLUMN_INDEX, 75);
 #endif
     setColumnWidth(PLAYBUTTON_COLUMN_INDEX, 40);
+
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setHorizontalScrollMode(ScrollMode::ScrollPerPixel);
 
     connect(m_player, &QProcess::stateChanged, this, [this] (QProcess::ProcessState newState) {
        if (newState == QProcess::NotRunning)
@@ -321,7 +325,11 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
         emit durationChanged(m_dirNum, duration);
     }
 
-    this->resizeColumnsToContents();
+    for( int c=2; c<TABLE_MAX_COLS; c++ ){
+        resizeColumnToContents(c);
+    }
+    resizeColumnsToContents();
+
     return true;
 }
 
@@ -689,11 +697,12 @@ void PlaylistView::setDriveSpaceDetails(quint64 used, quint64 total)
 
 void PlaylistView::setColumnVisible(int index, bool visible)
 {
-    if (visible)
+    if (visible){
         showColumn(index);
-    else
+        resizeColumnToContents(index);
+    } else {
         hideColumn(index);
-
+    }
     resizeColumnsToContents();
 }
 
