@@ -396,6 +396,15 @@ void PlaylistView::addSilence(int secs)
         insertSilence(secs, currentRow() + 1);
 }
 
+
+void PlaylistView::addUrl(const QString& newUrl="")
+{
+    if (currentRow() == -1)
+        insertUrl(newUrl, rowCount());
+    else
+        insertUrl(newUrl, currentRow() + 1);
+}
+
 void PlaylistView::insertSilence(int secs, int index)
 {
     if (secs < 0)
@@ -421,6 +430,34 @@ void PlaylistView::insertSilence(int secs, int index)
     entry.duration = secs;
     entry.metadata.title = "silence";
     entry.flag = 5; // silence flag
+
+    m_data[entry.id] = entry;
+    insertEntry(entry, index);
+}
+
+void PlaylistView::insertUrl(const QString& newUrl, int index)
+{
+    currentPlaylistIsUntouched( false );
+    if (index == -1)
+        index = rowCount();
+
+    if (index > rowCount())
+    {
+        index = rowCount();
+    }
+
+    AudioEntry entry;
+    entry.id = useID();
+    entry.order = index;
+    entry.path = "";
+    entry.state = 0;
+    entry.duration = 0;
+    if( newUrl!="" ){
+        entry.metadata.title = newUrl;
+    } else {
+        entry.metadata.title = "URL";
+    }
+    entry.flag = 6; // URL flag
 
     m_data[entry.id] = entry;
     insertEntry(entry, index);

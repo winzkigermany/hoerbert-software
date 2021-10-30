@@ -59,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_migrationPath = QString("");
     m_hasBeenRemindedOfBackup = false;
 
+    m_hoerbertVersion = 0;
+
     QDesktopWidget dw;
     setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
     setWindowTitle("hörbert");
@@ -229,6 +231,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_backupManager = nullptr;
     m_dbgDlg = new DebugDialog(this);
+
+    m_chooseHoerbertDialog = new ChooseHoerbertDialog(this);
+    m_chooseHoerbertDialog->setModal(true);
+    m_chooseHoerbertDialog->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);     // disable the close button. We NEED the user to choose.
+    connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, &MainWindow::setHoerbertModel);
+    m_chooseHoerbertDialog->show();
 }
 
 void MainWindow::updateActionAvailability( bool ANDed )
@@ -267,6 +275,18 @@ void MainWindow::updateActionAvailability( bool ANDed )
         m_printAction->setEnabled(false);
         m_backupAction->setEnabled(false);
     }
+
+    // the hörbert model selection
+    if( m_cardPage->isDiagnosticsModeEnabled() || (!m_cardPage->currentDriveName().isEmpty() && !m_cardPage->isWorkingOnCustomDirectory()) )
+    {
+        m_hoerbertModel2011Action->setEnabled(false);
+        m_hoerbertModel2021Action->setEnabled(false);
+    } else {
+        m_hoerbertModel2011Action->setEnabled(true);
+        m_hoerbertModel2021Action->setEnabled(true);
+    }
+
+
 }
 
 MainWindow::~MainWindow()
@@ -2053,6 +2073,47 @@ void MainWindow::createActions()
     m_viewMenu = new QMenu(tr("View"), this);
     menuBar()->addMenu(m_viewMenu);
 
+    m_hoerbertModelMenu = new QMenu(tr("Select hoerbert model..."), this);
+    m_hoerbertModelMenu->setEnabled(true);
+    m_viewMenu->addMenu( m_hoerbertModelMenu );
+
+
+    m_hoerbertModel2021Action = new QAction(tr("Latest hörbert model"), this);
+    m_hoerbertModel2021Action->setStatusTip(tr("The latest model (starting October 2021). This model has no mechanical on/off switch"));
+    connect(m_hoerbertModel2021Action, &QAction::triggered, this, [this] () {
+        setHoerbertModel(2021);
+    });
+    m_hoerbertModel2021Action->setEnabled(true);
+    m_hoerbertModel2021Action->setCheckable(true);
+    m_hoerbertModelMenu->addAction(m_hoerbertModel2021Action);
+
+
+    m_hoerbertModel2011Action = new QAction(tr("hörbert 2011"), this);
+    m_hoerbertModel2011Action->setStatusTip(tr("All hörbert models starting from 2011 that have a mechanical on/off switch"));
+    connect(m_hoerbertModel2011Action, &QAction::triggered, this, [this] () {
+        setHoerbertModel(2011);
+    });
+    m_hoerbertModel2011Action->setEnabled(true);
+    m_hoerbertModel2011Action->setCheckable(true);
+    m_hoerbertModelMenu->addAction(m_hoerbertModel2011Action);
+
+    {
+        QSettings settings;
+        settings.beginGroup("Global");
+        uint hoerbertModel = settings.value("hoerbertModel").toUInt();
+        if( hoerbertModel==2021 ){
+            m_hoerbertModel2021Action->setChecked(true);
+            m_hoerbertModel2011Action->setChecked(false);
+        } else {
+            m_hoerbertModel2021Action->setChecked(false);
+            m_hoerbertModel2011Action->setChecked(true);
+        }
+        settings.endGroup();
+    }
+
+    m_viewMenu->addSeparator();
+
+
     m_darkModeAction = new QAction(tr("Dark mode"), this);
     m_darkModeAction->setStatusTip(tr("Switch on or off dark mode"));
     m_darkModeAction->setEnabled(true);
@@ -2378,3 +2439,30 @@ int MainWindow::compareVersionWithThisApp( const QString& onlineVersionString)
     }
     return 0;
 }
+
+
+int MainWindow::getHoerbertVersion(){
+    return m_hoerbertVersion;
+}
+
+
+void MainWindow::setHoerbertModel( int modelIdentifier)
+{
+    if( modelIdentifier==2021 ){
+        m_hoerbertVersion = 2021;
+        m_hoerbertModel2021Action->setChecked(true);
+        m_hoerbertModel2011Action->setChecked(false);
+        setWindowTitle("hörbert");
+    } else {
+        m_hoerbertVersion = 2011;
+        m_hoerbertModel2021Action->setChecked(false);
+        m_hoerbertModel2011Action->setChecked(true);
+        setWindowTitle("hörbert 2011");
+    }
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    settings.setValue("hoerbertModel", m_hoerbertVersion);
+    settings.endGroup();
+}
+

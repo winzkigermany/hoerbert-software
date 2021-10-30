@@ -57,6 +57,7 @@ SOURCES += \
         capacitybar.cpp \
         cardpage.cpp \
         cdripper.cpp \
+        choosehoerbertdialog.cpp \
         debugdialog.cpp \
         devicemanager.cpp \
         dpiscale.cpp \
@@ -90,6 +91,7 @@ HEADERS += \
         capacitybar.h \
         cardpage.h \
         cdripper.h \
+        choosehoerbertdialog.h \
         debugdialog.h \
         devicemanager.h \
         dpiscale.h \

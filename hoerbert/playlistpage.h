@@ -125,6 +125,11 @@ public slots:
     void addSilence();
 
     /**
+     * @brief add an url to the position
+     */
+    void addUrl();
+
+    /**
      * @brief add files through file dialog
      */
     void add();
@@ -186,9 +191,12 @@ private:
     QMap<int, AudioList> m_implicitlyMovedList;
 
     QLabel *m_silenceLabel;
+    QLabel *m_urlLabel;
+    QLabel *m_fileLabel;
     QLabel *m_colorBlindHintLabel;
     QComboBox *m_silenceDuration;
     PieButton *m_addSilenceButton;
+    PieButton *m_addUrlButton;
     PieButton *m_addButton;
     PieButton *m_removeButton;
     PieButton *m_commitButton;

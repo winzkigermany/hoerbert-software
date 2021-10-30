@@ -140,11 +140,24 @@ public:
     void addSilence(int secs);
 
     /**
+     * @brief addUrl
+     * @param newUrl
+     */
+    void addUrl(const QString& newUrl);
+
+    /**
      * @brief insertSilence
      * @param secs
      * @param insertAt
      */
     void insertSilence(int secs, int insertAt);
+
+    /**
+     * @brief insertUrl
+     * @param newUrl
+     * @param insertAt
+     */
+    void insertUrl(const QString& newUrl, int insertAt);
 
     /**
      * @brief useID

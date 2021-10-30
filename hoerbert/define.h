@@ -91,7 +91,7 @@ struct AudioEntry {
     QString path; // actual path on disk
     MetaData metadata; // user modified text or original file name
     int duration; // in seconds
-    int flag = -1; // -1: default, 0: added, 1: metadata, 2: split on silence, 3: split per 3, 4: renamed, 5: silence,
+    int flag = -1; // -1: default, 0: added, 1: metadata, 2: split on silence, 3: split per 3, 4: renamed, 5: silence, 6: URL
 };
 
 typedef QMap<int, AudioEntry> AudioList;

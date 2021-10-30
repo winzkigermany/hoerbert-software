@@ -50,6 +50,7 @@
 #include "functions.h"
 #include "playlistview.h"
 #include "backuprestoredialog.h"
+#include "choosehoerbertdialog.h"
 
 class CardPage;
 
@@ -124,6 +125,8 @@ private slots:
     void collectInformationForSupport();
     void showHideEditMenuEntries( bool showHide, int playlistIndex=-1 );
 
+    int getHoerbertVersion();
+
 private:
 
     void closeEvent(QCloseEvent *e) override;
@@ -141,6 +144,8 @@ private:
 
     QString printButtons(int);
 
+    void setHoerbertModel( int modelIdentifier);
+
     bool m_hasBeenRemindedOfBackup = false;  // we set this flag once the user has been reminded of a backup for this card. Then we will keep from reminding him unless a new card is selected.
 
     /**
@@ -154,9 +159,12 @@ private:
      */
     int compareVersionWithThisApp( const QString& onlineVersionString );
 
+    uint m_hoerbertVersion;
     QString m_migrationPath;
     BackupManager *m_backupManager;
     QProgressDialog *m_progress;
+
+    ChooseHoerbertDialog *m_chooseHoerbertDialog;
 
     QStackedWidget *m_stackWidget;
     AboutDialog *m_aboutDlg;
@@ -177,6 +185,7 @@ private:
     QGraphicsDropShadowEffect *m_shadow;
 
     QMenu *m_moveToPlaylistMenu;
+    QMenu *m_hoerbertModelMenu;
     QMenu *m_subMenuBegin;
     QMenu *m_subMenuEnd;
     QMenu *m_backupMenu;
@@ -198,6 +207,8 @@ private:
     QAction *m_showAlbumAction;
     QAction *m_showPathAction;
     QAction *m_darkModeAction;
+    QAction *m_hoerbertModel2011Action;
+    QAction *m_hoerbertModel2021Action;
 
     QAction *m_moveToB1;
     QAction *m_moveToB2;
