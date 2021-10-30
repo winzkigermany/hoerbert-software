@@ -275,18 +275,6 @@ void MainWindow::updateActionAvailability( bool ANDed )
         m_printAction->setEnabled(false);
         m_backupAction->setEnabled(false);
     }
-
-    // the hörbert model selection
-    if( m_cardPage->isDiagnosticsModeEnabled() || (!m_cardPage->currentDriveName().isEmpty() && !m_cardPage->isWorkingOnCustomDirectory()) )
-    {
-        m_hoerbertModel2011Action->setEnabled(false);
-        m_hoerbertModel2021Action->setEnabled(false);
-    } else {
-        m_hoerbertModel2011Action->setEnabled(true);
-        m_hoerbertModel2021Action->setEnabled(true);
-    }
-
-
 }
 
 MainWindow::~MainWindow()
@@ -2079,35 +2067,29 @@ void MainWindow::createActions()
 
 
     m_hoerbertModel2021Action = new QAction(tr("Latest hörbert model"), this);
+    m_hoerbertModel2021Action->setCheckable(true);
     m_hoerbertModel2021Action->setStatusTip(tr("The latest model (starting October 2021). This model has no mechanical on/off switch"));
     connect(m_hoerbertModel2021Action, &QAction::triggered, this, [this] () {
         setHoerbertModel(2021);
     });
-    m_hoerbertModel2021Action->setEnabled(true);
-    m_hoerbertModel2021Action->setCheckable(true);
+    connect( this, &MainWindow::isLatestHoerbert, m_hoerbertModel2021Action, &QAction::setChecked);
     m_hoerbertModelMenu->addAction(m_hoerbertModel2021Action);
 
 
     m_hoerbertModel2011Action = new QAction(tr("hörbert 2011"), this);
+    m_hoerbertModel2011Action->setCheckable(true);
     m_hoerbertModel2011Action->setStatusTip(tr("All hörbert models starting from 2011 that have a mechanical on/off switch"));
     connect(m_hoerbertModel2011Action, &QAction::triggered, this, [this] () {
         setHoerbertModel(2011);
     });
-    m_hoerbertModel2011Action->setEnabled(true);
-    m_hoerbertModel2011Action->setCheckable(true);
+    connect( this, &MainWindow::isNotLatestHoerbert, m_hoerbertModel2011Action, &QAction::setChecked);
     m_hoerbertModelMenu->addAction(m_hoerbertModel2011Action);
 
     {
         QSettings settings;
         settings.beginGroup("Global");
         uint hoerbertModel = settings.value("hoerbertModel").toUInt();
-        if( hoerbertModel==2021 ){
-            m_hoerbertModel2021Action->setChecked(true);
-            m_hoerbertModel2011Action->setChecked(false);
-        } else {
-            m_hoerbertModel2021Action->setChecked(false);
-            m_hoerbertModel2011Action->setChecked(true);
-        }
+        setHoerbertModel( hoerbertModel );
         settings.endGroup();
     }
 
@@ -2446,23 +2428,29 @@ int MainWindow::getHoerbertVersion(){
 }
 
 
-void MainWindow::setHoerbertModel( int modelIdentifier)
+void MainWindow::setHoerbertModel( int modelIdentifier )
 {
     if( modelIdentifier==2021 ){
         m_hoerbertVersion = 2021;
         m_hoerbertModel2021Action->setChecked(true);
         m_hoerbertModel2011Action->setChecked(false);
         setWindowTitle("hörbert");
+        emit isLatestHoerbert(true);
+        emit isNotLatestHoerbert(false);
     } else {
         m_hoerbertVersion = 2011;
         m_hoerbertModel2021Action->setChecked(false);
         m_hoerbertModel2011Action->setChecked(true);
         setWindowTitle("hörbert 2011");
+        emit isLatestHoerbert(false);
+        emit isNotLatestHoerbert(true);
     }
 
     QSettings settings;
     settings.beginGroup("Global");
     settings.setValue("hoerbertModel", m_hoerbertVersion);
     settings.endGroup();
+
+    QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 

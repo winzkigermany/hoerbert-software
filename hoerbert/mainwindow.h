@@ -82,6 +82,8 @@ public:
      */
     void sync();
 
+    int getHoerbertVersion();
+
 
 signals:
     /**
@@ -95,6 +97,9 @@ signals:
      * @return
      */
     void changeCommentColumnVisibility( bool onOff );
+
+    void isLatestHoerbert(bool latestOlder );
+    void isNotLatestHoerbert(bool latestOlder );
 
 
 private slots:
@@ -124,8 +129,6 @@ private slots:
 
     void collectInformationForSupport();
     void showHideEditMenuEntries( bool showHide, int playlistIndex=-1 );
-
-    int getHoerbertVersion();
 
 private:
 

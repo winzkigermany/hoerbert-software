@@ -97,27 +97,12 @@ PlaylistPage::PlaylistPage(QWidget *parent)
 //    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
     m_addSilenceButton->setToolTip(tr("Add silence of given duration"));
 
-    m_urlLabel = new QLabel(this);
-    m_urlLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
-    m_urlLabel->setText(tr("URL:"));
-    m_urlLabel->setStyleSheet("QLabel{ color:#ffffff; }");
-
-    m_addUrlButton = new PieButton(this);
-    m_addUrlButton->setFixedSize(32, 32);
-    m_addUrlButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
-    m_addUrlButton->setMainPixmap(QPixmap(":/images/plus.png"));
-    m_addUrlButton->setShadowEnabled(false);
-//    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
-    m_addUrlButton->setToolTip(tr("Add Internet radio URL"));
 
     m_leftToolLayout->addWidget(m_colorBlindHintLabel);
     m_leftToolLayout->addSpacing(10);
     m_leftToolLayout->addWidget(m_silenceLabel);
     m_leftToolLayout->addWidget(m_silenceDuration);
     m_leftToolLayout->addWidget(m_addSilenceButton);
-    m_leftToolLayout->addSpacing(10);
-    m_leftToolLayout->addWidget(m_urlLabel);
-    m_leftToolLayout->addWidget(m_addUrlButton);
 
 //    m_centerToolLayout = new QHBoxLayout();
 //    m_centerToolLayout->setAlignment(Qt::AlignCenter);
@@ -138,6 +123,27 @@ PlaylistPage::PlaylistPage(QWidget *parent)
 //    m_addButton->setShortcut(QKeySequence("Ctrl+F"));       // not ideal, not adjusted for different OSs
     m_addButton->setToolTip(tr("Add audio files or tracks from Finder/Explorer"));
     m_leftToolLayout->addWidget(m_addButton);
+
+
+    m_urlLabel = new QLabel(this);
+    m_urlLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
+    m_urlLabel->setText(tr("URL:"));
+    connect ( (MainWindow*)parent, SIGNAL(isLatestHoerbert(bool)), m_urlLabel, SLOT(setEnabled(bool)));
+    m_urlLabel->setStyleSheet("QLabel{ color:#ffffff; }");
+
+    m_addUrlButton = new PieButton(this);
+    m_addUrlButton->setFixedSize(32, 32);
+    m_addUrlButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
+    m_addUrlButton->setMainPixmap(QPixmap(":/images/plus.png"));
+    m_addUrlButton->setShadowEnabled(false);
+    connect ( (MainWindow*)parent, SIGNAL(isLatestHoerbert(bool)), m_addUrlButton, SLOT(setEnabled(bool)));
+//    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
+    m_addUrlButton->setToolTip(tr("Add Internet radio URL"));
+
+    m_leftToolLayout->addSpacing(10);
+    m_leftToolLayout->addWidget(m_urlLabel);
+    m_leftToolLayout->addWidget(m_addUrlButton);
+
 
     m_leftToolLayout->addSpacing(30);
 
