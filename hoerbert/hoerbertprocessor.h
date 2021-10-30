@@ -162,9 +162,7 @@ private:
      * @param metadata metadata of audio
      * @return true if success, false otherwise
      */
-    bool convertToWav(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata);
-
-    bool convertToMp3(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata);
+    bool convertToAudioFile(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata);
 
     /**
      * @brief splitPer3Mins split audio per 3 minutes length, the last chunk would be the shortest
@@ -193,9 +191,7 @@ private:
      * @param metadata metadata of audio
      * @return true if success, false otherwise
      */
-    bool createSilenceWav(const QString &destFilePath, int duration, const MetaData &metadata);
-
-    bool createSilenceMp3(const QString &destFilePath, int duration, const MetaData &metadata);
+    bool createSilenceAudioFile(const QString &destFilePath, int duration, const MetaData &metadata);
 
     /**
      * @brief changeMetaData change metadata only

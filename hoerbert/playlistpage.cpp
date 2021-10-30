@@ -135,12 +135,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_urlLabel = new QLabel(this);
     m_urlLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
     m_urlLabel->setText(tr("URL:"));
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this] () {
-        bool isLatest = qApp->property("hoerbertModel")==2011;
-        m_urlLabel->setEnabled( isLatest );
-        m_urlLabel->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
-    });
-
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, &QLabel::setEnabled);
     m_urlLabel->setStyleSheet("QLabel{ color:#ffffff; }");
 
     m_addUrlButton = new PieButton(this);
@@ -148,10 +143,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addUrlButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addUrlButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addUrlButton->setShadowEnabled(false);
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this] () {
-        bool isLatest = qApp->property("hoerbertModel")==2011;
-        m_addUrlButton->setEnabled( isLatest );
-    });
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_addUrlButton, &PieButton::setEnabled);
 
     connect ( (MainWindow*)parent, SIGNAL(isLatestHoerbert(bool)), m_addUrlButton, SLOT(setEnabled(bool)));
 //    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
@@ -209,43 +201,28 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_bluetoothRecordingsRadioButton->setText(tr("Store Bluetooth recordings here"));
     m_bluetoothRecordingsRadioButton->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_bluetoothRecordingsRadioButton->setStyleSheet("QRadioButton{ color:#ffffff; }");
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, [this] () {
-        bool isLatest = qApp->property("hoerbertModel")==2011;
-        m_bluetoothRecordingsRadioButton->setEnabled( isLatest );
-        m_bluetoothRecordingsRadioButton->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
-    });
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setEnabled);
     connect(m_bluetoothRecordingsRadioButton, &QRadioButton::isChecked, this, [this] () {
         emit setBluetoothRecordingPlaylist(m_dirNum, m_bluetoothRecordingsRadioButton->isChecked());
     });
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setEnabled);
 
     m_microphoneRecordingsCheckbox = new QCheckBox(this);
     m_microphoneRecordingsCheckbox->setText(tr("Allow microphone recordings here"));
     m_microphoneRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_microphoneRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, [this] () {
-        bool isLatest = qApp->property("hoerbertModel")==2011;
-        m_microphoneRecordingsCheckbox->setEnabled( isLatest );
-        m_microphoneRecordingsCheckbox->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
-    });
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, &QCheckBox::setEnabled);
     connect(m_microphoneRecordingsCheckbox, &QCheckBox::isChecked, this, [this] () {
         emit allowMicrophoneRecordingsInPlaylist(m_dirNum, m_microphoneRecordingsCheckbox->isChecked());
     });
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, &QRadioButton::setEnabled);
 
     m_wifiRecordingsCheckbox = new QCheckBox(this);
     m_wifiRecordingsCheckbox->setText(tr("Allow internet radio recordings here"));
     m_wifiRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_wifiRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, [this] () {
-        bool isLatest = qApp->property("hoerbertModel")==2011;
-        m_wifiRecordingsCheckbox->setEnabled( isLatest );
-        m_wifiRecordingsCheckbox->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
-    });
-    connect(m_microphoneRecordingsCheckbox, &QCheckBox::isChecked, this, [this] () {
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QCheckBox::setEnabled);
+    connect(m_wifiRecordingsCheckbox, &QCheckBox::isChecked, this, [this] () {
         emit allowWifiRecordingsInPlaylist(m_dirNum, m_wifiRecordingsCheckbox->isChecked());
     });
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QRadioButton::setEnabled);
 
     m_authorizationsLayout->addWidget(m_bluetoothRecordingsRadioButton);
     m_authorizationsLayout->addSpacing(10);

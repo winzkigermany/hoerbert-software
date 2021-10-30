@@ -24,6 +24,7 @@
 
 #include <QObject>
 #include <QXmlStreamReader>
+#include <QApplication>
 
 #include "define.h"
 

@@ -168,7 +168,11 @@ void XmlMetadataReader::processItem(int folderID)
     AudioEntry entry;
     entry.id = m_entryID;
     entry.order = sequence.toInt();
-    entry.path = m_path + QString::number(folderID) + "/" + sequence + DESTINATION_FORMAT_WAV;
+    if( qApp->property("hoerbertModel")==2011 ){
+        entry.path = m_path + QString::number(folderID) + "/" + sequence + DESTINATION_FORMAT_WAV;
+    } else {
+        entry.path = m_path + QString::number(folderID) + "/" + sequence + DESTINATION_FORMAT_MP3;
+    }
     entry.metadata.title = userLabel;
     entry.metadata.comment = QUrl::fromPercentEncoding(source.toUtf8());
     entry.flag = 5; // metadata changed

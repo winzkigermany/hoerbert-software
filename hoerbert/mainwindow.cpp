@@ -319,7 +319,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
         if( qApp->property("hoerbertModel")==2011 ){
             dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
         } else {
-            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
         }
         dir.setSorting(QDir::Name);
 
@@ -348,7 +348,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
                     moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_WAV);
                 }
             } else {
-                if (item.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index
+                if (item.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index
                         && item.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index) {
                     qDebug() << "Index" << index << "is missing in" << sub_dir;
                     moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_MP3);
@@ -591,7 +591,7 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
         if( qApp->property("hoerbertModel")==2011 ){
             dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
         } else {
-            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
         }
         dir.setSorting(QDir::Name);
 

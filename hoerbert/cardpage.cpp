@@ -457,7 +457,7 @@ void CardPage::recreateXml()
         if( qApp->property("hoerbertModel")==2011 ){
             dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
         } else {
-            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
         }
         dir.setSorting(QDir::Name);
 
@@ -665,7 +665,7 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
             if( qApp->property("hoerbertModel")==2011 ){
                 dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
             } else {
-                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
             }
             dir.setSorting(QDir::Name);
 
@@ -684,9 +684,8 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                         break;
                     }
                 } else {
-                    if ( ((currentFile.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index)
-                         && (currentFile.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index))
-                         || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long
+                    if ( currentFile.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index
+                         || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long. We use that as standard
                         isPlausible = false;
                         qDebug() << list;
                         plausibilityFixList.push_back(i);
@@ -966,7 +965,7 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
     if( qApp->property("hoerbertModel")==2011 ){
         dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
     } else {
-        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
     }
     dir.setSorting(QDir::Name);
 

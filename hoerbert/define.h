@@ -122,7 +122,7 @@ enum RetCode {
 const int VOLUME_SIZE_LIMIT                  = 32; // in Gigabytes
 
 const QString DESTINATION_FORMAT_WAV         = ".WAV";
-const QString DESTINATION_FORMAT_MP3         = ".mp3";
+const QString DESTINATION_FORMAT_MP3         = ".MP3";
 
 const QString FFMPEG_PATH_WIN                = "/ffmpeg/";
 const QString FFMPEG_PATH_MAC                = "/../Resources/ffmpeg/";

@@ -107,7 +107,7 @@ void BackupManager::process()
                 if( qApp->property("hoerbertModel")==2011 ){
                     sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
                 } else {
-                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
                 }
                 sub_dir.setFilter(QDir::Files);
                 for (const auto& file : sub_dir.entryList())
@@ -170,7 +170,7 @@ void BackupManager::process()
                 if( qApp->property("hoerbertModel")==2011 ){
                     dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
                 } else {
-                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
                 }
             } else {
                 dir.setNameFilters(QStringList() << "*.flac");

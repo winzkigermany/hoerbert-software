@@ -455,7 +455,7 @@ void PlaylistView::insertUrl(const QString& newUrl, int index)
     if( newUrl!="" ){
         entry.metadata.title = newUrl;
     } else {
-        entry.metadata.title = "URL";
+        entry.metadata.title = tr("* enter URL here *");
     }
     entry.flag = 6; // URL flag
 
