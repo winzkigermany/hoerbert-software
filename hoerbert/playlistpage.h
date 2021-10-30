@@ -33,6 +33,8 @@ class QLabel;
 class QPushButton;
 class QFileInfo;
 class QMenu;
+class QCheckBox;
+class QRadioButton;
 
 class PieButton;
 class PlaylistView;
@@ -118,6 +120,11 @@ signals:
      */
     void errorOccurred(const QString &errorString);
 
+    void setBluetoothRecordingPlaylist(qint8 dirNum, bool onOff);
+    void allowMicrophoneRecordingsInPlaylist(qint8 dirNum, bool onOff);
+    void allowWifiRecordingsInPlaylist(qint8 dirNum, bool onOff);
+
+
 public slots:
     /**
      * @brief add silence to the position
@@ -161,6 +168,11 @@ private slots:
      */
     void onClosePage(bool doCommitChanges);
 
+    void onSetBluetoothRecordingPlaylist( qint8 playlistNumber, bool onOff );
+    void onSetAllowMicrophoneRecordingsInPlaylist( qint8 playlistNumber, bool onOff );
+    void onSetAllowWifiRecordingsInPlaylist( qint8 playlistNumber, bool onOff );
+
+
 private:
     /**
      * @brief getSelectedSilenceDurationInSeconds get duration of silence from combobox in seconds
@@ -203,8 +215,13 @@ private:
     PieButton *m_cancelButton;
     PlaylistView *m_playlistView;
 
+    QRadioButton *m_bluetoothRecordingsRadioButton;
+    QCheckBox *m_microphoneRecordingsCheckbox;
+    QCheckBox *m_wifiRecordingsCheckbox;
+
     QVBoxLayout *m_mainLayout;
     QHBoxLayout *m_toolLayout;
+    QHBoxLayout *m_authorizationsLayout;
     QHBoxLayout *m_leftToolLayout;
     QHBoxLayout *m_centerToolLayout;
     QHBoxLayout *m_rightToolLayout;

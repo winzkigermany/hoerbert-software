@@ -40,6 +40,8 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <QRadioButton>
+#include <QCheckBox>
 
 #include "piebutton.h"
 #include "playlistview.h"
@@ -68,6 +70,11 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_toolLayout->setAlignment(Qt::AlignCenter);
     m_toolLayout->setMargin(0);
     m_toolLayout->setSpacing(5);
+
+    m_authorizationsLayout = new QHBoxLayout();
+    m_authorizationsLayout->setAlignment(Qt::AlignCenter);
+    m_authorizationsLayout->setMargin(0);
+    m_authorizationsLayout->setSpacing(5);
 
     m_leftToolLayout = new QHBoxLayout();
     m_leftToolLayout->setAlignment(Qt::AlignLeft);
@@ -128,7 +135,12 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_urlLabel = new QLabel(this);
     m_urlLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
     m_urlLabel->setText(tr("URL:"));
-    connect ( (MainWindow*)parent, SIGNAL(isLatestHoerbert(bool)), m_urlLabel, SLOT(setEnabled(bool)));
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this, parent] () {
+        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+        m_urlLabel->setEnabled( isLatest );
+        m_urlLabel->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
+    });
+
     m_urlLabel->setStyleSheet("QLabel{ color:#ffffff; }");
 
     m_addUrlButton = new PieButton(this);
@@ -136,6 +148,11 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addUrlButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addUrlButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addUrlButton->setShadowEnabled(false);
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this, parent] () {
+        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+        m_addUrlButton->setEnabled( isLatest );
+    });
+
     connect ( (MainWindow*)parent, SIGNAL(isLatestHoerbert(bool)), m_addUrlButton, SLOT(setEnabled(bool)));
 //    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
     m_addUrlButton->setToolTip(tr("Add Internet radio URL"));
@@ -187,10 +204,60 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_toolLayout->addLayout(m_centerToolLayout, 1);
     m_toolLayout->addLayout(m_rightToolLayout, 1);
 
+    m_bluetoothRecordingsRadioButton = new QRadioButton(this);
+    m_bluetoothRecordingsRadioButton->setCheckable(true);
+    m_bluetoothRecordingsRadioButton->setText(tr("Store Bluetooth recordings here"));
+    m_bluetoothRecordingsRadioButton->setFont(QFont("Monospace", 11, QFont::DemiBold));
+    m_bluetoothRecordingsRadioButton->setStyleSheet("QRadioButton{ color:#ffffff; }");
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, [this, parent] () {
+        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+        m_bluetoothRecordingsRadioButton->setEnabled( isLatest );
+        m_bluetoothRecordingsRadioButton->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
+    });
+    connect(m_bluetoothRecordingsRadioButton, &QRadioButton::isChecked, this, [this] () {
+        emit setBluetoothRecordingPlaylist(m_dirNum, m_bluetoothRecordingsRadioButton->isChecked());
+    });
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setEnabled);
+
+    m_microphoneRecordingsCheckbox = new QCheckBox(this);
+    m_microphoneRecordingsCheckbox->setText(tr("Allow microphone recordings here"));
+    m_microphoneRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
+    m_microphoneRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, [this, parent] () {
+        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+        m_microphoneRecordingsCheckbox->setEnabled( isLatest );
+        m_microphoneRecordingsCheckbox->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
+    });
+    connect(m_microphoneRecordingsCheckbox, &QCheckBox::isChecked, this, [this] () {
+        emit allowMicrophoneRecordingsInPlaylist(m_dirNum, m_microphoneRecordingsCheckbox->isChecked());
+    });
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, &QRadioButton::setEnabled);
+
+    m_wifiRecordingsCheckbox = new QCheckBox(this);
+    m_wifiRecordingsCheckbox->setText(tr("Allow internet radio recordings here"));
+    m_wifiRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
+    m_wifiRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, [this, parent] () {
+        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+        m_wifiRecordingsCheckbox->setEnabled( isLatest );
+        m_wifiRecordingsCheckbox->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
+    });
+    connect(m_microphoneRecordingsCheckbox, &QCheckBox::isChecked, this, [this] () {
+        emit allowWifiRecordingsInPlaylist(m_dirNum, m_wifiRecordingsCheckbox->isChecked());
+    });
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QRadioButton::setEnabled);
+
+    m_authorizationsLayout->addWidget(m_bluetoothRecordingsRadioButton);
+    m_authorizationsLayout->addSpacing(10);
+    m_authorizationsLayout->addWidget(m_microphoneRecordingsCheckbox);
+    m_authorizationsLayout->addSpacing(10);
+    m_authorizationsLayout->addWidget(m_wifiRecordingsCheckbox);
+
     m_playlistView = new PlaylistView(this);
 
     m_mainLayout->addLayout(m_toolLayout);
     m_mainLayout->addWidget(m_playlistView);
+    m_mainLayout->addLayout(m_authorizationsLayout);
 
     setTabOrder(m_playlistView, m_silenceDuration);
     m_playlistView->setFocus();
@@ -582,4 +649,17 @@ const PlaylistView * PlaylistPage::getPlaylistView()
 int PlaylistPage::getPlaylistIndex()
 {
     return m_dirNum;
+}
+
+
+void PlaylistPage::onSetBluetoothRecordingPlaylist( qint8 playlistNumber, bool onOff ){
+
+}
+
+void PlaylistPage::onSetAllowMicrophoneRecordingsInPlaylist( qint8 playlistNumber, bool onOff ){
+
+}
+
+void PlaylistPage::onSetAllowWifiRecordingsInPlaylist( qint8 playlistNumber, bool onOff ){
+
 }
