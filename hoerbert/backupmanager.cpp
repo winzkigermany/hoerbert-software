@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QDebug>
+#include <QApplication>
 
 #include "define.h"
 #include "functions.h"
@@ -103,7 +104,11 @@ void BackupManager::process()
 
             if (sub_dir.exists())
             {
-                sub_dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+                if( qApp->property("hoerbertModel")==2011 ){
+                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+                } else {
+                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+                }
                 sub_dir.setFilter(QDir::Files);
                 for (const auto& file : sub_dir.entryList())
                 {
@@ -161,10 +166,15 @@ void BackupManager::process()
                 continue;
 
             dir.setFilter(QDir::Files | QDir::NoSymLinks);
-            if (m_isBackup)
-                dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
-            else
+            if (m_isBackup){
+                if( qApp->property("hoerbertModel")==2011 ){
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+                } else {
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+                }
+            } else {
                 dir.setNameFilters(QStringList() << "*.flac");
+            }
 
             QFileInfoList file_info_list = dir.entryInfoList();
 
@@ -255,7 +265,11 @@ void BackupManager::process()
 
             if (m_isBackup)
             {
-                success = convertWav2Flac(file_info.filePath(), dest_dir_path + file_info.fileName().replace( DEFAULT_DESTINATION_FORMAT, ".FLAC", Qt::CaseInsensitive));
+                if( qApp->property("hoerbertModel")==2011 ){
+                    success = convertWav2Flac(file_info.filePath(), dest_dir_path + file_info.fileName().replace( DESTINATION_FORMAT_WAV, ".FLAC", Qt::CaseInsensitive));
+                } else {
+                    success = convertMp32Flac(file_info.filePath(), dest_dir_path + file_info.fileName().replace( DESTINATION_FORMAT_MP3, ".FLAC", Qt::CaseInsensitive));
+                }
             }
             else
             {
@@ -269,7 +283,12 @@ void BackupManager::process()
                     destinationFileNumber = QString::number(decimalFileNumber);
                 }
 
-                QString destinationFileName = destinationFileNumber+DEFAULT_DESTINATION_FORMAT;
+                QString destinationFileName;
+                if( qApp->property("hoerbertModel")==2011 ){
+                    destinationFileName = destinationFileNumber+DESTINATION_FORMAT_WAV;
+                } else {
+                    destinationFileName = destinationFileNumber+DESTINATION_FORMAT_MP3;
+                }
 
                 success = convertFlac2Wav(file_info.filePath(), dest_dir_path + destinationFileName);
             }
@@ -396,6 +415,24 @@ bool BackupManager::convertWav2Flac(const QString &sourcePath, const QString des
 
     return output.first==0;
 }
+
+bool BackupManager::convertMp32Flac(const QString &sourcePath, const QString destPath)  // @TODO: Get rid of this
+{
+    qDebug() << sourcePath << " -> " << destPath;
+    QStringList arguments;
+    arguments.append("-i");
+    arguments.append(sourcePath);
+    arguments.append("-c:a");
+    arguments.append("flac");
+    arguments.append("-y");
+    arguments.append("-hide_banner");
+    arguments.append(destPath);
+
+    std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
+
+    return output.first==0;
+}
+
 
 bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString destPath)
 {

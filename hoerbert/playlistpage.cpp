@@ -135,8 +135,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_urlLabel = new QLabel(this);
     m_urlLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
     m_urlLabel->setText(tr("URL:"));
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this, parent] () {
-        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this] () {
+        bool isLatest = qApp->property("hoerbertModel")==2011;
         m_urlLabel->setEnabled( isLatest );
         m_urlLabel->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
     });
@@ -148,8 +148,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addUrlButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addUrlButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addUrlButton->setShadowEnabled(false);
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this, parent] () {
-        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, [this] () {
+        bool isLatest = qApp->property("hoerbertModel")==2011;
         m_addUrlButton->setEnabled( isLatest );
     });
 
@@ -209,8 +209,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_bluetoothRecordingsRadioButton->setText(tr("Store Bluetooth recordings here"));
     m_bluetoothRecordingsRadioButton->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_bluetoothRecordingsRadioButton->setStyleSheet("QRadioButton{ color:#ffffff; }");
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, [this, parent] () {
-        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, [this] () {
+        bool isLatest = qApp->property("hoerbertModel")==2011;
         m_bluetoothRecordingsRadioButton->setEnabled( isLatest );
         m_bluetoothRecordingsRadioButton->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
     });
@@ -223,8 +223,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_microphoneRecordingsCheckbox->setText(tr("Allow microphone recordings here"));
     m_microphoneRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_microphoneRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, [this, parent] () {
-        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, [this] () {
+        bool isLatest = qApp->property("hoerbertModel")==2011;
         m_microphoneRecordingsCheckbox->setEnabled( isLatest );
         m_microphoneRecordingsCheckbox->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
     });
@@ -237,8 +237,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_wifiRecordingsCheckbox->setText(tr("Allow internet radio recordings here"));
     m_wifiRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_wifiRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, [this, parent] () {
-        bool isLatest = ((MainWindow*)parent)->getHoerbertVersion()==2021;
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, [this] () {
+        bool isLatest = qApp->property("hoerbertModel")==2011;
         m_wifiRecordingsCheckbox->setEnabled( isLatest );
         m_wifiRecordingsCheckbox->setStyleSheet("QLabel{ color:rgba(255,255,255,128); }");
     });
@@ -419,7 +419,12 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
     // then we move the selected files to desired directory
     for (const auto& entry : m_clipBoard)
     {
-        QString new_file_name = dest_dir + QString::number(index++) + DEFAULT_DESTINATION_FORMAT;
+        QString new_file_name;
+        if( qApp->property("hoerbertModel")==2011 ){
+            new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_WAV;
+        } else {
+            new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_MP3;
+        }
 
         if (moveFile(entry.path, new_file_name))
         {

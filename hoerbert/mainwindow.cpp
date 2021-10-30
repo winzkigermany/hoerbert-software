@@ -316,7 +316,11 @@ void MainWindow::makePlausible(std::list <int> fixList)
             return;
         }
         dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-        dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+        } else {
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+        }
         dir.setSorting(QDir::Name);
 
         QFileInfoList list = dir.entryInfoList();
@@ -338,9 +342,17 @@ void MainWindow::makePlausible(std::list <int> fixList)
 
         auto index = 0;
         for (const auto &item : list) {
-            if (item.fileName().toLower().remove(DEFAULT_DESTINATION_FORMAT.toLower()).toInt() != index) {
-                qDebug() << "Index" << index << "is missing in" << sub_dir;
-                moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DEFAULT_DESTINATION_FORMAT);
+            if( qApp->property("hoerbertModel")==2011 ){
+                if (item.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index) {
+                    qDebug() << "Index" << index << "is missing in" << sub_dir;
+                    moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_WAV);
+                }
+            } else {
+                if (item.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index
+                        && item.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index) {
+                    qDebug() << "Index" << index << "is missing in" << sub_dir;
+                    moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_MP3);
+                }
             }
             index++;
         }
@@ -576,7 +588,11 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
         QDir dir(sub_dir);
 
         dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-        dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+        } else {
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+        }
         dir.setSorting(QDir::Name);
 
         QFileInfoList list = dir.entryInfoList();
@@ -2445,6 +2461,8 @@ void MainWindow::setHoerbertModel( int modelIdentifier )
         emit isLatestHoerbert(false);
         emit isNotLatestHoerbert(true);
     }
+
+    qApp->setProperty("hoerbertModel", m_hoerbertVersion);
 
     QSettings settings;
     settings.beginGroup("Global");

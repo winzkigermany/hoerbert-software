@@ -454,7 +454,11 @@ void CardPage::recreateXml()
             return;
         }
         dir.setFilter(QDir::Files | QDir::NoSymLinks);
-        dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+        } else {
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+        }
         dir.setSorting(QDir::Name);
 
         file_info_list.append(dir.entryInfoList());
@@ -658,7 +662,11 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                 return;
             }
             dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-            dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+            if( qApp->property("hoerbertModel")==2011 ){
+                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+            } else {
+                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+            }
             dir.setSorting(QDir::Name);
 
             QFileInfoList list = dir.entryInfoList();
@@ -667,12 +675,25 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
             // check plausibility at this point.
             auto index = 0;
             for (QFileInfo currentFile : list) {
-                if ( currentFile.fileName().toLower().remove(DEFAULT_DESTINATION_FORMAT.toLower()).toInt() != index || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long
-                    isPlausible = false;
-                    qDebug() << list;
-                    plausibilityFixList.push_back(i);
-                    break;
+                if( qApp->property("hoerbertModel")==2011 ){
+                    if ( currentFile.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index
+                         || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long
+                        isPlausible = false;
+                        qDebug() << list;
+                        plausibilityFixList.push_back(i);
+                        break;
+                    }
+                } else {
+                    if ( ((currentFile.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index)
+                         && (currentFile.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index))
+                         || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long
+                        isPlausible = false;
+                        qDebug() << list;
+                        plausibilityFixList.push_back(i);
+                        break;
+                    }
                 }
+
                 index++;
             }
 
@@ -942,7 +963,11 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
     QDir dir(sub_dir);
 
     dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+    if( qApp->property("hoerbertModel")==2011 ){
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3);
+    }
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();

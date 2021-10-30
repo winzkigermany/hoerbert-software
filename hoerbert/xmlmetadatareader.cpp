@@ -168,7 +168,7 @@ void XmlMetadataReader::processItem(int folderID)
     AudioEntry entry;
     entry.id = m_entryID;
     entry.order = sequence.toInt();
-    entry.path = m_path + QString::number(folderID) + "/" + sequence + DEFAULT_DESTINATION_FORMAT;
+    entry.path = m_path + QString::number(folderID) + "/" + sequence + DESTINATION_FORMAT_WAV;
     entry.metadata.title = userLabel;
     entry.metadata.comment = QUrl::fromPercentEncoding(source.toUtf8());
     entry.flag = 5; // metadata changed

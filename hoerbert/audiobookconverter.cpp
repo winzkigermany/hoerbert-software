@@ -26,6 +26,7 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QDir>
+#include <QApplication>
 
 #include "define.h"
 
@@ -115,7 +116,12 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         metadata.resize(m_maxMetadataLength, ' ');
         arguments.replace(13, QString("title=%1").arg(metadata.trimmed()));
 
-        auto output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DEFAULT_DESTINATION_FORMAT;
+        QString output_path;
+        if( qApp->property("hoerbertModel")==2011 ){
+            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_WAV;
+        } else {
+            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_MP3;
+        }
         arguments.replace(lastArgumentIndex, output_path);
 
         info_list.append(output_path);
