@@ -370,6 +370,10 @@ private:
 
     void openWifiDialog();
 
+    bool hasWavFiles( QString );
+
+    void convertAllWavFilesToMp3( QString rootPath);
+
     bool m_isProcessing;
     bool m_migrationSuggested;
     bool m_hoerbertXMLIsDirty;

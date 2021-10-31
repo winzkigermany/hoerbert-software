@@ -394,8 +394,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
                     moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_WAV);
                 }
             } else {
-                if (item.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index
-                        && item.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index) {
+                if (item.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index) {
                     qDebug() << "Index" << index << "is missing in" << sub_dir;
                     moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_MP3);
                 }
@@ -407,6 +406,7 @@ void MainWindow::makePlausible(std::list <int> fixList)
     sync();
     m_plausibilityCheckMutex.unlock();
 }
+
 
 
 /**

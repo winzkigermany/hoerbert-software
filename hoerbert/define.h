@@ -119,7 +119,7 @@ enum RetCode {
 /*!
  * \brief Path and files
  */
-const int VOLUME_SIZE_LIMIT                  = 32; // in Gigabytes
+const int VOLUME_SIZE_LIMIT                  = 64; // in Gigabytes
 
 const QString DESTINATION_FORMAT_WAV         = ".WAV";
 const QString DESTINATION_FORMAT_MP3         = ".MP3";

@@ -528,6 +528,51 @@ void CardPage::deselectDrive()
     emit driveSelected("");
 }
 
+
+
+/**
+* @brief CardPage::hasWavFiles
+*/
+bool CardPage::hasWavFiles( QString rootPath){
+    QStringList nameFilter("*.wav");
+
+    bool foundOne = false;
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        qDebug() << "Searching for *.wav in " << rootPath+QString::number(i);
+        QDir directory(rootPath+QString::number(i));
+        QStringList txtFilesAndDirectories = directory.entryList(nameFilter, QDir::AllEntries|QDir::NoDotAndDotDot);
+        if( txtFilesAndDirectories.length()>0 ){
+            foundOne = true;
+            break;
+        }
+    }
+
+    return foundOne;
+}
+
+
+void CardPage::convertAllWavFilesToMp3( QString rootPath){
+    QStringList nameFilter("*.wav");
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        qDebug() << "Searching for *.wav in " << rootPath+QString::number(i);
+        QDir directory(rootPath+QString::number(i));
+        QStringList txtFilesAndDirectories = directory.entryList(nameFilter, QDir::AllEntries|QDir::NoDotAndDotDot);
+        for ( const auto& iterator : txtFilesAndDirectories  )
+        {
+            HoerbertProcessor *processor = new HoerbertProcessor(rootPath+QString::number(i)+"/"+iterator, -1);
+            QFileInfo wavFile( rootPath+QString::number(i) +"/"+ iterator);
+            qDebug()<<wavFile.absoluteFilePath();
+            QString mp3FileName = wavFile.path() + "/" + wavFile.completeBaseName() + ".mp3";
+            mp3FileName.toLower().replace( ".wav", ".mp3" );
+
+            processor->convertToMp3( wavFile.absoluteFilePath(), mp3FileName, true);
+        }
+    }
+
+}
+
+
 void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 {
     if (driveName.isEmpty())
@@ -582,7 +627,7 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
     qint64 size_in_bytes = m_deviceManager->getVolumeSize(driveName);
     if ( size_in_bytes > (qint64(VOLUME_SIZE_LIMIT)*qint64(1073741824)+1024) )
     {
-        auto selected = QMessageBox::question(this, tr("Select drive"), tr("Volume size is bigger than 32GB. This may not be a memory card at all.")+"\n"+tr("Are you sure you want to work on this drive? [%1]").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
+        auto selected = QMessageBox::question(this, tr("Select drive"), tr("Volume size is bigger than 64GB. This may not be a memory card at all.")+"\n"+tr("Are you sure you want to work on this drive? [%1]").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
         if (selected == QMessageBox::No)
         {
             updateDriveList();
@@ -590,12 +635,21 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         }
     }
 
+
     bool isPlausible = true;
     std::list <int> plausibilityFixList;
 
     m_deviceManager->setCurrentDrive(driveName);
 
     QString drive_path = currentDrivePath();
+
+    if( hasWavFiles(drive_path) ){
+        auto selected = QMessageBox::question(this, tr("Convert files"), tr("There are large files on the card.")+"\n"+tr("Free some space by converting files to mp3?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+        if (selected == QMessageBox::Yes)
+        {
+            convertAllWavFilesToMp3(drive_path);
+        }
+    }
 
     QDir dir(drive_path);
     if (dir.exists(DIAGMODE_FILE))
@@ -702,11 +756,13 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         }
 
         //migrate old cards to the new format if there is no hoerbert.bak file on the card.
-        if (!m_migrationSuggested && QFile::exists(drive_path + HOERBERT_XML)) {
-            if (!QFile::exists(drive_path + HOERBERT_XML_BACKUP) && QFile::exists(drive_path + HOERBERT_XML)  )
-            {
-                emit migrationNeeded(drive_path);
-                m_migrationSuggested = true;
+        if( qApp->property("hoerbertModel")==2011 ){
+            if (!m_migrationSuggested && QFile::exists(drive_path + HOERBERT_XML)) {
+                if (!QFile::exists(drive_path + HOERBERT_XML_BACKUP) && QFile::exists(drive_path + HOERBERT_XML)  )
+                {
+                    emit migrationNeeded(drive_path);
+                    m_migrationSuggested = true;
+                }
             }
         }
     }

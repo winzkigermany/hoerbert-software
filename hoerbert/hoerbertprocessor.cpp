@@ -412,6 +412,7 @@ bool HoerbertProcessor::convertToAudioFile(const QString &sourceFilePath, const 
         arguments.append("-b:a");        // bit rate
         arguments.append("192k");
     }
+
     arguments.append("-metadata");
 
     auto arg_metadata_title = metadata.title;
@@ -437,6 +438,37 @@ bool HoerbertProcessor::convertToAudioFile(const QString &sourceFilePath, const 
     arguments.append(destFilePath);
 
     std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
+
+    return output.first==0;
+}
+
+
+bool HoerbertProcessor::convertToMp3(const QString &sourceFilePath, const QString &destFilePath, bool deleteOriginalWhenSuccessful)
+{
+
+    QStringList arguments;
+    arguments.append("-i");
+    arguments.append(sourceFilePath);
+    arguments.append("-ar");        // sample rate
+    arguments.append("44100");
+    arguments.append("-ac");        // channels
+    arguments.append("2");
+    arguments.append("-b:a");        // bit rate
+    arguments.append("192k");
+
+    arguments.append("-y");
+    arguments.append("-hide_banner");
+
+    arguments.append(destFilePath);
+
+    std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
+
+    if( output.first==0 && deleteOriginalWhenSuccessful ){
+        qDebug() << "deleting file: "<<sourceFilePath;
+        QFile f(sourceFilePath);
+        f.remove();
+        f.close();
+    }
 
     return output.first==0;
 }

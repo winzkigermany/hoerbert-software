@@ -77,12 +77,21 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     arguments.append("0"); // index = 3
     arguments.append("-to");
     arguments.append("<END>"); // index = 5
-    arguments.append("-acodec");
-    arguments.append("pcm_s16le");
-    arguments.append("-ar");
-    arguments.append("32k");
-    arguments.append("-ac");
-    arguments.append("1");
+    if( qApp->property("hoerbertModel")==2011 ){
+        arguments.append("-acodec");
+        arguments.append("pcm_s16le");
+        arguments.append("-ar");
+        arguments.append("32k");
+        arguments.append("-ac");
+        arguments.append("1");
+    } else {
+        arguments.append("-ar");        // sample rate
+        arguments.append("44100");
+        arguments.append("-ac");        // channels
+        arguments.append("2");
+        arguments.append("-b:a");        // bit rate
+        arguments.append("192k");
+    }
     arguments.append("-metadata");
     arguments.append("<METADATA>"); // index = 13
     arguments.append("-y");
