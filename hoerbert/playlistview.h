@@ -221,6 +221,9 @@ public:
      */
     void setColumnVisible(int index, bool visible);
 
+    bool m_allowWifiRecordings;
+    bool m_allowMicrophoneRecordings;
+
 signals:
 
      /**

@@ -55,6 +55,7 @@
 
 class CardPage;
 class WifiDialog;
+class PlaylistPage;
 
 class MainWindow : public QMainWindow
 {
@@ -87,6 +88,8 @@ public:
     int getHoerbertVersion();
 
     QString getCurrentDrivePath();
+
+    quint8 getBluetoothRecordingPlaylist();
 
 signals:
     /**
@@ -166,6 +169,7 @@ private:
      */
     int compareVersionWithThisApp( const QString& onlineVersionString );
 
+    quint8 m_bluetoothRecordingPlaylist;
     uint m_hoerbertVersion;
     QString m_migrationPath;
     BackupManager *m_backupManager;

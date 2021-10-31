@@ -75,6 +75,9 @@ PlaylistView::PlaylistView(QWidget *parent)
 
     m_totalSpace = 0;
 
+    m_allowWifiRecordings = false;
+    m_allowMicrophoneRecordings = false;
+
     m_player = new QProcess(this);
     m_player->setProcessChannelMode(QProcess::MergedChannels);
 

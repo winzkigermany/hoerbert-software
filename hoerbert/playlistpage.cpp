@@ -197,22 +197,24 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_toolLayout->addLayout(m_rightToolLayout, 1);
 
     m_bluetoothRecordingsRadioButton = new QRadioButton(this);
-    m_bluetoothRecordingsRadioButton->setCheckable(true);
     m_bluetoothRecordingsRadioButton->setText(tr("Store Bluetooth recordings here"));
     m_bluetoothRecordingsRadioButton->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_bluetoothRecordingsRadioButton->setStyleSheet("QRadioButton{ color:#ffffff; }");
+    m_bluetoothRecordingsRadioButton->setCheckable(true);
     connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setEnabled);
-    connect(m_bluetoothRecordingsRadioButton, &QRadioButton::isChecked, this, [this] () {
-        emit setBluetoothRecordingPlaylist(m_dirNum, m_bluetoothRecordingsRadioButton->isChecked());
+    connect( m_bluetoothRecordingsRadioButton, &QRadioButton::show, this, [this, parent]() {
+        m_bluetoothRecordingsRadioButton->setChecked( ((MainWindow*)parent)->getBluetoothRecordingPlaylist() == m_dirNum );
+        qDebug() << "bluetooth record set to: " << ((MainWindow*)parent)->getBluetoothRecordingPlaylist();
     });
+
 
     m_microphoneRecordingsCheckbox = new QCheckBox(this);
     m_microphoneRecordingsCheckbox->setText(tr("Allow microphone recordings here"));
     m_microphoneRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_microphoneRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
     connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, &QCheckBox::setEnabled);
-    connect(m_microphoneRecordingsCheckbox, &QCheckBox::isChecked, this, [this] () {
-        emit allowMicrophoneRecordingsInPlaylist(m_dirNum, m_microphoneRecordingsCheckbox->isChecked());
+    connect(m_microphoneRecordingsCheckbox, &QCheckBox::toggled, this, [this] () {
+        m_playlistView->m_allowMicrophoneRecordings = m_microphoneRecordingsCheckbox->isChecked();
     });
 
     m_wifiRecordingsCheckbox = new QCheckBox(this);
@@ -220,9 +222,6 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_wifiRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_wifiRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
     connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QCheckBox::setEnabled);
-    connect(m_wifiRecordingsCheckbox, &QCheckBox::isChecked, this, [this] () {
-        emit allowWifiRecordingsInPlaylist(m_dirNum, m_wifiRecordingsCheckbox->isChecked());
-    });
 
     m_authorizationsLayout->addWidget(m_bluetoothRecordingsRadioButton);
     m_authorizationsLayout->addSpacing(10);
@@ -272,7 +271,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     connect(m_playlistView, &PlaylistView::errorOccurred, this, &PlaylistPage::errorOccurred);
 }
 
-void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const AudioList &result)
+void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const AudioList &result, MainWindow* mw)
 {
     m_dir = dir_path;
     m_dirNum = dir_num;
@@ -319,6 +318,9 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
 
     m_commitButton->setEnabled(true);
     m_cancelButton->setEnabled(true);
+
+qDebug() << "the playlist" <<  mw->getBluetoothRecordingPlaylist() << "and dirNum" << m_dirNum;
+    m_bluetoothRecordingsRadioButton->setChecked( m_dirNum == mw->getBluetoothRecordingPlaylist()  );
 }
 
 quint8 PlaylistPage::directory()
@@ -594,6 +596,7 @@ void PlaylistPage::onClosePage(bool doCommitChanges)
         commit_list.insert(METADATA_CHANGED_ENTRIES, metadata_entries);
 
     emit commitChanges(commit_list, m_dirNum);
+    emit setBluetoothRecordingPlaylist(m_dirNum, m_bluetoothRecordingsRadioButton->isChecked());
 }
 
 int PlaylistPage::getSelectedSilenceDurationInSeconds()
@@ -631,17 +634,4 @@ const PlaylistView * PlaylistPage::getPlaylistView()
 int PlaylistPage::getPlaylistIndex()
 {
     return m_dirNum;
-}
-
-
-void PlaylistPage::onSetBluetoothRecordingPlaylist( qint8 playlistNumber, bool onOff ){
-
-}
-
-void PlaylistPage::onSetAllowMicrophoneRecordingsInPlaylist( qint8 playlistNumber, bool onOff ){
-
-}
-
-void PlaylistPage::onSetAllowWifiRecordingsInPlaylist( qint8 playlistNumber, bool onOff ){
-
 }

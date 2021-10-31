@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_hasBeenRemindedOfBackup = false;
 
     m_hoerbertVersion = 0;
+    m_bluetoothRecordingPlaylist = 255;
 
     QDesktopWidget dw;
     setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
@@ -159,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
         m_stackWidget->setCurrentIndex(1);
-        m_playlistPage->setListData(dir_path, dir_num, result);
+        m_playlistPage->setListData(dir_path, dir_num, result, this);
         m_playlistPage->setBackgroundColor(m_cardPage->getPlaylistColor(dir_num));
         m_shadow->setColor(m_cardPage->getPlaylistColor(dir_num));
 
@@ -196,6 +197,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_playlistPage, &PlaylistPage::durationChanged, this, [=]( int playlistIndex, quint64 durationInSeconds, bool isEstimation) {
         Q_UNUSED( isEstimation )
         m_cardPage->updateEstimatedDuration( playlistIndex, durationInSeconds );
+    });
+
+    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, this, [=]( quint8 playlistIndex, bool onOff ) {
+        qDebug() << "Setting bluetooth recording playlist: " << playlistIndex << ", value: " << onOff;
+
+        if( onOff ){
+            m_bluetoothRecordingPlaylist = playlistIndex;
+        } else {
+            if( m_bluetoothRecordingPlaylist == playlistIndex ){
+                m_bluetoothRecordingPlaylist = 255;
+            }
+        }
     });
 
 
@@ -2506,6 +2519,10 @@ void MainWindow::setHoerbertModel( int modelIdentifier )
 
 QString MainWindow::getCurrentDrivePath(){
     return m_cardPage->currentDrivePath();
+}
+
+quint8 MainWindow::getBluetoothRecordingPlaylist(){
+    return m_bluetoothRecordingPlaylist;
 }
 
 void MainWindow::openWifiDialog(){

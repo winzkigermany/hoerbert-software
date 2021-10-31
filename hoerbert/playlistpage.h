@@ -25,6 +25,7 @@
 #include <QWidget>
 
 #include "define.h"
+#include "mainwindow.h"
 
 class QComboBox;
 class QVBoxLayout;
@@ -38,6 +39,7 @@ class QRadioButton;
 
 class PieButton;
 class PlaylistView;
+class MainWindow;
 
 /**
  * @brief The PlaylistPage class represents a page to work on a playlist
@@ -56,7 +58,7 @@ public:
     /**
      * @brief set the absolute path to selected directory and directory number, list all files in it
      */
-    void setListData(const QString &, quint8 , const AudioList &);
+    void setListData(const QString &, quint8 , const AudioList &, MainWindow*);
 
     /**
      * @brief return the directory number
@@ -167,10 +169,6 @@ private slots:
      * @param doCommitChanges indicates whether the closing is due to commit or cancel
      */
     void onClosePage(bool doCommitChanges);
-
-    void onSetBluetoothRecordingPlaylist( qint8 playlistNumber, bool onOff );
-    void onSetAllowMicrophoneRecordingsInPlaylist( qint8 playlistNumber, bool onOff );
-    void onSetAllowWifiRecordingsInPlaylist( qint8 playlistNumber, bool onOff );
 
 
 private:
