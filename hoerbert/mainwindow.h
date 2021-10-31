@@ -51,8 +51,10 @@
 #include "playlistview.h"
 #include "backuprestoredialog.h"
 #include "choosehoerbertdialog.h"
+#include "wifidialog.h"
 
 class CardPage;
+class WifiDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -84,6 +86,7 @@ public:
 
     int getHoerbertVersion();
 
+    QString getCurrentDrivePath();
 
 signals:
     /**
@@ -100,6 +103,7 @@ signals:
 
     void isLatestHoerbert(bool latestOlder );
     void isNotLatestHoerbert(bool latestOlder );
+
 
 
 private slots:
@@ -212,6 +216,7 @@ private:
     QAction *m_darkModeAction;
     QAction *m_hoerbertModel2011Action;
     QAction *m_hoerbertModel2021Action;
+    QAction *m_wifiAction;
 
     QAction *m_moveToB1;
     QAction *m_moveToB2;
@@ -245,6 +250,8 @@ private:
 
     QMap<int, QString> m_errorLog;
     PleaseWaitDialog* m_pleaseWaitDialog;
+    WifiDialog* m_wifiDialog;
+    void openWifiDialog();
 };
 
 #endif // MAINWINDOW_H

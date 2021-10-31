@@ -141,6 +141,7 @@ const QString HOERBERT_XML                   = "hoerbert.xml";
 const QString HOERBERT_XML_BACKUP            = "hoerbert.bak";
 const QString BACKUP_INFO_FILE               = "backup.xml";
 const QString CARD_INFO_FILE                 = "info.xml";
+const QString WIFI_INI_FILE                  = "wifi.ini";
 const QString CONTENT_HTML                   = "contents.html";
 const QString DIAGMODE_FILE                  = "diag.txt";
 const QString DIAGMODE_ORIGINALS_DIR         = "originals";

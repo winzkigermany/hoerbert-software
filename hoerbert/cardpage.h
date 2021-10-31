@@ -368,6 +368,8 @@ private:
      */
     void sendDriveCapacity();
 
+    void openWifiDialog();
+
     bool m_isProcessing;
     bool m_migrationSuggested;
     bool m_hoerbertXMLIsDirty;

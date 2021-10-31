@@ -78,6 +78,7 @@ SOURCES += \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         waitingspinnerwidget.cpp \
+        wifidialog.cpp \
         xmlmetadatareader.cpp \
         xmlwriter.cpp
 
@@ -113,6 +114,7 @@ HEADERS += \
         triplecheckboxwidget.h \
         version.h \
         waitingspinnerwidget.h \
+        wifidialog.h \
         xmlmetadatareader.h \
         xmlwriter.h
 

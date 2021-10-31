@@ -275,6 +275,23 @@ void MainWindow::updateActionAvailability( bool ANDed )
         m_printAction->setEnabled(false);
         m_backupAction->setEnabled(false);
     }
+
+    // The wifi settings action
+    if( m_cardPage->getSelectedDrive().isEmpty() )
+    {
+        m_hoerbertModel2011Action->setEnabled(true);
+        m_hoerbertModel2021Action->setEnabled(true);
+        m_wifiAction->setEnabled(false);
+    } else {
+        m_hoerbertModel2011Action->setEnabled(false);
+        m_hoerbertModel2021Action->setEnabled(false);
+        if( getHoerbertVersion()==2011 ){
+            m_wifiAction->setEnabled(false);
+        } else {
+            m_wifiAction->setEnabled(true);
+        }
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -2087,6 +2104,7 @@ void MainWindow::createActions()
     m_hoerbertModel2021Action->setStatusTip(tr("The latest model (starting October 2021). This model has no mechanical on/off switch"));
     connect(m_hoerbertModel2021Action, &QAction::triggered, this, [this] () {
         setHoerbertModel(2021);
+        updateActionAvailability();
     });
     connect( this, &MainWindow::isLatestHoerbert, m_hoerbertModel2021Action, &QAction::setChecked);
     m_hoerbertModelMenu->addAction(m_hoerbertModel2021Action);
@@ -2097,6 +2115,7 @@ void MainWindow::createActions()
     m_hoerbertModel2011Action->setStatusTip(tr("All hörbert models starting from 2011 that have a mechanical on/off switch"));
     connect(m_hoerbertModel2011Action, &QAction::triggered, this, [this] () {
         setHoerbertModel(2011);
+        updateActionAvailability();
     });
     connect( this, &MainWindow::isNotLatestHoerbert, m_hoerbertModel2011Action, &QAction::setChecked);
     m_hoerbertModelMenu->addAction(m_hoerbertModel2011Action);
@@ -2187,6 +2206,18 @@ void MainWindow::createActions()
 
     m_extrasMenu = new QMenu(tr("Extras"), this);
     menuBar()->addMenu(m_extrasMenu);
+
+    m_wifiDialog = new WifiDialog(this);
+    m_wifiDialog->setModal(true);
+
+    m_wifiAction = new QAction(tr("Configure WiFi connections"), this);
+    m_wifiAction->setStatusTip(tr("Configure WiFi connections"));
+    m_wifiAction->setEnabled(false);
+    connect(m_wifiAction, &QAction::triggered, this, [this] () {
+        openWifiDialog();
+    });
+    m_extrasMenu->addAction(m_wifiAction);
+
 
     m_printAction = new QAction(tr("Print table of contents"), this);
     m_printAction->setStatusTip(tr("Print table of contents"));
@@ -2472,3 +2503,11 @@ void MainWindow::setHoerbertModel( int modelIdentifier )
     QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
+
+QString MainWindow::getCurrentDrivePath(){
+    return m_cardPage->currentDrivePath();
+}
+
+void MainWindow::openWifiDialog(){
+    m_wifiDialog->show();
+}
