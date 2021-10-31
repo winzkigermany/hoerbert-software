@@ -319,8 +319,9 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
     m_commitButton->setEnabled(true);
     m_cancelButton->setEnabled(true);
 
-qDebug() << "the playlist" <<  mw->getBluetoothRecordingPlaylist() << "and dirNum" << m_dirNum;
     m_bluetoothRecordingsRadioButton->setChecked( m_dirNum == mw->getBluetoothRecordingPlaylist()  );
+    m_wifiRecordingsCheckbox->setChecked( mw->isWifiRecordingAllowedInPlaylist(m_dirNum) );
+    m_microphoneRecordingsCheckbox->setChecked( mw->isMicrophoneRecordingAllowedInPlaylist(m_dirNum) );
 }
 
 quint8 PlaylistPage::directory()
@@ -597,6 +598,8 @@ void PlaylistPage::onClosePage(bool doCommitChanges)
 
     emit commitChanges(commit_list, m_dirNum);
     emit setBluetoothRecordingPlaylist(m_dirNum, m_bluetoothRecordingsRadioButton->isChecked());
+    emit setWifiRecordingPermission(m_dirNum, m_wifiRecordingsCheckbox->isChecked());
+    emit setMicrophoneRecordingPermission(m_dirNum, m_microphoneRecordingsCheckbox->isChecked());
 }
 
 int PlaylistPage::getSelectedSilenceDurationInSeconds()

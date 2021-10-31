@@ -123,9 +123,8 @@ signals:
     void errorOccurred(const QString &errorString);
 
     void setBluetoothRecordingPlaylist(qint8 dirNum, bool onOff);
-    void allowMicrophoneRecordingsInPlaylist(qint8 dirNum, bool onOff);
-    void allowWifiRecordingsInPlaylist(qint8 dirNum, bool onOff);
-
+    void setWifiRecordingPermission(qint8 dirNum, bool onOff );
+    void setMicrophoneRecordingPermission(qint8 dirNum, bool onOff);
 
 public slots:
     /**

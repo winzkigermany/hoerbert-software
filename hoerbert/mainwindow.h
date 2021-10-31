@@ -53,6 +53,8 @@
 #include "choosehoerbertdialog.h"
 #include "wifidialog.h"
 
+#define MAX_PLAYLIST_COUNT 9
+
 class CardPage;
 class WifiDialog;
 class PlaylistPage;
@@ -91,6 +93,10 @@ public:
 
     quint8 getBluetoothRecordingPlaylist();
 
+    bool isWifiRecordingAllowedInPlaylist( quint8 playlistNumber );
+
+    bool isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber );
+
 signals:
     /**
      * @brief changeAlbumColumnVisibility is a signal that's sent when the user toggles visibility of the album column
@@ -105,8 +111,8 @@ signals:
     void changeCommentColumnVisibility( bool onOff );
 
     void isLatestHoerbert(bool latestOlder );
-    void isNotLatestHoerbert(bool latestOlder );
 
+    void isNotLatestHoerbert(bool latestOlder );
 
 
 private slots:
@@ -158,6 +164,10 @@ private:
 
     bool m_hasBeenRemindedOfBackup = false;  // we set this flag once the user has been reminded of a backup for this card. Then we will keep from reminding him unless a new card is selected.
 
+    void readIndexM3u();
+
+    void generateIndexM3u();
+
     /**
      * @brief updateFormatActionAvailability The format action needs special care as of when to enable or disable it.
      */
@@ -169,7 +179,6 @@ private:
      */
     int compareVersionWithThisApp( const QString& onlineVersionString );
 
-    quint8 m_bluetoothRecordingPlaylist;
     uint m_hoerbertVersion;
     QString m_migrationPath;
     BackupManager *m_backupManager;
@@ -256,6 +265,10 @@ private:
     PleaseWaitDialog* m_pleaseWaitDialog;
     WifiDialog* m_wifiDialog;
     void openWifiDialog();
+
+    quint8 m_bluetoothRecordingPlaylist;
+    bool m_wifiRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
+    bool m_microphoneRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
 };
 
 #endif // MAINWINDOW_H
