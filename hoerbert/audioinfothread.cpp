@@ -37,6 +37,8 @@ AudioInfoThread::AudioInfoThread()
     m_flag = -1;
     m_IDBeginsFrom = 0;
 }
+
+
 AudioInfoThread::AudioInfoThread(const QFileInfoList &fileList, int idBeginsFrom, int flag)
     : QThread()
 {
@@ -45,14 +47,19 @@ AudioInfoThread::AudioInfoThread(const QFileInfoList &fileList, int idBeginsFrom
     m_IDBeginsFrom = idBeginsFrom;
 }
 
+
 AudioInfoThread::~AudioInfoThread()
 {
 
 }
+
+
 void AudioInfoThread::setFileList(const QFileInfoList &fileList)
 {
     m_fileList = fileList;
 }
+
+
 void AudioInfoThread::setFileListWithMetadata(const QFileInfoList &fileList, const QStringList &metadataList)
 {
     m_fileList = fileList;
@@ -62,14 +69,20 @@ void AudioInfoThread::setFileListWithMetadata(const QFileInfoList &fileList, con
         qDebug() << "Number of files and number of metadata do not match.";
     }
 }
+
+
 void AudioInfoThread::setBeginID(int beginID)
 {
     m_IDBeginsFrom = beginID;
 }
+
+
 void AudioInfoThread::setDeafultFlag(int flag)
 {
     m_flag = flag;
 }
+
+
 void AudioInfoThread::run()
 {
     if (m_fileList.count() == 0)
@@ -98,55 +111,75 @@ void AudioInfoThread::run()
     for (int i = 0; i < m_fileList.size(); i++)
     {       
         QFileInfo info = m_fileList.at(i);
-        arguments.replace(1, info.absoluteFilePath());
 
-        QString output = m_processExecutor.executeCommand(FFPROBE_PATH, arguments).second;
+        if( info.suffix().toLower()=="url" ){   // this is an url file
 
-        QJsonDocument jsonDocument = QJsonDocument::fromJson(output.toUtf8());
-        QJsonObject jsonObject = jsonDocument.object();
-        QJsonObject formatObject = jsonObject["format"].toObject();
-        QJsonObject tagsObject = formatObject["tags"].toObject();
+            QFile urlFile(info.absoluteFilePath());
+            if( urlFile.open(QIODevice::ReadOnly | QIODevice::Text) ){
+                QTextStream stream(&urlFile);
+                QString line = stream.readLine();
+                line.truncate(2048);
+                entry.duration = 0;
+                entry.flag = 6;     // url
+                entry.metadata.title = line;
+                entry.path = info.absoluteFilePath();
+                entry.id = m_IDBeginsFrom++;
 
-        // this is in format->tags->title
-        QString metadata_title = tagsObject["title"].toString();
-        QString metadata_album = tagsObject["album"].toString();
-        QString metadata_comment = tagsObject["comment"].toString();
-
-        auto duration = formatObject["duration"].toString().toDouble();
-
-        // skip over temp files
-        if (duration <= 0.0)
-            continue;
-
-        if (m_metadataList.count() == 0)
-        {
-            if( metadata_title.isNull() || metadata_title.isEmpty() ){
-                metadata_title = "";
+                urlFile.close();
             }
 
-            if (metadata_title.isEmpty())
-                metadata_title = info.absoluteFilePath();
-        }
-        else {
-            metadata_title = m_metadataList.at(i);
+        } else {
+            arguments.replace(1, info.absoluteFilePath());
+
+            QString output = m_processExecutor.executeCommand(FFPROBE_PATH, arguments).second;
+
+            QJsonDocument jsonDocument = QJsonDocument::fromJson(output.toUtf8());
+            QJsonObject jsonObject = jsonDocument.object();
+            QJsonObject formatObject = jsonObject["format"].toObject();
+            QJsonObject tagsObject = formatObject["tags"].toObject();
+
+            // this is in format->tags->title
+            QString metadata_title = tagsObject["title"].toString();
+            QString metadata_album = tagsObject["album"].toString();
+            QString metadata_comment = tagsObject["comment"].toString();
+
+            auto duration = formatObject["duration"].toString().toDouble();
+
+            // skip over temp files
+            if (duration <= 0.0)
+                continue;
+
+            if (m_metadataList.count() == 0)
+            {
+                if( metadata_title.isNull() || metadata_title.isEmpty() ){
+                    metadata_title = "";
+                }
+
+                if (metadata_title.isEmpty())
+                    metadata_title = info.absoluteFilePath();
+            }
+            else {
+                metadata_title = m_metadataList.at(i);
+            }
+
+            metadata_title = metadata_title.trimmed();
+            if( metadata_title.length() > 80 ){
+                metadata_title = "..."+metadata_title.right(77);
+            }
+
+            // build audio entry from the information
+            entry.id = m_IDBeginsFrom++;
+            if (readFromCard)
+                entry.order = entry.id;
+            entry.state = 0;
+            entry.path = info.absoluteFilePath();
+            entry.metadata.title = metadata_title;
+            entry.metadata.album = metadata_album;
+            entry.metadata.comment = metadata_comment;
+            entry.duration = static_cast<int>(duration);
+            entry.flag = m_flag;
         }
 
-        metadata_title = metadata_title.trimmed();
-        if( metadata_title.length() > 80 ){
-            metadata_title = "..."+metadata_title.right(77);
-        }
-
-        // build audio entry from the information
-        entry.id = m_IDBeginsFrom++;
-        if (readFromCard)
-            entry.order = entry.id;
-        entry.state = 0;
-        entry.path = info.absoluteFilePath();
-        entry.metadata.title = metadata_title;
-        entry.metadata.album = metadata_album;
-        entry.metadata.comment = metadata_comment;
-        entry.duration = static_cast<int>(duration);
-        entry.flag = m_flag;
         entry_list[entry.id] = entry;
         counter++;
 

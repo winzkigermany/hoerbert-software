@@ -403,7 +403,12 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
         if( qApp->property("hoerbertModel")==2011 ){
             new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_WAV;
         } else {
-            new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_MP3;
+            QFileInfo info(entry.path);
+            if( info.suffix().toLower()=="url" ){
+                new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_URL;
+            } else {
+                new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_MP3;
+            }
         }
 
         if (moveFile(entry.path, new_file_name))

@@ -202,7 +202,12 @@ void PlaylistView::insertBatchAt(const AudioList &list, int index, bool readFrom
 bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=false)
 {
     if (!readFromDrive) {
-        quint64 expectedFileSizeInBytes = WAV_HEADER_SIZE_IN_BYTES + (((quint64)entry.duration) * 32000 * 16 / 8) + MEMORY_SPARE_SPACE_IN_BYTES;
+        quint64 expectedFileSizeInBytes;
+        if( qApp->property("hoerbertModel")==2011){
+            expectedFileSizeInBytes = WAV_HEADER_SIZE_IN_BYTES + (((quint64)entry.duration) * 32000 * 16 / 8) + MEMORY_SPARE_SPACE_IN_BYTES;
+        } else {
+            expectedFileSizeInBytes = (((quint64)entry.duration) * 24000 /8) + MEMORY_SPARE_SPACE_IN_BYTES;
+        }
 
         qDebug() << expectedFileSizeInBytes << bytesToSeconds(m_totalSpace);
         if ( expectedFileSizeInBytes > (m_totalSpace-m_usedSpace) ) {
@@ -458,7 +463,7 @@ void PlaylistView::insertUrl(const QString& newUrl, int index)
     if( newUrl!="" ){
         entry.metadata.title = newUrl;
     } else {
-        entry.metadata.title = tr("* enter URL here *");
+        entry.metadata.title = tr("http://enter_radio_URL_here");
     }
     entry.flag = 6; // URL flag
 

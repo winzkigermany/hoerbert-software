@@ -78,6 +78,7 @@ public:
 
     bool convertToMp3(const QString &sourceFilePath, const QString &destFilePath, bool deleteOriginalWhenSuccessful=false);
 
+
 signals:
     /**
      * @brief this signal is emitted every processing entry is done
@@ -217,6 +218,8 @@ private:
      * @return true if success, false otherwise
      */
     bool convertToAudioFile(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata);
+
+    bool createUrlFile( QString destinationPath, MetaData metaData);
 
     QProcess *m_process;
     QString m_dirPath;

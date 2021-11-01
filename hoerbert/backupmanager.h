@@ -125,7 +125,7 @@ private:
      * @param destPath absolute path to destination file
      * @return true if success, false otherwise
      */
-    bool convertFlac2Wav(const QString &sourcePath, const QString destPath);
+    bool convertFlac2Audio(const QString &sourcePath, const QString destPath);
 
     /**
      * @brief recursively get all files' info in dirPath, excluding hoerbert music files

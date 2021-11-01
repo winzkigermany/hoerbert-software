@@ -151,8 +151,17 @@ void HoerbertProcessor::run()
                         entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_WAV;
                     }
                 } else {
-                    if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_MP3)) {
-                        entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_MP3;
+                    QFileInfo info(entry.path);
+                    if( info.suffix().toLower()=="mp3" ){
+                        if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_MP3)) {
+                            entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_MP3;
+                        }
+                    }
+
+                    if( info.suffix().toLower()=="url" ){
+                        if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_URL)) {
+                            entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_URL;
+                        }
                     }
                 }
             }
@@ -261,6 +270,23 @@ bool HoerbertProcessor::removeEntry(const AudioEntry &entry)
         return true;
 }
 
+bool HoerbertProcessor::createUrlFile( QString destinationPath, MetaData metaData){
+    qDebug() << "Create URL file: " << destinationPath;
+
+    QFile file(destinationPath);
+    if( file.open(QIODevice::ReadWrite | QIODevice::Text) )
+    {
+        QTextStream stream(&file);
+
+        QString urlString = metaData.title;
+        stream << urlString << "\n";
+        file.close();
+        return true;
+    }
+
+    return false;
+}
+
 bool HoerbertProcessor::addEntry(const AudioEntry &entry)
 {
     auto sourcePath = entry.path;
@@ -269,10 +295,16 @@ bool HoerbertProcessor::addEntry(const AudioEntry &entry)
     if( qApp->property("hoerbertModel")==2011 ){
         destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DESTINATION_FORMAT_WAV);
     } else {
-        destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DESTINATION_FORMAT_MP3);
+        if( entry.flag==6 ){    // this is an URL
+            destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DESTINATION_FORMAT_URL);
+        } else {
+            destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DESTINATION_FORMAT_MP3);
+        }
     }
 
-    if (entry.flag != 5){
+    if (entry.flag==6){ // this is an url
+        return createUrlFile(destPath, entry.metadata);
+    } else if( entry.flag!=5 ){
         return convertToAudioFile(sourcePath, destPath, entry.metadata);
     } else {
         return createSilenceAudioFile(destPath, entry.duration, entry.metadata);
@@ -285,13 +317,21 @@ bool HoerbertProcessor::moveEntry(const AudioEntry &entry)
     if( qApp->property("hoerbertModel")==2011){
         result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_WAV);
     } else {
-        result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_MP3);
+        if( entry.flag==6){ // this is an URL
+            result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_URL);
+        } else {
+            result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_MP3);
+        }
     }
     return result;
 }
 
 bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
 {
+    if( entry.flag==6){
+        return true;
+    }
+
     if (entry.state == 2) // split per 3 minutes
     {
         if (!splitPer3Mins(entry.path, m_dirPath, entry.order + m_splitOffset, entry.metadata))
@@ -388,6 +428,17 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
 
 bool HoerbertProcessor::changeEntryMetadata(const AudioEntry &entry)
 {
+    if( entry.flag==6 ){    // this is an URL file
+        QFile file(entry.path);
+        if( file.open(QIODevice::WriteOnly | QIODevice::Text) ){
+            QTextStream stream(&file);
+            stream << entry.metadata.title << "\n";
+            file.close();
+            return true;
+        }
+        return  false;
+    }
+
     return changeMetaData(entry.path, entry.metadata);
 }
 

@@ -107,7 +107,7 @@ void BackupManager::process()
                 if( qApp->property("hoerbertModel")==2011 ){
                     sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
                 } else {
-                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
+                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
                 }
                 sub_dir.setFilter(QDir::Files);
                 for (const auto& file : sub_dir.entryList())
@@ -170,7 +170,7 @@ void BackupManager::process()
                 if( qApp->property("hoerbertModel")==2011 ){
                     dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
                 } else {
-                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
                 }
             } else {
                 dir.setNameFilters(QStringList() << "*.flac");
@@ -289,8 +289,8 @@ void BackupManager::process()
                 } else {
                     destinationFileName = destinationFileNumber+DESTINATION_FORMAT_MP3;
                 }
+                success = convertFlac2Audio(file_info.filePath(), dest_dir_path + destinationFileName);
 
-                success = convertFlac2Wav(file_info.filePath(), dest_dir_path + destinationFileName);
             }
 
             if (success)
@@ -434,7 +434,7 @@ bool BackupManager::convertMp32Flac(const QString &sourcePath, const QString des
 }
 
 
-bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString destPath)
+bool BackupManager::convertFlac2Audio(const QString &sourcePath, const QString destPath)
 {
     qDebug() << sourcePath << " -> " << destPath;
     QStringList arguments;
