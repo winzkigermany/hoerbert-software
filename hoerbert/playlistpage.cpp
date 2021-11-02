@@ -193,7 +193,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_rightToolLayout->addWidget(m_cancelButton);
 
     m_toolLayout->addLayout(m_leftToolLayout, 1);
-    m_toolLayout->addLayout(m_centerToolLayout, 1);
+//    m_toolLayout->addLayout(m_centerToolLayout, 1);
     m_toolLayout->addLayout(m_rightToolLayout, 1);
 
     m_bluetoothRecordingsRadioButton = new QRadioButton(this);
