@@ -531,16 +531,22 @@ void CardPage::deselectDrive()
 
 
 /**
-* @brief CardPage::hasWavFiles
+* @brief CardPage::hasAudioFiles
+* look for all audio files EXCEPT mp3 files. (We don't need to re-encode mp3 files)
 */
-bool CardPage::hasWavFiles( QString rootPath){
-    QStringList nameFilter("*.wav");
+bool CardPage::hasAudioFiles( QString rootPath){
+    QStringList nameFilter;
+    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4;
 
     bool foundOne = false;
     for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
-        qDebug() << "Searching for *.wav in " << rootPath+QString::number(i);
+        qDebug() << "Searching for audio files in " << rootPath+QString::number(i);
         QDir directory(rootPath+QString::number(i));
         QStringList txtFilesAndDirectories = directory.entryList(nameFilter, QDir::AllEntries|QDir::NoDotAndDotDot);
+        for ( const auto& entry : txtFilesAndDirectories  )
+        {
+            qDebug() << entry;
+        }
         if( txtFilesAndDirectories.length()>0 ){
             foundOne = true;
             break;
@@ -551,25 +557,25 @@ bool CardPage::hasWavFiles( QString rootPath){
 }
 
 
-void CardPage::convertAllWavFilesToMp3( QString rootPath){
-    QStringList nameFilter("*.wav");
+void CardPage::convertAllAudioFilesToMp3( QString rootPath){
+    QStringList nameFilter;
+    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4;
 
     for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
-        qDebug() << "Searching for *.wav in " << rootPath+QString::number(i);
+        qDebug() << "Searching for audio files in " << rootPath+QString::number(i);
         QDir directory(rootPath+QString::number(i));
         QStringList txtFilesAndDirectories = directory.entryList(nameFilter, QDir::AllEntries|QDir::NoDotAndDotDot);
         for ( const auto& iterator : txtFilesAndDirectories  )
         {
             HoerbertProcessor *processor = new HoerbertProcessor(rootPath+QString::number(i)+"/"+iterator, -1);
-            QFileInfo wavFile( rootPath+QString::number(i) +"/"+ iterator);
-            qDebug()<<wavFile.absoluteFilePath();
-            QString mp3FileName = wavFile.path() + "/" + wavFile.completeBaseName() + ".mp3";
-            mp3FileName.toLower().replace( ".wav", ".mp3" );
+            QFileInfo audioFile( rootPath+QString::number(i) +"/"+ iterator);
+            qDebug()<<audioFile.absoluteFilePath();
+            QString mp3FileName = audioFile.path() + "/" + audioFile.completeBaseName() + ".mp3";
+            mp3FileName.toLower().replace( audioFile.suffix(), ".mp3" );
 
-            processor->convertToMp3( wavFile.absoluteFilePath(), mp3FileName, true);
+            processor->convertToMp3( audioFile.absoluteFilePath(), mp3FileName, true);
         }
     }
-
 }
 
 
@@ -643,11 +649,11 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 
     QString drive_path = currentDrivePath();
 
-    if( hasWavFiles(drive_path) ){
+    if( hasAudioFiles(drive_path) ){
         auto selected = QMessageBox::question(this, tr("Convert files"), tr("There are large files on the card.")+"\n"+tr("Free some space by converting files to mp3?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
         if (selected == QMessageBox::Yes)
         {
-            convertAllWavFilesToMp3(drive_path);
+            convertAllAudioFilesToMp3(drive_path);
         }
     }
 

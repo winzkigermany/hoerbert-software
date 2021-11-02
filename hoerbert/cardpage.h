@@ -370,9 +370,9 @@ private:
 
     void openWifiDialog();
 
-    bool hasWavFiles( QString );
+    bool hasAudioFiles( QString );
 
-    void convertAllWavFilesToMp3( QString rootPath);
+    void convertAllAudioFilesToMp3( QString rootPath);
 
     bool m_isProcessing;
     bool m_migrationSuggested;
