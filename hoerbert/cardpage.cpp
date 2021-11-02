@@ -573,6 +573,8 @@ void CardPage::convertAllAudioFilesToMp3( QString rootPath){
             QString mp3FileName = audioFile.path() + "/" + audioFile.completeBaseName() + ".mp3";
             mp3FileName.toLower().replace( audioFile.suffix(), ".mp3" );
 
+            emit convertingCurrentFile(audioFile.absoluteFilePath());
+
             processor->convertToMp3( audioFile.absoluteFilePath(), mp3FileName, true);
         }
     }
@@ -650,10 +652,20 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
     QString drive_path = currentDrivePath();
 
     if( hasAudioFiles(drive_path) ){
-        auto selected = QMessageBox::question(this, tr("Convert files"), tr("There are large files on the card.")+"\n"+tr("Free some space by converting files to mp3?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+        auto selected = QMessageBox::question(this, tr("Convert files"), tr("There are large files on the card.")+"\n"+tr("Free some space by converting all files to mp3?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
         if (selected == QMessageBox::Yes)
         {
+            m_pleaseWaitDialog = new PleaseWaitDialog();
+            connect( m_pleaseWaitDialog, &QDialog::finished, m_pleaseWaitDialog, &PleaseWaitDialog::close);
+            m_pleaseWaitDialog->setParent( this );
+            m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+            m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
+            m_pleaseWaitDialog->show();
+
+            connect( this, &CardPage::convertingCurrentFile, m_pleaseWaitDialog, &PleaseWaitDialog::setWaitMessage);
             convertAllAudioFilesToMp3(drive_path);
+
+            m_pleaseWaitDialog->setResultString(tr("Finished converting all files."));
         }
     }
 

@@ -315,6 +315,8 @@ signals:
      */
     void driveListChanged( int );
 
+    void convertingCurrentFile( QString );
+
 public slots:
 
     /**
