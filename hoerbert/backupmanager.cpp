@@ -327,14 +327,12 @@ void BackupManager::process()
         if (backup_info_file.open(QIODevice::WriteOnly))
         {
             QString xml_content = "";
-            if( qApp->property("hoerbertModel")==2011 ){
-                QString tag, value = "";
-                for (const auto& line : m_stamp)
-                {
-                    tag = line.section("!@#$%^&*", 0, 0);
-                    value = line.section("!@#$%^&*", 1);
-                    xml_content += "<" + tag + ">" + value + "</" + tag + ">\n";
-                }
+            QString tag, value = "";
+            for (const auto& line : m_stamp)
+            {
+                tag = line.section("!@#$%^&*", 0, 0);
+                value = line.section("!@#$%^&*", 1);
+                xml_content += "<" + tag + ">" + value + "</" + tag + ">\n";
             }
 
             backup_info_file.write(QString(xml_string_header + xml_content + xml_string_tail).toUtf8());

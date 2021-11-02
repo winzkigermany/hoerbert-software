@@ -797,7 +797,7 @@ void MainWindow::migrate(const QString &dirPath)
         sync();
 
         bool doGenerateHoerbertXml = false;
-        {
+        if( qApp->property("hoerbertModel")==2011 ){
             QSettings settings;
             settings.beginGroup("Global");
             doGenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
@@ -811,7 +811,7 @@ void MainWindow::migrate(const QString &dirPath)
         }
         else
         {
-            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version 2.x"));
+            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use"));
         }
         m_pleaseWaitDialog->setWindowTitle(tr("Ready for use"));
         m_pleaseWaitDialog->showButton(true);
@@ -1221,6 +1221,15 @@ void MainWindow::collectInformationForSupport()
         info_list << "";
         info_list << "[notes]";
 
+        if ( qApp->property("hoerbertModel")==2011 )
+        {
+            info_list << "App is in the mode for hoerbert 2011";
+        }
+        else
+        {
+            info_list << "App is in the mode for hoerbert without Power switch";
+        }
+
         QString current_card_path = m_cardPage->currentDrivePath();
         QDir card_dir(current_card_path);
         if (card_dir.exists(HOERBERT_XML))
@@ -1257,6 +1266,53 @@ void MainWindow::collectInformationForSupport()
         else
         {
             info_list << "No info.xml was found in the card root directory.";
+        }
+
+
+
+        if (card_dir.exists("wifi.ini"))
+        {
+            info_list << "wifi.ini file was found in the card root directory. Not copying that due to security reasons.";
+        }
+        else
+        {
+            info_list << "No wifi.ini was found in the card root directory.";
+        }
+
+
+        if (card_dir.exists("index.m3u"))
+        {
+            if (!QFile::copy(tailPath(current_card_path) + "index.m3u", tailPath(collect_path) + "index.m3u"))
+            {
+                info_list << "Failed to copy index.m3u from" << current_card_path << "to" << collect_path;
+            }
+        }
+        else
+        {
+            info_list << "No index.m3u was found in the card root directory.";
+        }
+
+
+        if (card_dir.exists("ver_fw.txt"))
+        {
+            if (!QFile::copy(tailPath(current_card_path) + "ver_fw.txt", tailPath(collect_path) + "ver_fw.txt"))
+            {
+                info_list << "Failed to copy ver_fw.txt from" << current_card_path << "to" << collect_path;
+            }
+        }
+        else
+        {
+            info_list << "No ver_fw.txt was found in the card root directory.";
+        }
+
+
+        if (card_dir.exists("hoerbert_firmware.bin"))
+        {
+            info_list << "hoerbert_firmware.bin was found in the card root directory.";
+        }
+        else
+        {
+            info_list << "No hoerbert_firmware.bin was found in the card root directory.";
         }
 
         printTableOfContent(collect_path);
