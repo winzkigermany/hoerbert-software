@@ -738,15 +738,13 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                         break;
                     }
                 } else {
-                    QFileInfo info(currentFile.absoluteFilePath());
-                    if ( ((currentFile.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index)
-                         && (currentFile.fileName().toLower().remove(DESTINATION_FORMAT_URL.toLower()).toInt() != index))
-                         || (info.suffix().toLower()!="url" && currentFile.size()<45) ) {    // the header of a wav file is at least 44 bytes long. We use that as standard
-                        isPlausible = false;
-                        qDebug() << list;
-                        plausibilityFixList.push_back(i);
-                        break;
-                    }
+                    //@TODO: Plausibility is a difficult concept for multi-file, multi-suffix scenarios.
+                    //in the future, we might be able to check plausibility against an m3u file again.
+                    //For now, the chances for false positives are simply too high for a sensible plausibility check.
+
+                    //Probably, we could at least make sure that there is only one file suffix per file index. Except m3u files, of course...
+
+                    ;
                 }
 
                 index++;

@@ -124,6 +124,9 @@ const int VOLUME_SIZE_LIMIT                  = 64; // in Gigabytes
 const QString DESTINATION_FORMAT_WAV         = ".WAV";
 const QString DESTINATION_FORMAT_MP3         = ".MP3";
 const QString DESTINATION_FORMAT_URL         = ".URL";
+const QString DESTINATION_FORMAT_AAC         = ".AAC";
+const QString DESTINATION_FORMAT_M4A         = ".M4A";
+const QString DESTINATION_FORMAT_MP4         = ".MP4";
 const QString DESTINATION_FORMAT_FLAC        = ".FLAC";
 
 const QString FFMPEG_PATH_WIN                = "/ffmpeg/";
