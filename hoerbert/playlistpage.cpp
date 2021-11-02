@@ -40,6 +40,8 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <QRadioButton>
+#include <QCheckBox>
 
 #include "piebutton.h"
 #include "playlistview.h"
@@ -69,6 +71,11 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_toolLayout->setMargin(0);
     m_toolLayout->setSpacing(5);
 
+    m_authorizationsLayout = new QHBoxLayout();
+    m_authorizationsLayout->setAlignment(Qt::AlignCenter);
+    m_authorizationsLayout->setMargin(0);
+    m_authorizationsLayout->setSpacing(5);
+
     m_leftToolLayout = new QHBoxLayout();
     m_leftToolLayout->setAlignment(Qt::AlignLeft);
 
@@ -83,7 +90,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_silenceLabel->setStyleSheet("QLabel{ color:#ffffff; }");
 
     m_silenceDuration = new QComboBox(this);
-    m_silenceDuration->setFixedWidth(100);
+    m_silenceDuration->setFixedWidth(70);
     m_silenceDuration->setEditable(true);
     m_silenceDuration->lineEdit()->setReadOnly(true);
     m_silenceDuration->lineEdit()->setAlignment(Qt::AlignCenter);
@@ -97,14 +104,23 @@ PlaylistPage::PlaylistPage(QWidget *parent)
 //    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
     m_addSilenceButton->setToolTip(tr("Add silence of given duration"));
 
+
     m_leftToolLayout->addWidget(m_colorBlindHintLabel);
     m_leftToolLayout->addSpacing(10);
     m_leftToolLayout->addWidget(m_silenceLabel);
     m_leftToolLayout->addWidget(m_silenceDuration);
     m_leftToolLayout->addWidget(m_addSilenceButton);
 
-    m_centerToolLayout = new QHBoxLayout();
-    m_centerToolLayout->setAlignment(Qt::AlignCenter);
+//    m_centerToolLayout = new QHBoxLayout();
+//    m_centerToolLayout->setAlignment(Qt::AlignCenter);
+
+    m_leftToolLayout->addSpacing(10);
+
+    m_fileLabel = new QLabel(this);
+    m_fileLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
+    m_fileLabel->setText(tr("File:"));
+    m_fileLabel->setStyleSheet("QLabel{ color:#ffffff; }");
+    m_leftToolLayout->addWidget(m_fileLabel);
 
     m_addButton = new PieButton(this);
     m_addButton->setFixedSize(32, 32);
@@ -113,6 +129,32 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addButton->setShadowEnabled(false);
 //    m_addButton->setShortcut(QKeySequence("Ctrl+F"));       // not ideal, not adjusted for different OSs
     m_addButton->setToolTip(tr("Add audio files or tracks from Finder/Explorer"));
+    m_leftToolLayout->addWidget(m_addButton);
+
+
+    m_urlLabel = new QLabel(this);
+    m_urlLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
+    m_urlLabel->setText(tr("URL:"));
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, &QLabel::setEnabled);
+    m_urlLabel->setStyleSheet("QLabel{ color:#ffffff; }");
+
+    m_addUrlButton = new PieButton(this);
+    m_addUrlButton->setFixedSize(32, 32);
+    m_addUrlButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
+    m_addUrlButton->setMainPixmap(QPixmap(":/images/plus.png"));
+    m_addUrlButton->setShadowEnabled(false);
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_addUrlButton, &PieButton::setEnabled);
+
+    connect ( (MainWindow*)parent, SIGNAL(isLatestHoerbert(bool)), m_addUrlButton, SLOT(setEnabled(bool)));
+//    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
+    m_addUrlButton->setToolTip(tr("Add Internet radio URL"));
+
+    m_leftToolLayout->addSpacing(10);
+    m_leftToolLayout->addWidget(m_urlLabel);
+    m_leftToolLayout->addWidget(m_addUrlButton);
+
+
+    m_leftToolLayout->addSpacing(30);
 
     m_removeButton = new PieButton(this);
     m_removeButton->setFixedSize(32, 32);
@@ -122,9 +164,10 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_removeButton->setShadowEnabled(false);
 //    m_removeButton->setShortcut(QKeySequence("Ctrl+R"));    // not ideal, not adjusted for different OSs
     m_removeButton->setToolTip(tr("Remove tracks from the list"));
+    m_leftToolLayout->addWidget(m_removeButton);
 
-    m_centerToolLayout->addWidget(m_addButton);
-    m_centerToolLayout->addWidget(m_removeButton);
+//    m_centerToolLayout->addWidget(m_addButton);
+//    m_centerToolLayout->addWidget(m_removeButton);
 
     m_rightToolLayout = new QHBoxLayout();
     m_rightToolLayout->setAlignment(Qt::AlignRight);
@@ -153,10 +196,44 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_toolLayout->addLayout(m_centerToolLayout, 1);
     m_toolLayout->addLayout(m_rightToolLayout, 1);
 
+    m_bluetoothRecordingsRadioButton = new QRadioButton(this);
+    m_bluetoothRecordingsRadioButton->setText(tr("Store Bluetooth recordings here"));
+    m_bluetoothRecordingsRadioButton->setFont(QFont("Monospace", 11, QFont::DemiBold));
+    m_bluetoothRecordingsRadioButton->setStyleSheet("QRadioButton{ color:#ffffff; }");
+    m_bluetoothRecordingsRadioButton->setCheckable(true);
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setEnabled);
+    connect( m_bluetoothRecordingsRadioButton, &QRadioButton::show, this, [this, parent]() {
+        m_bluetoothRecordingsRadioButton->setChecked( ((MainWindow*)parent)->getBluetoothRecordingPlaylist() == m_dirNum );
+        qDebug() << "bluetooth record set to: " << ((MainWindow*)parent)->getBluetoothRecordingPlaylist();
+    });
+
+
+    m_microphoneRecordingsCheckbox = new QCheckBox(this);
+    m_microphoneRecordingsCheckbox->setText(tr("Allow microphone recordings here"));
+    m_microphoneRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
+    m_microphoneRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, &QCheckBox::setEnabled);
+    connect(m_microphoneRecordingsCheckbox, &QCheckBox::toggled, this, [this] () {
+        m_playlistView->m_allowMicrophoneRecordings = m_microphoneRecordingsCheckbox->isChecked();
+    });
+
+    m_wifiRecordingsCheckbox = new QCheckBox(this);
+    m_wifiRecordingsCheckbox->setText(tr("Allow internet radio recordings here"));
+    m_wifiRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
+    m_wifiRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QCheckBox::setEnabled);
+
+    m_authorizationsLayout->addWidget(m_bluetoothRecordingsRadioButton);
+    m_authorizationsLayout->addSpacing(10);
+    m_authorizationsLayout->addWidget(m_microphoneRecordingsCheckbox);
+    m_authorizationsLayout->addSpacing(10);
+    m_authorizationsLayout->addWidget(m_wifiRecordingsCheckbox);
+
     m_playlistView = new PlaylistView(this);
 
     m_mainLayout->addLayout(m_toolLayout);
     m_mainLayout->addWidget(m_playlistView);
+    m_mainLayout->addLayout(m_authorizationsLayout);
 
     setTabOrder(m_playlistView, m_silenceDuration);
     m_playlistView->setFocus();
@@ -176,6 +253,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
         m_playlistView->setColumnVisible(METADATA_COMMENT_COLUMN_INDEX, false);
 
     connect(m_addSilenceButton, &QPushButton::clicked, this, &PlaylistPage::addSilence);
+    connect(m_addUrlButton, &QPushButton::clicked, this, &PlaylistPage::addUrl);
     connect(m_addButton, &QPushButton::clicked, this, &PlaylistPage::add);
     connect(m_removeButton, &QPushButton::clicked, this, &PlaylistPage::remove);
     connect(m_commitButton, &QPushButton::clicked, this, [this] () {
@@ -193,7 +271,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     connect(m_playlistView, &PlaylistView::errorOccurred, this, &PlaylistPage::errorOccurred);
 }
 
-void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const AudioList &result)
+void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const AudioList &result, MainWindow* mw)
 {
     m_dir = dir_path;
     m_dirNum = dir_num;
@@ -240,6 +318,10 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
 
     m_commitButton->setEnabled(true);
     m_cancelButton->setEnabled(true);
+
+    m_bluetoothRecordingsRadioButton->setChecked( m_dirNum == mw->getBluetoothRecordingPlaylist()  );
+    m_wifiRecordingsCheckbox->setChecked( mw->isWifiRecordingAllowedInPlaylist(m_dirNum) );
+    m_microphoneRecordingsCheckbox->setChecked( mw->isMicrophoneRecordingAllowedInPlaylist(m_dirNum) );
 }
 
 quint8 PlaylistPage::directory()
@@ -317,7 +399,17 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
     // then we move the selected files to desired directory
     for (const auto& entry : m_clipBoard)
     {
-        QString new_file_name = dest_dir + QString::number(index++) + DEFAULT_DESTINATION_FORMAT;
+        QString new_file_name;
+        if( qApp->property("hoerbertModel")==2011 ){
+            new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_WAV;
+        } else {
+            QFileInfo info(entry.path);
+            if( info.suffix().toLower()=="url" ){
+                new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_URL;
+            } else {
+                new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_MP3;
+            }
+        }
 
         if (moveFile(entry.path, new_file_name))
         {
@@ -338,6 +430,13 @@ void PlaylistPage::addSilence()
     // do some stuffs for actual commands to generate silence wav files
     m_playlistView->addSilence(getSelectedSilenceDurationInSeconds());
 }
+
+void PlaylistPage::addUrl()
+{
+    // do some stuffs for actual commands to generate silence wav files
+    m_playlistView->addUrl("");
+}
+
 
 void PlaylistPage::add()
 {
@@ -503,6 +602,9 @@ void PlaylistPage::onClosePage(bool doCommitChanges)
         commit_list.insert(METADATA_CHANGED_ENTRIES, metadata_entries);
 
     emit commitChanges(commit_list, m_dirNum);
+    emit setBluetoothRecordingPlaylist(m_dirNum, m_bluetoothRecordingsRadioButton->isChecked());
+    emit setWifiRecordingPermission(m_dirNum, m_wifiRecordingsCheckbox->isChecked());
+    emit setMicrophoneRecordingPermission(m_dirNum, m_microphoneRecordingsCheckbox->isChecked());
 }
 
 int PlaylistPage::getSelectedSilenceDurationInSeconds()

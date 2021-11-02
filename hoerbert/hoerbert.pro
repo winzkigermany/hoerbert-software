@@ -57,6 +57,7 @@ SOURCES += \
         capacitybar.cpp \
         cardpage.cpp \
         cdripper.cpp \
+        choosehoerbertdialog.cpp \
         debugdialog.cpp \
         devicemanager.cpp \
         dpiscale.cpp \
@@ -77,6 +78,7 @@ SOURCES += \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         waitingspinnerwidget.cpp \
+        wifidialog.cpp \
         xmlmetadatareader.cpp \
         xmlwriter.cpp
 
@@ -90,6 +92,7 @@ HEADERS += \
         capacitybar.h \
         cardpage.h \
         cdripper.h \
+        choosehoerbertdialog.h \
         debugdialog.h \
         devicemanager.h \
         dpiscale.h \
@@ -111,6 +114,7 @@ HEADERS += \
         triplecheckboxwidget.h \
         version.h \
         waitingspinnerwidget.h \
+        wifidialog.h \
         xmlmetadatareader.h \
         xmlwriter.h
 

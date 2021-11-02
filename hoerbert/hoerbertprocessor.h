@@ -76,6 +76,9 @@ public:
      */
     int directoryNumber();
 
+    bool convertToMp3(const QString &sourceFilePath, const QString &destFilePath, bool deleteOriginalWhenSuccessful=false);
+
+
 signals:
     /**
      * @brief this signal is emitted every processing entry is done
@@ -156,15 +159,6 @@ private:
     bool changeEntryMetadata(const AudioEntry &);
 
     /**
-     * @brief convertToWav convert all supported file formats to hoerbert format
-     * @param sourceFilePath absolute path of the file to be converted
-     * @param destFilePath absolute path of converted file
-     * @param metadata metadata of audio
-     * @return true if success, false otherwise
-     */
-    bool convertToWav(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata);
-
-    /**
      * @brief splitPer3Mins split audio per 3 minutes length, the last chunk would be the shortest
      * @param sourceFilePath absolute path of the file to be split
      * @param destDir absolute path where we want to put converted file
@@ -191,7 +185,7 @@ private:
      * @param metadata metadata of audio
      * @return true if success, false otherwise
      */
-    bool createSilenceWav(const QString &destFilePath, int duration, const MetaData &metadata);
+    bool createSilenceAudioFile(const QString &destFilePath, int duration, const MetaData &metadata);
 
     /**
      * @brief changeMetaData change metadata only
@@ -215,6 +209,17 @@ private:
      * @return the correction in dB that must be applied to the file
      */
     double getVolumeDifference(const QString &sourceFilePath);
+
+    /**
+     * @brief convertToAudioFile convert all supported file formats to hoerbert format
+     * @param sourceFilePath absolute path of the file to be converted
+     * @param destFilePath absolute path of converted file
+     * @param metadata metadata of audio
+     * @return true if success, false otherwise
+     */
+    bool convertToAudioFile(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata);
+
+    bool createUrlFile( QString destinationPath, MetaData metaData);
 
     QProcess *m_process;
     QString m_dirPath;

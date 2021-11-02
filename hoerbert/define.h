@@ -91,7 +91,7 @@ struct AudioEntry {
     QString path; // actual path on disk
     MetaData metadata; // user modified text or original file name
     int duration; // in seconds
-    int flag = -1; // -1: default, 0: added, 1: metadata, 2: split on silence, 3: split per 3, 4: renamed, 5: silence,
+    int flag = -1; // -1: default, 0: added, 1: metadata, 2: split on silence, 3: split per 3, 4: renamed, 5: silence, 6: URL
 };
 
 typedef QMap<int, AudioEntry> AudioList;
@@ -119,9 +119,15 @@ enum RetCode {
 /*!
  * \brief Path and files
  */
-const int VOLUME_SIZE_LIMIT                  = 32; // in Gigabytes
+const int VOLUME_SIZE_LIMIT                  = 64; // in Gigabytes
 
-const QString DEFAULT_DESTINATION_FORMAT     = ".WAV";
+const QString DESTINATION_FORMAT_WAV         = ".WAV";
+const QString DESTINATION_FORMAT_MP3         = ".MP3";
+const QString DESTINATION_FORMAT_URL         = ".URL";
+const QString DESTINATION_FORMAT_AAC         = ".AAC";
+const QString DESTINATION_FORMAT_M4A         = ".M4A";
+const QString DESTINATION_FORMAT_MP4         = ".MP4";
+const QString DESTINATION_FORMAT_FLAC        = ".FLAC";
 
 const QString FFMPEG_PATH_WIN                = "/ffmpeg/";
 const QString FFMPEG_PATH_MAC                = "/../Resources/ffmpeg/";
@@ -140,6 +146,9 @@ const QString HOERBERT_XML                   = "hoerbert.xml";
 const QString HOERBERT_XML_BACKUP            = "hoerbert.bak";
 const QString BACKUP_INFO_FILE               = "backup.xml";
 const QString CARD_INFO_FILE                 = "info.xml";
+const QString WIFI_INI_FILE                  = "wifi.ini";
+const QString INDEX_M3U_FILE                 = "index.m3u";
+const QString INDEX_M3U_FILE_BAK             = "index.m3u.bak";
 const QString CONTENT_HTML                   = "contents.html";
 const QString DIAGMODE_FILE                  = "diag.txt";
 const QString DIAGMODE_ORIGINALS_DIR         = "originals";

@@ -46,5 +46,9 @@
         <file>languages/qtbase_en.qm</file>
         <file>languages/qtbase_fr.qm</file>
         <file>app.rc</file>
+        <file>images/hoerbert_without_switch_200.png</file>
+        <file>images/hoerbert_without_switch_400.png</file>
+        <file>images/hoerbert_with_switch_200.png</file>
+        <file>images/hoerbert_with_switch_400.png</file>
     </qresource>
 </RCC>

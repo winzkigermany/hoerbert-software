@@ -33,12 +33,6 @@ public:
     void setCheckBoxLabel( QString label );
 
     /**
-     * @brief Show the "please wait" message for the long running operation
-     * @param waitMessageString A translated string
-     */
-    void setWaitMessage( QString waitMessageString );
-
-    /**
      * @brief is called then QDialog should be closed. We intercept that.
      */
     void reject();
@@ -68,6 +62,14 @@ public slots:
      * @param yesNo
      */
     void showButton( bool yesNo );
+
+    /**
+     * @brief Show the "please wait" message for the long running operation
+     * @param waitMessageString A translated string
+     */
+    void setWaitMessage( QString waitMessageString );
+
+
 
 private:
 

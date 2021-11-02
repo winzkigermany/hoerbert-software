@@ -26,6 +26,7 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QDir>
+#include <QApplication>
 
 #include "define.h"
 
@@ -76,12 +77,21 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
     arguments.append("0"); // index = 3
     arguments.append("-to");
     arguments.append("<END>"); // index = 5
-    arguments.append("-acodec");
-    arguments.append("pcm_s16le");
-    arguments.append("-ar");
-    arguments.append("32k");
-    arguments.append("-ac");
-    arguments.append("1");
+    if( qApp->property("hoerbertModel")==2011 ){
+        arguments.append("-acodec");
+        arguments.append("pcm_s16le");
+        arguments.append("-ar");
+        arguments.append("32k");
+        arguments.append("-ac");
+        arguments.append("1");
+    } else {
+        arguments.append("-ar");        // sample rate
+        arguments.append("44100");
+        arguments.append("-ac");        // channels
+        arguments.append("2");
+        arguments.append("-b:a");        // bit rate
+        arguments.append("192k");
+    }
     arguments.append("-metadata");
     arguments.append("<METADATA>"); // index = 13
     arguments.append("-y");
@@ -115,7 +125,12 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         metadata.resize(m_maxMetadataLength, ' ');
         arguments.replace(13, QString("title=%1").arg(metadata.trimmed()));
 
-        auto output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DEFAULT_DESTINATION_FORMAT;
+        QString output_path;
+        if( qApp->property("hoerbertModel")==2011 ){
+            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_WAV;
+        } else {
+            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_MP3;
+        }
         arguments.replace(lastArgumentIndex, output_path);
 
         info_list.append(output_path);

@@ -376,7 +376,7 @@ bool CardPage::ejectDrive()
     settings.beginGroup("Global");
     bool regenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
     settings.endGroup();
-    if( isHoerbertXMLDirty() && regenerateHoerbertXml ){
+    if( (qApp->property("hoerbertModel")==2011) && isHoerbertXMLDirty() && regenerateHoerbertXml ){
         m_pleaseWaitDialog->setWindowTitle(tr("Generating hoerbert.xml"));
         m_pleaseWaitDialog->setWaitMessage(tr("Making this card compatible with the old hoerbert app V1.x"));
         m_pleaseWaitDialog->setProgressRange( 0, 100 );
@@ -454,7 +454,11 @@ void CardPage::recreateXml()
             return;
         }
         dir.setFilter(QDir::Files | QDir::NoSymLinks);
-        dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+        } else {
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
+        }
         dir.setSorting(QDir::Name);
 
         file_info_list.append(dir.entryInfoList());
@@ -524,6 +528,59 @@ void CardPage::deselectDrive()
     emit driveSelected("");
 }
 
+
+
+/**
+* @brief CardPage::hasAudioFiles
+* look for all audio files EXCEPT mp3 files. (We don't need to re-encode mp3 files)
+*/
+bool CardPage::hasAudioFiles( QString rootPath){
+    QStringList nameFilter;
+    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4;
+
+    bool foundOne = false;
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        qDebug() << "Searching for audio files in " << rootPath+QString::number(i);
+        QDir directory(rootPath+QString::number(i));
+        QStringList txtFilesAndDirectories = directory.entryList(nameFilter, QDir::AllEntries|QDir::NoDotAndDotDot);
+        for ( const auto& entry : txtFilesAndDirectories  )
+        {
+            qDebug() << entry;
+        }
+        if( txtFilesAndDirectories.length()>0 ){
+            foundOne = true;
+            break;
+        }
+    }
+
+    return foundOne;
+}
+
+
+void CardPage::convertAllAudioFilesToMp3( QString rootPath){
+    QStringList nameFilter;
+    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4;
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        qDebug() << "Searching for audio files in " << rootPath+QString::number(i);
+        QDir directory(rootPath+QString::number(i));
+        QStringList txtFilesAndDirectories = directory.entryList(nameFilter, QDir::AllEntries|QDir::NoDotAndDotDot);
+        for ( const auto& iterator : txtFilesAndDirectories  )
+        {
+            HoerbertProcessor *processor = new HoerbertProcessor(rootPath+QString::number(i)+"/"+iterator, -1);
+            QFileInfo audioFile( rootPath+QString::number(i) +"/"+ iterator);
+            qDebug()<<audioFile.absoluteFilePath();
+            QString mp3FileName = audioFile.path() + "/" + audioFile.completeBaseName() + ".mp3";
+            mp3FileName.toLower().replace( audioFile.suffix(), ".mp3" );
+
+            emit convertingCurrentFile(audioFile.absoluteFilePath());
+
+            processor->convertToMp3( audioFile.absoluteFilePath(), mp3FileName, true);
+        }
+    }
+}
+
+
 void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 {
     if (driveName.isEmpty())
@@ -578,7 +635,7 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
     qint64 size_in_bytes = m_deviceManager->getVolumeSize(driveName);
     if ( size_in_bytes > (qint64(VOLUME_SIZE_LIMIT)*qint64(1073741824)+1024) )
     {
-        auto selected = QMessageBox::question(this, tr("Select drive"), tr("Volume size is bigger than 32GB. This may not be a memory card at all.")+"\n"+tr("Are you sure you want to work on this drive? [%1]").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
+        auto selected = QMessageBox::question(this, tr("Select drive"), tr("Volume size is bigger than 64GB. This may not be a memory card at all.")+"\n"+tr("Are you sure you want to work on this drive? [%1]").arg(driveName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No );
         if (selected == QMessageBox::No)
         {
             updateDriveList();
@@ -586,12 +643,31 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         }
     }
 
+
     bool isPlausible = true;
     std::list <int> plausibilityFixList;
 
     m_deviceManager->setCurrentDrive(driveName);
 
     QString drive_path = currentDrivePath();
+
+    if( hasAudioFiles(drive_path) ){
+        auto selected = QMessageBox::question(this, tr("Convert files"), tr("There are large files on the card.")+"\n"+tr("Free some space by converting all files to mp3?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+        if (selected == QMessageBox::Yes)
+        {
+            m_pleaseWaitDialog = new PleaseWaitDialog();
+            connect( m_pleaseWaitDialog, &QDialog::finished, m_pleaseWaitDialog, &PleaseWaitDialog::close);
+            m_pleaseWaitDialog->setParent( this );
+            m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+            m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
+            m_pleaseWaitDialog->show();
+
+            connect( this, &CardPage::convertingCurrentFile, m_pleaseWaitDialog, &PleaseWaitDialog::setWaitMessage);
+            convertAllAudioFilesToMp3(drive_path);
+
+            m_pleaseWaitDialog->setResultString(tr("Finished converting all files."));
+        }
+    }
 
     QDir dir(drive_path);
     if (dir.exists(DIAGMODE_FILE))
@@ -658,7 +734,11 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                 return;
             }
             dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-            dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+            if( qApp->property("hoerbertModel")==2011 ){
+                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+            } else {
+                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+            }
             dir.setSorting(QDir::Name);
 
             QFileInfoList list = dir.entryInfoList();
@@ -667,12 +747,24 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
             // check plausibility at this point.
             auto index = 0;
             for (QFileInfo currentFile : list) {
-                if ( currentFile.fileName().toLower().remove(DEFAULT_DESTINATION_FORMAT.toLower()).toInt() != index || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long
-                    isPlausible = false;
-                    qDebug() << list;
-                    plausibilityFixList.push_back(i);
-                    break;
+                if( qApp->property("hoerbertModel")==2011 ){
+                    if ( currentFile.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index
+                         || currentFile.size()<45 ) {    // the header of a wav file is at least 44 bytes long
+                        isPlausible = false;
+                        qDebug() << list;
+                        plausibilityFixList.push_back(i);
+                        break;
+                    }
+                } else {
+                    //@TODO: Plausibility is a difficult concept for multi-file, multi-suffix scenarios.
+                    //in the future, we might be able to check plausibility against an m3u file again.
+                    //For now, the chances for false positives are simply too high for a sensible plausibility check.
+
+                    //Probably, we could at least make sure that there is only one file suffix per file index. Except m3u files, of course...
+
+                    ;
                 }
+
                 index++;
             }
 
@@ -682,11 +774,13 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         }
 
         //migrate old cards to the new format if there is no hoerbert.bak file on the card.
-        if (!m_migrationSuggested && QFile::exists(drive_path + HOERBERT_XML)) {
-            if (!QFile::exists(drive_path + HOERBERT_XML_BACKUP) && QFile::exists(drive_path + HOERBERT_XML)  )
-            {
-                emit migrationNeeded(drive_path);
-                m_migrationSuggested = true;
+        if( qApp->property("hoerbertModel")==2011 ){
+            if (!m_migrationSuggested && QFile::exists(drive_path + HOERBERT_XML)) {
+                if (!QFile::exists(drive_path + HOERBERT_XML_BACKUP) && QFile::exists(drive_path + HOERBERT_XML)  )
+                {
+                    emit migrationNeeded(drive_path);
+                    m_migrationSuggested = true;
+                }
             }
         }
     }
@@ -942,7 +1036,11 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
     QDir dir(sub_dir);
 
     dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+    if( qApp->property("hoerbertModel")==2011 ){
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+    }
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();

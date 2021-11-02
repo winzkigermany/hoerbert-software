@@ -25,6 +25,7 @@
 #include <QWidget>
 
 #include "define.h"
+#include "mainwindow.h"
 
 class QComboBox;
 class QVBoxLayout;
@@ -33,9 +34,12 @@ class QLabel;
 class QPushButton;
 class QFileInfo;
 class QMenu;
+class QCheckBox;
+class QRadioButton;
 
 class PieButton;
 class PlaylistView;
+class MainWindow;
 
 /**
  * @brief The PlaylistPage class represents a page to work on a playlist
@@ -54,7 +58,7 @@ public:
     /**
      * @brief set the absolute path to selected directory and directory number, list all files in it
      */
-    void setListData(const QString &, quint8 , const AudioList &);
+    void setListData(const QString &, quint8 , const AudioList &, MainWindow*);
 
     /**
      * @brief return the directory number
@@ -118,11 +122,20 @@ signals:
      */
     void errorOccurred(const QString &errorString);
 
+    void setBluetoothRecordingPlaylist(qint8 dirNum, bool onOff);
+    void setWifiRecordingPermission(qint8 dirNum, bool onOff );
+    void setMicrophoneRecordingPermission(qint8 dirNum, bool onOff);
+
 public slots:
     /**
      * @brief add silence to the position
      */
     void addSilence();
+
+    /**
+     * @brief add an url to the position
+     */
+    void addUrl();
 
     /**
      * @brief add files through file dialog
@@ -156,6 +169,7 @@ private slots:
      */
     void onClosePage(bool doCommitChanges);
 
+
 private:
     /**
      * @brief getSelectedSilenceDurationInSeconds get duration of silence from combobox in seconds
@@ -186,17 +200,25 @@ private:
     QMap<int, AudioList> m_implicitlyMovedList;
 
     QLabel *m_silenceLabel;
+    QLabel *m_urlLabel;
+    QLabel *m_fileLabel;
     QLabel *m_colorBlindHintLabel;
     QComboBox *m_silenceDuration;
     PieButton *m_addSilenceButton;
+    PieButton *m_addUrlButton;
     PieButton *m_addButton;
     PieButton *m_removeButton;
     PieButton *m_commitButton;
     PieButton *m_cancelButton;
     PlaylistView *m_playlistView;
 
+    QRadioButton *m_bluetoothRecordingsRadioButton;
+    QCheckBox *m_microphoneRecordingsCheckbox;
+    QCheckBox *m_wifiRecordingsCheckbox;
+
     QVBoxLayout *m_mainLayout;
     QHBoxLayout *m_toolLayout;
+    QHBoxLayout *m_authorizationsLayout;
     QHBoxLayout *m_leftToolLayout;
     QHBoxLayout *m_centerToolLayout;
     QHBoxLayout *m_rightToolLayout;

@@ -315,6 +315,8 @@ signals:
      */
     void driveListChanged( int );
 
+    void convertingCurrentFile( QString );
+
 public slots:
 
     /**
@@ -367,6 +369,12 @@ private:
      * @brief sendDriveCapacity sends information about space used + max space available in bytes
      */
     void sendDriveCapacity();
+
+    void openWifiDialog();
+
+    bool hasAudioFiles( QString );
+
+    void convertAllAudioFilesToMp3( QString rootPath);
 
     bool m_isProcessing;
     bool m_migrationSuggested;

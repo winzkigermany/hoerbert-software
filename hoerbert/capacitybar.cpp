@@ -23,6 +23,7 @@
 
 #include <QDebug>
 #include <QPainter>
+#include <QApplication>
 
 #include "define.h"
 #include "functions.h"
@@ -57,10 +58,15 @@ void CapacityBar::setParams(quint64 usedBytes, quint64 totalBytes)
 
 void CapacityBar::paintEvent(QPaintEvent *e)
 {
-    if (m_totalBytes > 0)
-        setText(QString("~ %1 / %2 min").arg(bytesToSeconds(m_usedBytes) / 60 ).arg(bytesToSeconds(m_totalBytes)/60));
-    else
+    if (m_totalBytes > 0){
+        if( qApp->property("hoerbertModel")==2011 ){
+            setText(QString("~ %1 / %2 min").arg(bytesToSeconds(m_usedBytes) / 60 ).arg(bytesToSeconds(m_totalBytes)/60));
+        } else {
+            setText(QString("~ %1 / %2 MB").arg( m_usedBytes/1000000 ).arg( m_totalBytes/1000000 ));
+        }
+    } else {
         setText(tr("Please select a device first."));
+    }
 
     int percentage =  int(double(m_usedBytes) / double(m_totalBytes) * 100);
 

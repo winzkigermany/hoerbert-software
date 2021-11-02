@@ -50,8 +50,14 @@
 #include "functions.h"
 #include "playlistview.h"
 #include "backuprestoredialog.h"
+#include "choosehoerbertdialog.h"
+#include "wifidialog.h"
+
+#define MAX_PLAYLIST_COUNT 9
 
 class CardPage;
+class WifiDialog;
+class PlaylistPage;
 
 class MainWindow : public QMainWindow
 {
@@ -81,6 +87,15 @@ public:
      */
     void sync();
 
+    int getHoerbertVersion();
+
+    QString getCurrentDrivePath();
+
+    quint8 getBluetoothRecordingPlaylist();
+
+    bool isWifiRecordingAllowedInPlaylist( quint8 playlistNumber );
+
+    bool isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber );
 
 signals:
     /**
@@ -94,6 +109,10 @@ signals:
      * @return
      */
     void changeCommentColumnVisibility( bool onOff );
+
+    void isLatestHoerbert(bool latestOlder );
+
+    void isNotLatestHoerbert(bool latestOlder );
 
 
 private slots:
@@ -141,7 +160,13 @@ private:
 
     QString printButtons(int);
 
+    void setHoerbertModel( int modelIdentifier);
+
     bool m_hasBeenRemindedOfBackup = false;  // we set this flag once the user has been reminded of a backup for this card. Then we will keep from reminding him unless a new card is selected.
+
+    void readIndexM3u();
+
+    void generateIndexM3u();
 
     /**
      * @brief updateFormatActionAvailability The format action needs special care as of when to enable or disable it.
@@ -154,9 +179,12 @@ private:
      */
     int compareVersionWithThisApp( const QString& onlineVersionString );
 
+    uint m_hoerbertVersion;
     QString m_migrationPath;
     BackupManager *m_backupManager;
     QProgressDialog *m_progress;
+
+    ChooseHoerbertDialog *m_chooseHoerbertDialog;
 
     QStackedWidget *m_stackWidget;
     AboutDialog *m_aboutDlg;
@@ -177,6 +205,7 @@ private:
     QGraphicsDropShadowEffect *m_shadow;
 
     QMenu *m_moveToPlaylistMenu;
+    QMenu *m_hoerbertModelMenu;
     QMenu *m_subMenuBegin;
     QMenu *m_subMenuEnd;
     QMenu *m_backupMenu;
@@ -198,6 +227,9 @@ private:
     QAction *m_showAlbumAction;
     QAction *m_showPathAction;
     QAction *m_darkModeAction;
+    QAction *m_hoerbertModel2011Action;
+    QAction *m_hoerbertModel2021Action;
+    QAction *m_wifiAction;
 
     QAction *m_moveToB1;
     QAction *m_moveToB2;
@@ -231,6 +263,12 @@ private:
 
     QMap<int, QString> m_errorLog;
     PleaseWaitDialog* m_pleaseWaitDialog;
+    WifiDialog* m_wifiDialog;
+    void openWifiDialog();
+
+    quint8 m_bluetoothRecordingPlaylist;
+    bool m_wifiRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
+    bool m_microphoneRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
 };
 
 #endif // MAINWINDOW_H

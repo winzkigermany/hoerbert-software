@@ -23,6 +23,7 @@
 
 #include <QDir>
 #include <QDebug>
+#include <QApplication>
 
 int sortByNumber(const QFileInfo &fileName1, const QFileInfo &fileName2)
 {
@@ -436,11 +437,19 @@ void recursivelyGetDirectoryContent(QStringList *list, const QString &destDir, i
 
 quint64 bytesToSeconds(quint64 byteSize)
 {
-    return quint64(double(byteSize) / 32000 / 2 / 1.05);
+    if( qApp->property("hoerbertModel")==2011 ){
+        return quint64(double(byteSize) / 32000 / 2 / 1.05);
+    } else {
+        return quint64(double(byteSize) / 24000 / 1.01);
+    }
 }
 
 quint64 secondsToBytes(int seconds)
 {
-    return quint64(double(seconds) * 32000 * 2 * 1.05);
+    if( qApp->property("hoerbertModel")==2011 ){
+        return quint64(double(seconds) * 32000 * 2 * 1.05);
+    } else {
+        return quint64(double(seconds) * 24000 * 1.01);
+    }
 }
 

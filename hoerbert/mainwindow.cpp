@@ -59,6 +59,9 @@ MainWindow::MainWindow(QWidget *parent)
     m_migrationPath = QString("");
     m_hasBeenRemindedOfBackup = false;
 
+    m_hoerbertVersion = 0;
+    m_bluetoothRecordingPlaylist = 255;
+
     QDesktopWidget dw;
     setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
     setWindowTitle("hörbert");
@@ -84,7 +87,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_cardPage = new CardPage(this);
     m_playlistPage = new PlaylistPage(this);
-
 
     connect(m_cardPage, &CardPage::driveCapacityUpdated, m_capBar, &CapacityBar::setParams);
 
@@ -150,6 +152,8 @@ MainWindow::MainWindow(QWidget *parent)
                 migrate(m_migrationPath);
                 m_migrationPath = QString("");
             }
+
+            readIndexM3u();
         }
 
         updateActionAvailability(true);
@@ -157,7 +161,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
         m_stackWidget->setCurrentIndex(1);
-        m_playlistPage->setListData(dir_path, dir_num, result);
+        m_playlistPage->setListData(dir_path, dir_num, result, this);
         m_playlistPage->setBackgroundColor(m_cardPage->getPlaylistColor(dir_num));
         m_shadow->setColor(m_cardPage->getPlaylistColor(dir_num));
 
@@ -196,6 +200,33 @@ MainWindow::MainWindow(QWidget *parent)
         m_cardPage->updateEstimatedDuration( playlistIndex, durationInSeconds );
     });
 
+    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, this, [=]( quint8 playlistIndex, bool onOff ) {
+        qDebug() << "Setting bluetooth recording playlist: " << playlistIndex << ", value: " << onOff;
+
+        if( onOff ){
+            m_bluetoothRecordingPlaylist = playlistIndex;
+        } else {
+            if( m_bluetoothRecordingPlaylist == playlistIndex ){
+                m_bluetoothRecordingPlaylist = 255;
+            }
+        }
+    });
+
+    connect(m_playlistPage, &PlaylistPage::setWifiRecordingPermission, this, [=]( quint8 playlistIndex, bool onOff ) {
+        qDebug() << "Setting Wifi recording permission: " << playlistIndex << ", value: " << onOff;
+
+        if( playlistIndex<MAX_PLAYLIST_COUNT ){
+            m_wifiRecordingPermissions[playlistIndex] = onOff;
+        }
+    });
+
+    connect(m_playlistPage, &PlaylistPage::setMicrophoneRecordingPermission, this, [=]( quint8 playlistIndex, bool onOff ) {
+        qDebug() << "Setting Microphone recording permission: " << playlistIndex << ", value: " << onOff;
+
+        if( playlistIndex<MAX_PLAYLIST_COUNT ){
+            m_microphoneRecordingPermissions[playlistIndex] = onOff;
+        }
+    });
 
     connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
 
@@ -229,6 +260,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_backupManager = nullptr;
     m_dbgDlg = new DebugDialog(this);
+
+    m_chooseHoerbertDialog = new ChooseHoerbertDialog(this);
+    m_chooseHoerbertDialog->setModal(true);
+    m_chooseHoerbertDialog->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);     // disable the close button. We NEED the user to choose.
+    connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, &MainWindow::setHoerbertModel);
+    m_chooseHoerbertDialog->show();
 }
 
 void MainWindow::updateActionAvailability( bool ANDed )
@@ -267,6 +304,23 @@ void MainWindow::updateActionAvailability( bool ANDed )
         m_printAction->setEnabled(false);
         m_backupAction->setEnabled(false);
     }
+
+    // The wifi settings action
+    if( m_cardPage->getSelectedDrive().isEmpty() )
+    {
+        m_hoerbertModel2011Action->setEnabled(true);
+        m_hoerbertModel2021Action->setEnabled(true);
+        m_wifiAction->setEnabled(false);
+    } else {
+        m_hoerbertModel2011Action->setEnabled(false);
+        m_hoerbertModel2021Action->setEnabled(false);
+        if( getHoerbertVersion()==2011 ){
+            m_wifiAction->setEnabled(false);
+        } else {
+            m_wifiAction->setEnabled(true);
+        }
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -308,14 +362,18 @@ void MainWindow::makePlausible(std::list <int> fixList)
             return;
         }
         dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
-        dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+        } else {
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+        }
         dir.setSorting(QDir::Name);
 
         QFileInfoList list = dir.entryInfoList();
 
         // clean up empty files(file size is 0KB)
         for( QFileInfo &item : list ) {
-            if (item.size() < 45) {
+            if ( item.suffix().toLower()!="url" && item.size() < 45) {
                 if (QFile::remove(item.absoluteFilePath())) {
                     qDebug() << "Deleted empty file:" << item.absoluteFilePath();
                 } else {
@@ -330,9 +388,24 @@ void MainWindow::makePlausible(std::list <int> fixList)
 
         auto index = 0;
         for (const auto &item : list) {
-            if (item.fileName().toLower().remove(DEFAULT_DESTINATION_FORMAT.toLower()).toInt() != index) {
-                qDebug() << "Index" << index << "is missing in" << sub_dir;
-                moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DEFAULT_DESTINATION_FORMAT);
+            if( qApp->property("hoerbertModel")==2011 ){
+                if (item.fileName().toLower().remove(DESTINATION_FORMAT_WAV.toLower()).toInt() != index) {
+                    qDebug() << "Index" << index << "is missing in" << sub_dir;
+                    moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_WAV);
+                }
+            } else {
+                if ((item.fileName().toLower().remove(DESTINATION_FORMAT_MP3.toLower()).toInt() != index)
+                        && (item.fileName().toLower().remove(DESTINATION_FORMAT_URL.toLower()).toInt() != index)) {
+                    qDebug() << "Index" << index << "is missing in" << sub_dir;
+
+                    QFileInfo info(item.absoluteFilePath());
+                    if( info.suffix().toLower()=="url" ){
+                        moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_URL);
+                    } else {
+                        moveFile(item.absoluteFilePath(), tailPath(item.absolutePath()) + QString::number(index) + DESTINATION_FORMAT_MP3);
+                    }
+
+                }
             }
             index++;
         }
@@ -342,11 +415,227 @@ void MainWindow::makePlausible(std::list <int> fixList)
     m_plausibilityCheckMutex.unlock();
 }
 
+
+
+/**
+ * @brief MainWindow::readIndexM3U read the index.m3u file
+ * @param rootPath
+ */
+void MainWindow::readIndexM3u(){
+
+    QString rootPath = getCurrentDrivePath();
+    qDebug() << "root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
+
+    // reset all values
+    m_bluetoothRecordingPlaylist = 255;
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        m_microphoneRecordingPermissions[i] = false;
+        m_wifiRecordingPermissions[i] = false;
+    }
+
+    // Open file to read contents
+    QFile file(rootPath + INDEX_M3U_FILE);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+
+        while (!stream.atEnd())
+        {
+            QString newLine = stream.readLine();
+            QString dataString = "";
+            QString searchString;
+
+            searchString = "#hoerbert:set_bluetooth_recordings_playlist";
+            if( newLine.toLower().startsWith(searchString) ){
+                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+                int playlistNumber = dataString.toInt();
+                if( playlistNumber>=0 && playlistNumber<MAX_PLAYLIST_COUNT ){
+                    m_bluetoothRecordingPlaylist = playlistNumber;
+                }
+            }
+
+            searchString = "#hoerbert:allow_microphone_recordings_in_playlist";
+            if( newLine.toLower().startsWith(searchString) ){
+                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
+                for ( const auto& i : list  )
+                {
+                    if( i.trimmed()=="0.0")
+                        m_microphoneRecordingPermissions[0] = true;
+
+                    if( i.trimmed()=="0.1")
+                        m_microphoneRecordingPermissions[1] = true;
+
+                    if( i.trimmed()=="0.2")
+                        m_microphoneRecordingPermissions[2] = true;
+
+                    if( i.trimmed()=="0.3")
+                        m_microphoneRecordingPermissions[3] = true;
+
+                    if( i.trimmed()=="0.4")
+                        m_microphoneRecordingPermissions[4] = true;
+
+                    if( i.trimmed()=="0.5")
+                        m_microphoneRecordingPermissions[5] = true;
+
+                    if( i.trimmed()=="0.6")
+                        m_microphoneRecordingPermissions[6] = true;
+
+                    if( i.trimmed()=="0.7")
+                        m_microphoneRecordingPermissions[7] = true;
+
+                    if( i.trimmed()=="0.8")
+                        m_microphoneRecordingPermissions[8] = true;
+                }
+            }
+
+            searchString = "#hoerbert:allow_wifi_recordings_in_playlist";
+            if( newLine.toLower().startsWith(searchString) ){
+                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
+                for ( const auto& i : list  )
+                {
+                    if( i.trimmed()=="0.0")
+                        m_wifiRecordingPermissions[0] = true;
+
+                    if( i.trimmed()=="0.1")
+                        m_wifiRecordingPermissions[1] = true;
+
+                    if( i.trimmed()=="0.2")
+                        m_wifiRecordingPermissions[2] = true;
+
+                    if( i.trimmed()=="0.3")
+                        m_wifiRecordingPermissions[3] = true;
+
+                    if( i.trimmed()=="0.4")
+                        m_wifiRecordingPermissions[4] = true;
+
+                    if( i.trimmed()=="0.5")
+                        m_wifiRecordingPermissions[5] = true;
+
+                    if( i.trimmed()=="0.6")
+                        m_wifiRecordingPermissions[6] = true;
+
+                    if( i.trimmed()=="0.7")
+                        m_wifiRecordingPermissions[7] = true;
+
+                    if( i.trimmed()=="0.8")
+                        m_wifiRecordingPermissions[8] = true;
+                }
+            }
+        }
+
+        file.close();
+    }
+}
+
+/**
+ * @brief MainWindow::generateIndexM3u
+ * @param rootPath
+ */
+void MainWindow::generateIndexM3u(){
+
+    QString rootPath = getCurrentDrivePath();
+    qDebug() << "root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
+
+    // Open file to copy contents
+    bool isNewFile = false;
+    QFile file(rootPath + INDEX_M3U_FILE);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        // create the file to keep the rest working as if it existed.
+        file.open(QIODevice::ReadWrite | QIODevice::Text);
+        isNewFile = true;
+    }
+    file.close();
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        // Open new file to write
+        uint32_t lineNumber = 0;
+        QFile temp(rootPath + INDEX_M3U_FILE_BAK);
+        if( temp.open(QIODevice::ReadWrite | QIODevice::Text) )
+        {
+            QTextStream stream(&file);
+            QTextStream out(&temp);
+            bool foundOne = false;
+
+            out << "#EXTM3U" << "\n";
+
+            if( m_bluetoothRecordingPlaylist<MAX_PLAYLIST_COUNT ){
+                out << "#hoerbert:set_bluetooth_recordings_playlist" << " 0." << m_bluetoothRecordingPlaylist << "\n";
+            }
+
+            QString microphonePermissionsString = "";
+            foundOne = false;
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+                if( m_microphoneRecordingPermissions[i] ){
+                    microphonePermissionsString += " 0."+QString::number(i);
+                    foundOne = true;
+                }
+            }
+            if( foundOne ){
+                out << "#hoerbert:allow_microphone_recordings_in_playlist" << microphonePermissionsString << "\n";
+            }
+
+            QString wifiPermissionsString = "";
+            foundOne = false;
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+                if( m_wifiRecordingPermissions[i] ){
+                    wifiPermissionsString += " 0."+QString::number(i);
+                    foundOne = true;
+                }
+                foundOne = true;
+            }
+            if( foundOne ){
+                out << "#hoerbert:allow_wifi_recordings_in_playlist" << wifiPermissionsString << "\n";
+            }
+
+            while (!stream.atEnd())
+            {
+                QString newLine = stream.readLine();
+
+                if( newLine.toLower().startsWith("#extm3u") ){
+                    lineNumber++;
+                    continue;
+                }
+                if( newLine.toLower().startsWith("#hoerbert:set_bluetooth_recordings_playlist") ){
+                    lineNumber++;
+                    continue;
+                }
+                if( newLine.toLower().startsWith("#hoerbert:allow_microphone_recordings_in_playlist") ){
+                    lineNumber++;
+                    continue;
+                }
+                if( newLine.toLower().startsWith("#hoerbert:allow_wifi_recordings_in_playlist") ){
+                    lineNumber++;
+                    continue;
+                }
+
+                out << newLine  << "\n";
+                lineNumber++;
+            }
+            temp.close();
+            file.close();
+
+            file.remove();
+            temp.rename(rootPath + INDEX_M3U_FILE);
+         }
+    }
+}
+
+
+/**
+ * @brief MainWindow::processCommit
+ * @param list
+ * @param dir_index
+ */
 void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index)
 {
     m_cardPage->enableButtons(true);
     showHideEditMenuEntries(false);
     updateActionAvailability(false);
+
+    generateIndexM3u();
 
     if (list.count() == 0) {
         m_cardPage->update();
@@ -508,7 +797,7 @@ void MainWindow::migrate(const QString &dirPath)
         sync();
 
         bool doGenerateHoerbertXml = false;
-        {
+        if( qApp->property("hoerbertModel")==2011 ){
             QSettings settings;
             settings.beginGroup("Global");
             doGenerateHoerbertXml = settings.value("regenerateHoerbertXml").toBool();
@@ -522,7 +811,7 @@ void MainWindow::migrate(const QString &dirPath)
         }
         else
         {
-            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version 2.x"));
+            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use"));
         }
         m_pleaseWaitDialog->setWindowTitle(tr("Ready for use"));
         m_pleaseWaitDialog->showButton(true);
@@ -568,7 +857,11 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
         QDir dir(sub_dir);
 
         dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-        dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+        } else {
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+        }
         dir.setSorting(QDir::Name);
 
         QFileInfoList list = dir.entryInfoList();
@@ -928,6 +1221,15 @@ void MainWindow::collectInformationForSupport()
         info_list << "";
         info_list << "[notes]";
 
+        if ( qApp->property("hoerbertModel")==2011 )
+        {
+            info_list << "App is in the mode for hoerbert 2011";
+        }
+        else
+        {
+            info_list << "App is in the mode for hoerbert without Power switch";
+        }
+
         QString current_card_path = m_cardPage->currentDrivePath();
         QDir card_dir(current_card_path);
         if (card_dir.exists(HOERBERT_XML))
@@ -964,6 +1266,53 @@ void MainWindow::collectInformationForSupport()
         else
         {
             info_list << "No info.xml was found in the card root directory.";
+        }
+
+
+
+        if (card_dir.exists("wifi.ini"))
+        {
+            info_list << "wifi.ini file was found in the card root directory. Not copying that due to security reasons.";
+        }
+        else
+        {
+            info_list << "No wifi.ini was found in the card root directory.";
+        }
+
+
+        if (card_dir.exists("index.m3u"))
+        {
+            if (!QFile::copy(tailPath(current_card_path) + "index.m3u", tailPath(collect_path) + "index.m3u"))
+            {
+                info_list << "Failed to copy index.m3u from" << current_card_path << "to" << collect_path;
+            }
+        }
+        else
+        {
+            info_list << "No index.m3u was found in the card root directory.";
+        }
+
+
+        if (card_dir.exists("ver_fw.txt"))
+        {
+            if (!QFile::copy(tailPath(current_card_path) + "ver_fw.txt", tailPath(collect_path) + "ver_fw.txt"))
+            {
+                info_list << "Failed to copy ver_fw.txt from" << current_card_path << "to" << collect_path;
+            }
+        }
+        else
+        {
+            info_list << "No ver_fw.txt was found in the card root directory.";
+        }
+
+
+        if (card_dir.exists("hoerbert_firmware.bin"))
+        {
+            info_list << "hoerbert_firmware.bin was found in the card root directory.";
+        }
+        else
+        {
+            info_list << "No hoerbert_firmware.bin was found in the card root directory.";
         }
 
         printTableOfContent(collect_path);
@@ -2053,6 +2402,43 @@ void MainWindow::createActions()
     m_viewMenu = new QMenu(tr("View"), this);
     menuBar()->addMenu(m_viewMenu);
 
+    m_hoerbertModelMenu = new QMenu(tr("Select hoerbert model..."), this);
+    m_hoerbertModelMenu->setEnabled(true);
+    m_viewMenu->addMenu( m_hoerbertModelMenu );
+
+
+    m_hoerbertModel2021Action = new QAction(tr("Latest hörbert model"), this);
+    m_hoerbertModel2021Action->setCheckable(true);
+    m_hoerbertModel2021Action->setStatusTip(tr("The latest model (starting October 2021). This model has no mechanical on/off switch"));
+    connect(m_hoerbertModel2021Action, &QAction::triggered, this, [this] () {
+        setHoerbertModel(2021);
+        updateActionAvailability();
+    });
+    connect( this, &MainWindow::isLatestHoerbert, m_hoerbertModel2021Action, &QAction::setChecked);
+    m_hoerbertModelMenu->addAction(m_hoerbertModel2021Action);
+
+
+    m_hoerbertModel2011Action = new QAction(tr("hörbert 2011"), this);
+    m_hoerbertModel2011Action->setCheckable(true);
+    m_hoerbertModel2011Action->setStatusTip(tr("All hörbert models starting from 2011 that have a mechanical on/off switch"));
+    connect(m_hoerbertModel2011Action, &QAction::triggered, this, [this] () {
+        setHoerbertModel(2011);
+        updateActionAvailability();
+    });
+    connect( this, &MainWindow::isNotLatestHoerbert, m_hoerbertModel2011Action, &QAction::setChecked);
+    m_hoerbertModelMenu->addAction(m_hoerbertModel2011Action);
+
+    {
+        QSettings settings;
+        settings.beginGroup("Global");
+        uint hoerbertModel = settings.value("hoerbertModel").toUInt();
+        setHoerbertModel( hoerbertModel );
+        settings.endGroup();
+    }
+
+    m_viewMenu->addSeparator();
+
+
     m_darkModeAction = new QAction(tr("Dark mode"), this);
     m_darkModeAction->setStatusTip(tr("Switch on or off dark mode"));
     m_darkModeAction->setEnabled(true);
@@ -2127,7 +2513,19 @@ void MainWindow::createActions()
 
 
     m_extrasMenu = new QMenu(tr("Extras"), this);
-    menuBar()->addMenu(m_extrasMenu);
+
+    m_wifiDialog = new WifiDialog(this);
+    m_wifiDialog->setModal(true);
+
+    m_wifiAction = new QAction(tr("Configure WiFi connections"), this);
+    m_wifiAction->setStatusTip(tr("Configure WiFi connections"));
+    m_wifiAction->setEnabled(true);
+    m_wifiAction->setMenuRole(QAction::NoRole);
+    connect(m_wifiAction, &QAction::triggered, this, [this] () {
+        openWifiDialog();
+    });
+    m_extrasMenu->addAction(m_wifiAction);
+
 
     m_printAction = new QAction(tr("Print table of contents"), this);
     m_printAction->setStatusTip(tr("Print table of contents"));
@@ -2136,6 +2534,9 @@ void MainWindow::createActions()
         printTableOfContent();
     });
     m_extrasMenu->addAction(m_printAction);
+    m_extrasMenu->addAction(m_printAction);
+
+    menuBar()->addMenu(m_extrasMenu);
 
     m_backupMenu = new QMenu(tr("Backup..."), this);
     m_backupAction = new QAction(tr("Backup memory card"), this);
@@ -2377,4 +2778,65 @@ int MainWindow::compareVersionWithThisApp( const QString& onlineVersionString)
             return 1;
     }
     return 0;
+}
+
+
+int MainWindow::getHoerbertVersion(){
+    return m_hoerbertVersion;
+}
+
+
+void MainWindow::setHoerbertModel( int modelIdentifier )
+{
+    if( modelIdentifier==2021 ){
+        m_hoerbertVersion = 2021;
+        m_hoerbertModel2021Action->setChecked(true);
+        m_hoerbertModel2011Action->setChecked(false);
+        setWindowTitle("hörbert");
+        emit isLatestHoerbert(true);
+        emit isNotLatestHoerbert(false);
+    } else {
+        m_hoerbertVersion = 2011;
+        m_hoerbertModel2021Action->setChecked(false);
+        m_hoerbertModel2011Action->setChecked(true);
+        setWindowTitle("hörbert 2011");
+        emit isLatestHoerbert(false);
+        emit isNotLatestHoerbert(true);
+    }
+
+    qApp->setProperty("hoerbertModel", m_hoerbertVersion);
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    settings.setValue("hoerbertModel", m_hoerbertVersion);
+    settings.endGroup();
+
+    QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+}
+
+
+QString MainWindow::getCurrentDrivePath(){
+    return m_cardPage->currentDrivePath();
+}
+
+quint8 MainWindow::getBluetoothRecordingPlaylist(){
+    return m_bluetoothRecordingPlaylist;
+}
+
+void MainWindow::openWifiDialog(){
+    m_wifiDialog->show();
+}
+
+bool MainWindow::isWifiRecordingAllowedInPlaylist( quint8 playlistNumber ){
+    if( playlistNumber<MAX_PLAYLIST_COUNT && m_wifiRecordingPermissions[playlistNumber] ){
+        return true;
+    }
+    return false;
+}
+
+bool MainWindow::isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber ){
+    if( playlistNumber<MAX_PLAYLIST_COUNT && m_microphoneRecordingPermissions[playlistNumber] ){
+        return true;
+    }
+    return false;
 }

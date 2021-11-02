@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QDebug>
+#include <QApplication>
 
 #include "define.h"
 #include "functions.h"
@@ -103,7 +104,11 @@ void BackupManager::process()
 
             if (sub_dir.exists())
             {
-                sub_dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+                if( qApp->property("hoerbertModel")==2011 ){
+                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+                } else {
+                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+                }
                 sub_dir.setFilter(QDir::Files);
                 for (const auto& file : sub_dir.entryList())
                 {
@@ -161,10 +166,19 @@ void BackupManager::process()
                 continue;
 
             dir.setFilter(QDir::Files | QDir::NoSymLinks);
-            if (m_isBackup)
-                dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
-            else
-                dir.setNameFilters(QStringList() << "*.flac");
+            if (m_isBackup){
+                if( qApp->property("hoerbertModel")==2011 ){
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+                } else {
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+                }
+            } else {
+                if( qApp->property("hoerbertModel")==2011 ){
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_FLAC.toLower() << "*" + DESTINATION_FORMAT_URL.toLower() );
+                } else {
+                    dir.setNameFilters(QStringList() << "*" );
+                }
+            }
 
             QFileInfoList file_info_list = dir.entryInfoList();
 
@@ -245,7 +259,11 @@ void BackupManager::process()
 
         QDir dir( dest_dir_path );
         dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot );   // NOT case sensitive by default
-        dir.setNameFilters( QStringList()<<"*.wav" );
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters( QStringList()<<"*.wav" );
+        } else {
+            dir.setNameFilters( QStringList()<<"*" );
+        }
         int total_files_offset = dir.count();
 
         auto file_list = file_list_map.value(i);
@@ -255,11 +273,15 @@ void BackupManager::process()
 
             if (m_isBackup)
             {
-                success = convertWav2Flac(file_info.filePath(), dest_dir_path + file_info.fileName().replace( DEFAULT_DESTINATION_FORMAT, ".FLAC", Qt::CaseInsensitive));
+                if( qApp->property("hoerbertModel")==2011 ){
+                    success = convertWav2Flac(file_info.filePath(), dest_dir_path + file_info.fileName().replace( DESTINATION_FORMAT_WAV, DESTINATION_FORMAT_FLAC, Qt::CaseInsensitive));
+                } else {
+                    success = QFile::copy(file_info.filePath(), dest_dir_path + file_info.fileName() );
+                }
             }
             else
             {
-                QString destinationFileNumber = file_info.fileName().replace(".FLAC", "", Qt::CaseInsensitive);
+                QString destinationFileNumber = file_info.fileName().replace(DESTINATION_FORMAT_FLAC, "", Qt::CaseInsensitive);
 
                 bool ok;
                 int decimalFileNumber = destinationFileNumber.toInt(&ok, 10);       // dec == 0, ok == false
@@ -269,9 +291,13 @@ void BackupManager::process()
                     destinationFileNumber = QString::number(decimalFileNumber);
                 }
 
-                QString destinationFileName = destinationFileNumber+DEFAULT_DESTINATION_FORMAT;
-
-                success = convertFlac2Wav(file_info.filePath(), dest_dir_path + destinationFileName);
+                if( qApp->property("hoerbertModel")==2011 ){
+                    QString destinationFileName;
+                    destinationFileName = destinationFileNumber+DESTINATION_FORMAT_WAV;
+                    success = convertFlac2Audio(file_info.filePath(), dest_dir_path + destinationFileName);
+                } else {
+                    success = QFile::copy(file_info.filePath(), dest_dir_path + file_info.fileName());
+                }
             }
 
             if (success)
@@ -397,7 +423,9 @@ bool BackupManager::convertWav2Flac(const QString &sourcePath, const QString des
     return output.first==0;
 }
 
-bool BackupManager::convertFlac2Wav(const QString &sourcePath, const QString destPath)
+
+
+bool BackupManager::convertFlac2Audio(const QString &sourcePath, const QString destPath)
 {
     qDebug() << sourcePath << " -> " << destPath;
     QStringList arguments;
@@ -431,9 +459,11 @@ void BackupManager::getFileInfoList(const QString &dirPath, QFileInfoList *fileL
         QFileInfo fileInfo = list.at(i);
         if (fileInfo.isDir())
         {
-            // hoerbert music files need to be converted, thus, should be excluded copy list
-            if (m_excludeList.contains(fileInfo.absoluteFilePath()))
-                continue;
+            if( qApp->property("hoerbertModel")==2011 ){
+                // hoerbert music files need to be converted, thus, should be excluded copy list
+                if (m_excludeList.contains(fileInfo.absoluteFilePath()))
+                    continue;
+            }
 
             // recursively get file info list in the directory
             getFileInfoList(fileInfo.absoluteFilePath(), fileList);

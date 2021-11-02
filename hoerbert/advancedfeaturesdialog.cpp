@@ -33,6 +33,7 @@
 #include <QButtonGroup>
 #include <QDebug>
 #include <QMessageBox>
+#include <QApplication>
 
 #include "version.h"
 #include "define.h"
@@ -128,8 +129,10 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_showLargeDriveCheck = new QCheckBox(this);
     m_showLargeDriveCheck->setText(tr("Show drives larger than %1GB").arg(VOLUME_SIZE_LIMIT));
 
-    m_regenerateXmlCheck = new QCheckBox(this);
-    m_regenerateXmlCheck->setText( tr("Always regenerate hoerbert.xml for the old hoerbert app versions 1.x") );
+    if( qApp->property("hoerbertModel")==2011 ){
+        m_regenerateXmlCheck = new QCheckBox(this);
+        m_regenerateXmlCheck->setText( tr("Always regenerate hoerbert.xml for the old hoerbert app versions 1.x") );
+    }
 
     m_checkLayout = new QVBoxLayout;
     m_checkLayout->setAlignment(Qt::AlignCenter);
@@ -137,7 +140,9 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_checkLayout->addWidget(m_increaseVolumeOption);
     m_checkLayout->addWidget(m_reminderOption);
     m_checkLayout->addWidget(m_showLargeDriveCheck);
-    m_checkLayout->addWidget(m_regenerateXmlCheck);
+    if( qApp->property("hoerbertModel")==2011 ){
+        m_checkLayout->addWidget(m_regenerateXmlCheck);
+    }
 
     m_closeButton = new QPushButton(this);
     m_closeButton->setText(tr("Close"));
@@ -197,13 +202,15 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
         settings.endGroup();
     });
 
-    connect(m_regenerateXmlCheck, &QCheckBox::stateChanged, this, [this] (int state) {
-        Q_UNUSED(state)
-        QSettings settings;
-        settings.beginGroup("Global");
-        settings.setValue("regenerateHoerbertXml", m_regenerateXmlCheck->isChecked());
-        settings.endGroup();
-    });
+    if( qApp->property("hoerbertModel")==2011 ){
+        connect(m_regenerateXmlCheck, &QCheckBox::stateChanged, this, [this] (int state) {
+            Q_UNUSED(state)
+            QSettings settings;
+            settings.beginGroup("Global");
+            settings.setValue("regenerateHoerbertXml", m_regenerateXmlCheck->isChecked());
+            settings.endGroup();
+        });
+    }
 
     connect(m_closeButton, &QPushButton::clicked, this, &QDialog::close);
 
@@ -246,8 +253,10 @@ void AdvancedFeaturesDialog::readSettings()
     bool showLarge = settings.value("showLargeDrives").toBool();
     m_showLargeDriveCheck->setChecked(showLarge);
 
-    bool generateXml = settings.value("regenerateHoerbertXml").toBool();
-    m_regenerateXmlCheck->setChecked(generateXml);
+    if( qApp->property("hoerbertModel")==2011 ){
+        bool generateXml = settings.value("regenerateHoerbertXml").toBool();
+        m_regenerateXmlCheck->setChecked(generateXml);
+    }
 
     settings.endGroup();
 }

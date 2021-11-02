@@ -146,8 +146,23 @@ void HoerbertProcessor::run()
             auto num = getFileNameWithoutExtension(entry.path);
             if (num == -1) {
                 auto max = getLastNumberInDirectory(m_dirPath);
-                if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DEFAULT_DESTINATION_FORMAT)) {
-                    entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DEFAULT_DESTINATION_FORMAT;
+                if( qApp->property("hoerbertModel")==2011 ){
+                    if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_WAV)) {
+                        entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_WAV;
+                    }
+                } else {
+                    QFileInfo info(entry.path);
+                    if( info.suffix().toLower()=="mp3" ){
+                        if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_MP3)) {
+                            entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_MP3;
+                        }
+                    }
+
+                    if( info.suffix().toLower()=="url" ){
+                        if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_URL)) {
+                            entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_URL;
+                        }
+                    }
                 }
             }
             auto tmp_file = attachSuffixToFileName(entry.path, "A");
@@ -172,12 +187,20 @@ void HoerbertProcessor::run()
                    no need to update added list since it only contains newly added files which were not on card */
                 if (m_entries[METADATA_CHANGED_ENTRIES].contains(entry.id))
                 {
-                    m_entries[METADATA_CHANGED_ENTRIES][entry.id].path = tailPath(m_dirPath) + QString::number(entry.order) + DEFAULT_DESTINATION_FORMAT;
+                    if( qApp->property("hoerbertModel")==2011 ){
+                        m_entries[METADATA_CHANGED_ENTRIES][entry.id].path = tailPath(m_dirPath) + QString::number(entry.order) + DESTINATION_FORMAT_WAV;
+                    } else {
+                        m_entries[METADATA_CHANGED_ENTRIES][entry.id].path = tailPath(m_dirPath) + QString::number(entry.order) + DESTINATION_FORMAT_MP3;
+                    }
                 }
 
                 if (m_entries[SPLIT_ENTRIES].contains(entry.id))
                 {
-                    m_entries[SPLIT_ENTRIES][entry.id].path = tailPath(m_dirPath) + QString::number(entry.order) + DEFAULT_DESTINATION_FORMAT;
+                    if( qApp->property("hoerbertModel")==2011 ){
+                        m_entries[SPLIT_ENTRIES][entry.id].path = tailPath(m_dirPath) + QString::number(entry.order) + DESTINATION_FORMAT_WAV;
+                    } else {
+                        m_entries[SPLIT_ENTRIES][entry.id].path = tailPath(m_dirPath) + QString::number(entry.order) + DESTINATION_FORMAT_MP3;
+                    }
                 }
             }
 
@@ -247,24 +270,68 @@ bool HoerbertProcessor::removeEntry(const AudioEntry &entry)
         return true;
 }
 
+bool HoerbertProcessor::createUrlFile( QString destinationPath, MetaData metaData){
+    qDebug() << "Create URL file: " << destinationPath;
+
+    QFile file(destinationPath);
+    if( file.open(QIODevice::ReadWrite | QIODevice::Text) )
+    {
+        QTextStream stream(&file);
+
+        QString urlString = metaData.title;
+        stream << urlString << "\n";
+        file.close();
+        return true;
+    }
+
+    return false;
+}
+
 bool HoerbertProcessor::addEntry(const AudioEntry &entry)
 {
     auto sourcePath = entry.path;
-    auto destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DEFAULT_DESTINATION_FORMAT);
+    QString destPath;
 
-    if (entry.flag != 5)
-        return convertToWav(sourcePath, destPath, entry.metadata);
-    else
-        return createSilenceWav(destPath, entry.duration, entry.metadata);
+    if( qApp->property("hoerbertModel")==2011 ){
+        destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DESTINATION_FORMAT_WAV);
+    } else {
+        if( entry.flag==6 ){    // this is an URL
+            destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DESTINATION_FORMAT_URL);
+        } else {
+            destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(DESTINATION_FORMAT_MP3);
+        }
+    }
+
+    if (entry.flag==6){ // this is an url
+        return createUrlFile(destPath, entry.metadata);
+    } else if( entry.flag!=5 ){
+        return convertToAudioFile(sourcePath, destPath, entry.metadata);
+    } else {
+        return createSilenceAudioFile(destPath, entry.duration, entry.metadata);
+    }
 }
 
 bool HoerbertProcessor::moveEntry(const AudioEntry &entry)
 {
-    return moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DEFAULT_DESTINATION_FORMAT);
+    bool result;
+    if( qApp->property("hoerbertModel")==2011){
+        result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_WAV);
+    } else {
+        if( entry.flag==6){ // this is an URL
+            result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_URL);
+        } else {
+            result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_MP3);
+        }
+    }
+    return result;
 }
 
 bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
 {
+    if( entry.flag==6){
+        return true;
+    }
+
     if (entry.state == 2) // split per 3 minutes
     {
         if (!splitPer3Mins(entry.path, m_dirPath, entry.order + m_splitOffset, entry.metadata))
@@ -289,8 +356,13 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
             /* can't be split, no silence section detected.
              just convert & add the file to the card */
             auto sourcePath = entry.path;
-            auto destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order + m_splitOffset).arg(DEFAULT_DESTINATION_FORMAT);
-            return convertToWav(sourcePath, destPath, entry.metadata);
+            QString destPath;
+            if( qApp->property("hoerbertModel")==2011 ){
+                destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order + m_splitOffset).arg(DESTINATION_FORMAT_WAV);
+            } else {
+                destPath = QString("%1/%2%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order + m_splitOffset).arg(DESTINATION_FORMAT_MP3);
+            }
+            return convertToAudioFile(sourcePath, destPath, entry.metadata);
         }
 
     }
@@ -312,14 +384,29 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
         auto file_number = entry.order + m_splitOffset;
         QDir dir(m_dirPath);
         dir.setFilter(QDir::Files | QDir::NoSymLinks);
-        dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+        if( qApp->property("hoerbertModel")==2011 ){
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+        } else {
+            dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
+        }
         dir.setSorting(QDir::Name);
         QFileInfoList list;
         for (auto fileInfo : dir.entryInfoList())
         {
-            if (fileInfo.fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT, 0, 0).section("-", 0, 0).toInt() == file_number)
+            int theNumber;
+            if( qApp->property("hoerbertModel")==2011){
+                theNumber = fileInfo.fileName().toUpper().section(DESTINATION_FORMAT_WAV, 0, 0).section("-", 0, 0).toInt();
+            } else {
+                theNumber = fileInfo.fileName().toUpper().section(DESTINATION_FORMAT_MP3, 0, 0).section("-", 0, 0).toInt();
+            }
+            if ( theNumber == file_number)
             {
-                int suffix_number = fileInfo.fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT, 0, 0).section("-", 1, 1).toInt();
+                int suffix_number;
+                if( qApp->property("hoerbertModel")==2011 ){
+                    suffix_number = fileInfo.fileName().toUpper().section(DESTINATION_FORMAT_WAV, 0, 0).section("-", 1, 1).toInt();
+                } else {
+                    suffix_number = fileInfo.fileName().toUpper().section(DESTINATION_FORMAT_MP3, 0, 0).section("-", 1, 1).toInt();
+                }
                 QString metadata_title = (entry.metadata.title).toUtf8();
                 QString index = (QString(" %1").arg(suffix_number + 1)).toUtf8();
                 if (metadata_title.size() + index.size() > m_maxMetadataLength)
@@ -341,21 +428,42 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
 
 bool HoerbertProcessor::changeEntryMetadata(const AudioEntry &entry)
 {
+    if( entry.flag==6 ){    // this is an URL file
+        QFile file(entry.path);
+        if( file.open(QIODevice::WriteOnly | QIODevice::Text) ){
+            QTextStream stream(&file);
+            stream << entry.metadata.title << "\n";
+            file.close();
+            return true;
+        }
+        return  false;
+    }
+
     return changeMetaData(entry.path, entry.metadata);
 }
 
-bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata)
+bool HoerbertProcessor::convertToAudioFile(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata)
 {
 
     QStringList arguments;
     arguments.append("-i");
     arguments.append(sourceFilePath);
-    arguments.append("-acodec");
-    arguments.append("pcm_s16le");
-    arguments.append("-ar");
-    arguments.append("32k");
-    arguments.append("-ac");
-    arguments.append("1");
+    if( qApp->property("hoerbertModel")==2011 ){
+        arguments.append("-acodec");
+        arguments.append("pcm_s16le");
+        arguments.append("-ar");
+        arguments.append("32k");
+        arguments.append("-ac");
+        arguments.append("1");
+    } else {
+        arguments.append("-ar");        // sample rate
+        arguments.append("44100");
+        arguments.append("-ac");        // channels
+        arguments.append("2");
+        arguments.append("-b:a");        // bit rate
+        arguments.append("192k");
+    }
+
     arguments.append("-metadata");
 
     auto arg_metadata_title = metadata.title;
@@ -385,18 +493,59 @@ bool HoerbertProcessor::convertToWav(const QString &sourceFilePath, const QStrin
     return output.first==0;
 }
 
+
+bool HoerbertProcessor::convertToMp3(const QString &sourceFilePath, const QString &destFilePath, bool deleteOriginalWhenSuccessful)
+{
+
+    QStringList arguments;
+    arguments.append("-i");
+    arguments.append(sourceFilePath);
+    arguments.append("-ar");        // sample rate
+    arguments.append("44100");
+    arguments.append("-ac");        // channels
+    arguments.append("2");
+    arguments.append("-b:a");        // bit rate
+    arguments.append("192k");
+
+    arguments.append("-y");
+    arguments.append("-hide_banner");
+
+    arguments.append(destFilePath);
+
+    std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
+
+    if( output.first==0 && deleteOriginalWhenSuccessful ){
+        qDebug() << "deleting file: "<<sourceFilePath;
+        QFile f(sourceFilePath);
+        f.remove();
+        f.close();
+    }
+
+    return output.first==0;
+}
+
+
 bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QString &destDir, int outfileName, const MetaData &metadata)
 {
 
     QStringList arguments;
     arguments.append("-i");
     arguments.append(sourceFilePath);
-    arguments.append("-acodec");
-    arguments.append("pcm_s16le");
-    arguments.append("-ar");
-    arguments.append("32k");
-    arguments.append("-ac");
-    arguments.append("1");
+    if( qApp->property("hoerbertModel")==2011 ){
+        arguments.append("-acodec");
+        arguments.append("pcm_s16le");
+        arguments.append("-ar");
+        arguments.append("32k");
+        arguments.append("-ac");
+        arguments.append("1");
+    } else {
+        arguments.append("-ar");        // sample rate
+        arguments.append("44100");
+        arguments.append("-ac");        // channels
+        arguments.append("2");
+        arguments.append("-b:a");       // bit rate
+        arguments.append("192k");
+    }
     arguments.append("-y");
     arguments.append("-hide_banner");
     arguments.append("-metadata");
@@ -420,7 +569,11 @@ bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QStri
         arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
     }
 
-    arguments.append(tailPath(destDir) + QString::number(outfileName) + "-%01d" + DEFAULT_DESTINATION_FORMAT);
+    if( qApp->property("hoerbertModel")==2011 ){
+        arguments.append(tailPath(destDir) + QString::number(outfileName) + "-%01d" + DESTINATION_FORMAT_WAV);
+    } else {
+        arguments.append(tailPath(destDir) + QString::number(outfileName) + "-%01d" + DESTINATION_FORMAT_MP3);
+    }
     arguments.append("-y");
 
     std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
@@ -532,12 +685,21 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
         return true;
     }
 
-    arguments.append("-acodec");
-    arguments.append("pcm_s16le");
-    arguments.append("-ar");
-    arguments.append("32k");
-    arguments.append("-ac");
-    arguments.append("1");
+    if( qApp->property("hoerbertModel")==2011 ){
+        arguments.append("-acodec");
+        arguments.append("pcm_s16le");
+        arguments.append("-ar");
+        arguments.append("32k");
+        arguments.append("-ac");
+        arguments.append("1");
+    } else {
+        arguments.append("-ar");        // sample rate
+        arguments.append("44100");
+        arguments.append("-ac");        // channels
+        arguments.append("2");
+        arguments.append("-b:a");       // bit rate
+        arguments.append("192k");
+    }
     arguments.append("-y");
     arguments.append("-hide_banner");
     arguments.append("-metadata");
@@ -566,7 +728,12 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
         arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
     }
 
-    QString output_filename = destDir + "/" + QString::number(outfileName) + "-0" + DEFAULT_DESTINATION_FORMAT;
+    QString output_filename;
+    if( qApp->property("hoerbertModel")==2011 ){
+        output_filename = destDir + "/" + QString::number(outfileName) + "-0" + DESTINATION_FORMAT_WAV;
+    } else {
+        output_filename = destDir + "/" + QString::number(outfileName) + "-0" + DESTINATION_FORMAT_MP3;
+    }
     arguments.append(output_filename);
 
     output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
@@ -586,7 +753,11 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
 
         arguments.replace(15, QString("title=%1").arg(metadata_ + " " + QString::number(i + 2)));
 
-        output_filename = destDir + "/" + QString::number(outfileName) + "-" + QString::number(i + 1) + DEFAULT_DESTINATION_FORMAT;
+        if( qApp->property("hoerbertModel")==2011 ){
+            output_filename = destDir + "/" + QString::number(outfileName) + "-" + QString::number(i + 1) + DESTINATION_FORMAT_WAV;
+        } else {
+            output_filename = destDir + "/" + QString::number(outfileName) + "-" + QString::number(i + 1) + DESTINATION_FORMAT_MP3;
+        }
         arguments.replace(lastArgumentIndex, output_filename);
 
         output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
@@ -679,17 +850,30 @@ double HoerbertProcessor::getVolumeDifference(const QString &sourceFilePath)
 }
 
 
-bool HoerbertProcessor::createSilenceWav(const QString &destFilePath, int duration, const MetaData &metadata)
+bool HoerbertProcessor::createSilenceAudioFile(const QString &destFilePath, int duration, const MetaData &metadata)
 {
     QStringList arguments;
     arguments.append("-f");
     arguments.append("lavfi");
-    arguments.append("-i");
-    arguments.append("anullsrc=r=32000:cl=mono");
-    arguments.append("-t");
-    arguments.append(QString::number(duration));
-    arguments.append("-acodec");
-    arguments.append("pcm_s16le");
+    if( qApp->property("hoerbertModel")==2011 ){
+        arguments.append("-i");
+        arguments.append("anullsrc=r=32000:cl=mono");
+        arguments.append("-t");
+        arguments.append(QString::number(duration));
+        arguments.append("-acodec");
+        arguments.append("pcm_s16le");
+    } else {
+        arguments.append("-i");
+        arguments.append("anullsrc=r=44100:cl=stereo");
+        arguments.append("-t");
+        arguments.append(QString::number(duration));
+        arguments.append("-ar");        // sample rate
+        arguments.append("44100");
+        arguments.append("-ac");        // channels
+        arguments.append("2");
+        arguments.append("-b:a");        // bit rate
+        arguments.append("128k");
+    }
     arguments.append("-hide_banner");
 
     arguments.append("-metadata");
@@ -713,6 +897,8 @@ bool HoerbertProcessor::createSilenceWav(const QString &destFilePath, int durati
     return output.first==0;
 }
 
+
+
 bool HoerbertProcessor::changeMetaData(const QString &sourceFilePath, const MetaData &metadata, const QString &suffix)
 {
     QStringList arguments;
@@ -735,7 +921,12 @@ bool HoerbertProcessor::changeMetaData(const QString &sourceFilePath, const Meta
     arguments.append("-codec");
     arguments.append("copy");
 
-    QString tmp_file = tailPath(HOERBERT_TEMP_PATH) + "temp" + DEFAULT_DESTINATION_FORMAT;
+    QString tmp_file;
+    if( qApp->property("hoerbertModel")==2011 ){
+        tmp_file = tailPath(HOERBERT_TEMP_PATH) + "temp" + DESTINATION_FORMAT_WAV;
+    } else {
+        tmp_file = tailPath(HOERBERT_TEMP_PATH) + "temp" + DESTINATION_FORMAT_MP3;
+    }
 
     arguments.append(tmp_file);
     arguments.append("-y");
@@ -761,7 +952,11 @@ bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
 {
     QDir dir(destDir);
     dir.setFilter(QDir::Files | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << "*" + DEFAULT_DESTINATION_FORMAT);
+    if( qApp->property("hoerbertModel")==2011 ){
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
+    }
     dir.setSorting(QDir::Name);
 
     QFileInfoList file_info_list = dir.entryInfoList();
@@ -769,10 +964,20 @@ bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
     std::sort(file_info_list.begin(), file_info_list.end(), sortByNumber);
     for (int i = file_info_list.count() - 1; i >= 0 ; i--)
     {
-        QString fileNameBeforeSeparator = file_info_list[i].fileName().toUpper().section(DEFAULT_DESTINATION_FORMAT.toUpper(), 0, 0);
+        QString fileNameBeforeSeparator;
+        if( qApp->property("hoerbertModel")==2011 ){
+            fileNameBeforeSeparator = file_info_list[i].fileName().toUpper().section(DESTINATION_FORMAT_WAV.toLower(), 0, 0);
+        } else {
+            fileNameBeforeSeparator = file_info_list[i].fileName().toUpper().section(DESTINATION_FORMAT_MP3.toLower(), 0, 0);
+        }
         qDebug() << "file name before separator: " << fileNameBeforeSeparator;
 
-        QString destPath = tailPath(file_info_list[i].absolutePath()) + QString("%1%2").arg(i).arg(DEFAULT_DESTINATION_FORMAT);
+        QString destPath;
+        if( qApp->property("hoerbertModel")==2011 ){
+            destPath = tailPath(file_info_list[i].absolutePath()) + QString("%1%2").arg(i).arg(DESTINATION_FORMAT_WAV);
+        } else {
+            destPath = tailPath(file_info_list[i].absolutePath()) + QString("%1%2").arg(i).arg(DESTINATION_FORMAT_MP3);
+        }
 
         QRegExp re("\\d*");  // a digit (\d), zero or more times (*)
         bool needsRename = false;
