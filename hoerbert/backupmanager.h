@@ -117,8 +117,6 @@ private:
      */
     bool convertWav2Flac(const QString &sourcePath, const QString destPath);
 
-    bool convertMp32Flac(const QString &sourcePath, const QString destPath);
-
     /**
      * @brief convertFlac2Wav converts flac to wav using ffmpeg
      * @param sourcePath absolute path to the source file

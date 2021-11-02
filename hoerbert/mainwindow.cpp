@@ -2457,14 +2457,14 @@ void MainWindow::createActions()
 
 
     m_extrasMenu = new QMenu(tr("Extras"), this);
-    menuBar()->addMenu(m_extrasMenu);
 
     m_wifiDialog = new WifiDialog(this);
     m_wifiDialog->setModal(true);
 
     m_wifiAction = new QAction(tr("Configure WiFi connections"), this);
     m_wifiAction->setStatusTip(tr("Configure WiFi connections"));
-    m_wifiAction->setEnabled(false);
+    m_wifiAction->setEnabled(true);
+    m_wifiAction->setMenuRole(QAction::NoRole);
     connect(m_wifiAction, &QAction::triggered, this, [this] () {
         openWifiDialog();
     });
@@ -2478,6 +2478,9 @@ void MainWindow::createActions()
         printTableOfContent();
     });
     m_extrasMenu->addAction(m_printAction);
+    m_extrasMenu->addAction(m_printAction);
+
+    menuBar()->addMenu(m_extrasMenu);
 
     m_backupMenu = new QMenu(tr("Backup..."), this);
     m_backupAction = new QAction(tr("Backup memory card"), this);
