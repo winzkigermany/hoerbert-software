@@ -41,6 +41,7 @@ ChooseHoerbertDialog::ChooseHoerbertDialog(QWidget* parent) : QDialog(parent)
     m_model2011Button->setFixedSize(buttonSize);
     m_model2011Button->setIconSize(buttonSize);
     m_model2011Button->setToolTip(tr("hoerbert model 2011 with a mechanical switch"));
+    m_model2011Button->setCursor(Qt::PointingHandCursor);
     m_buttonHLayout->addWidget(m_model2011Button);
     connect( m_model2011Button, &QAbstractButton::clicked, this, &ChooseHoerbertDialog::confirm2011Clicked );
 
@@ -52,6 +53,7 @@ ChooseHoerbertDialog::ChooseHoerbertDialog(QWidget* parent) : QDialog(parent)
     m_model2021Button->setFixedSize(buttonSize);
     m_model2021Button->setIconSize(buttonSize);
     m_model2021Button->setToolTip(tr("hoerbert without a mechanical switch"));
+    m_model2021Button->setCursor(Qt::PointingHandCursor);
     m_buttonHLayout->addWidget(m_model2021Button);
     connect( m_model2021Button, &QAbstractButton::clicked, this, &ChooseHoerbertDialog::confirm2021Clicked );
 
