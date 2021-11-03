@@ -206,6 +206,9 @@ PlaylistPage::PlaylistPage(QWidget *parent)
         m_bluetoothRecordingsRadioButton->setChecked( ((MainWindow*)parent)->getBluetoothRecordingPlaylist() == m_dirNum );
         qDebug() << "bluetooth record set to: " << ((MainWindow*)parent)->getBluetoothRecordingPlaylist();
     });
+    connect( m_bluetoothRecordingsRadioButton, &QRadioButton::clicked, this, [this]() {
+        QMessageBox::information(this, tr("Change of bluetooth recording directory"), QString(tr("There can be only one single bluetooth recording playlist. This is now the playlist where all bluetooth recordings will be saved to.")), QMessageBox::Ok);
+    });
 
 
     m_microphoneRecordingsCheckbox = new QCheckBox(this);
