@@ -573,71 +573,87 @@ Never pull the card from the computer without ejecting it first. Doing so may ca
         <translation>Terminé</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="414"/>
-        <location filename="../cardpage.cpp" line="425"/>
+        <location filename="../cardpage.cpp" line="415"/>
+        <location filename="../cardpage.cpp" line="424"/>
+        <location filename="../cardpage.cpp" line="429"/>
         <source>[%1] has been ejected.</source>
         <translation>[%1] a été éjecté.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="414"/>
-        <location filename="../cardpage.cpp" line="425"/>
+        <location filename="../cardpage.cpp" line="415"/>
+        <location filename="../cardpage.cpp" line="424"/>
+        <location filename="../cardpage.cpp" line="429"/>
         <source>It is now safe to remove it from your computer.</source>
         <translation>La carte peut maintenant être déconnectée de l&apos;ordinateur.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="414"/>
+        <location filename="../cardpage.cpp" line="415"/>
         <source>If you do not need hoerbert.xml for the old hoerbert app 1.x,
 skip this step by ticking the check box below.</source>
         <translation>Si vous n&apos;avez pas besoin de hoerbert.xml pour l&apos;ancien logiciel hoerbert 1.x,
 sautez cette étape en cochant la case ci-dessous.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="421"/>
+        <location filename="../cardpage.cpp" line="422"/>
         <source>I only will use my memory cards with this new software from now on.</source>
         <translation>Désormais, je n&apos;utiliserai plus que mes cartes mémoire avec ce nouveau logiciel.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="432"/>
+        <location filename="../cardpage.cpp" line="436"/>
         <source>Failed to eject the memory card [%1].</source>
         <translation>La carte mémoire [%1] n&apos;a pas pu être éjectée.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="432"/>
+        <location filename="../cardpage.cpp" line="436"/>
         <source>Please try again or try to remove it with your operating system</source>
         <translation>Veuillez réessayer ou essayer de le supprimer avec votre système d&apos;exploitation.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="596"/>
+        <location filename="../cardpage.cpp" line="670"/>
         <source>The selected device is write-protected. Please remove the write protection if you want to modify any playlists on it.</source>
         <translation>L&apos;appareil sélectionné est protégé en écriture. Veuillez supprimer la protection en écriture si vous souhaitez modifier les listes de lecture.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="615"/>
+        <location filename="../cardpage.cpp" line="689"/>
         <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
         <translation>La cible sélectionnée n&apos;est pas formatée en FAT32. Il doit être formaté correctement, sinon la lecture ne fonctionnera pas avec hörbert.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="615"/>
+        <location filename="../cardpage.cpp" line="689"/>
         <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
         <translation>Veuillez vous assurer que votre destination a le bon format FAT32 pour hörbert.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="621"/>
+        <location filename="../cardpage.cpp" line="695"/>
         <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
         <translation>La carte mémoire sélectionnée n&apos;est pas formatée en FAT32. Elle doit être formatée correctement, ce qui effacera tout ce qui se trouve sur la carte.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="621"/>
+        <location filename="../cardpage.cpp" line="695"/>
         <source>Do you you want to format this drive [%1] now?</source>
         <translation>Voulez-vous formater ce disque [%1] maintenant ?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="655"/>
-        <source>Free some space by converting all files to mp3?</source>
-        <translation>Libérer de l&apos;espace en convertissant tous les fichiers en mp3 ?</translation>
+        <location filename="../cardpage.cpp" line="736"/>
+        <source>Audio files need to be converted for this hörbert.</source>
+        <translation>Les fichiers audio doivent être convertis pour ce hörbert.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="668"/>
+        <location filename="../cardpage.cpp" line="736"/>
+        <source>After converting files, this card will NOT WORK in the older hörbert model 2011</source>
+        <translation>Après la conversion, cette carte ne fonctionnera PAS dans l&apos;ancien modèle hörbert 2011.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="736"/>
+        <source>Do you want this?</source>
+        <translation>Est-ce que tu veux ça ?</translation>
+    </message>
+    <message>
+        <source>Free some space by converting all files to mp3?</source>
+        <translation type="vanished">Libérer de l&apos;espace en convertissant tous les fichiers en mp3 ?</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="761"/>
         <source>Finished converting all files.</source>
         <translation>La conversion de tous les fichiers est terminée.</translation>
     </message>
@@ -680,11 +696,11 @@ sautez cette étape en cochant la case ci-dessous.</translation>
         <translation type="vanished">Annulé...</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="596"/>
-        <location filename="../cardpage.cpp" line="615"/>
-        <location filename="../cardpage.cpp" line="621"/>
-        <location filename="../cardpage.cpp" line="638"/>
-        <location filename="../cardpage.cpp" line="696"/>
+        <location filename="../cardpage.cpp" line="670"/>
+        <location filename="../cardpage.cpp" line="689"/>
+        <location filename="../cardpage.cpp" line="695"/>
+        <location filename="../cardpage.cpp" line="712"/>
+        <location filename="../cardpage.cpp" line="793"/>
         <source>Select drive</source>
         <translation>Sélectionner le lecteur</translation>
     </message>
@@ -697,36 +713,40 @@ sautez cette étape en cochant la case ci-dessous.</translation>
         <translation type="vanished">La taille du volume est supérieure à 32 Go. Ce n&apos;est peut-être pas du tout une carte mémoire.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="638"/>
+        <location filename="../cardpage.cpp" line="712"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation>Tu es sûr de vouloir travailler sur ce disque [%1] ?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="638"/>
+        <location filename="../cardpage.cpp" line="712"/>
         <source>Volume size is bigger than 64GB. This may not be a memory card at all.</source>
         <translation>La taille du volume est supérieure à 64 Go. Ce n&apos;est peut-être pas du tout une carte mémoire. {64G?}</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="655"/>
+        <location filename="../cardpage.cpp" line="733"/>
+        <source>In the next step, you will need to select a folder on your computer for a backup of this card.</source>
+        <translation>À l&apos;étape suivante, vous devrez sélectionner un dossier sur votre ordinateur pour une sauvegarde de cette carte.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="736"/>
         <source>Convert files</source>
         <translation>Convertir des fichiers</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="655"/>
         <source>There are large files on the card.</source>
-        <translation>Il y a de gros fichiers sur la carte.</translation>
+        <translation type="vanished">Il y a de gros fichiers sur la carte.</translation>
     </message>
     <message>
         <source>Free some space by converting files to mp3?</source>
         <translation type="vanished">Libérer de l&apos;espace en convertissant des fichiers en mp3 ?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="696"/>
+        <location filename="../cardpage.cpp" line="793"/>
         <source>This card has never been used with hörbert.</source>
         <translation>Cette carte n&apos;a jamais été utilisée avec hörbert.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="696"/>
+        <location filename="../cardpage.cpp" line="793"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation>Voulez-vous le rendre prêt à l&apos;emploi avec hörbert ?</translation>
     </message>
@@ -822,7 +842,7 @@ Tu es sûr de vouloir travailler sur ce disque ? (%1)</translation>
         <translation>hörbert modèle 2011 avec un interrupteur mécanique</translation>
     </message>
     <message>
-        <location filename="../choosehoerbertdialog.cpp" line="54"/>
+        <location filename="../choosehoerbertdialog.cpp" line="55"/>
         <source>hoerbert without a mechanical switch</source>
         <translation>hoerbert sans interrupteur mécanique</translation>
     </message>
@@ -1676,7 +1696,6 @@ Cela évitera la perte accidentelle de données. Voulez-vous faire une sauvegard
         <translation type="vanished">Im&amp;primer la table des matières</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="880"/>
         <location filename="../mainwindow.cpp" line="2530"/>
         <location filename="../mainwindow.cpp" line="2531"/>
         <source>Print table of contents</source>
@@ -1704,9 +1723,8 @@ Do you want to update the memory card&apos;s files for using it with this new ap
 Voulez-vous mettre à jour les fichiers de la carte mémoire pour l&apos;utiliser avec cette nouvelle application à l&apos;avenir ?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="880"/>
         <source>No audio file detected on the drive.</source>
-        <translation>Aucun fichier audio détecté sur le lecteur.</translation>
+        <translation type="vanished">Aucun fichier audio détecté sur le lecteur.</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1121"/>
@@ -1921,12 +1939,22 @@ Créer une sauvegarde maintenant ?</translation>
         <translation>Stockez les enregistrements Bluetooth ici</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="212"/>
+        <location filename="../playlistpage.cpp" line="210"/>
+        <source>Change of bluetooth recording directory</source>
+        <translation>Changement du répertoire d&apos;enregistrement Bluetooth</translation>
+    </message>
+    <message>
+        <location filename="../playlistpage.cpp" line="210"/>
+        <source>There can be only one single bluetooth recording playlist. This is now the playlist where all bluetooth recordings will be saved to.</source>
+        <translation>Il ne peut y avoir qu&apos;une seule liste de lecture d&apos;enregistrement Bluetooth. C&apos;est maintenant la liste de lecture où tous les enregistrements Bluetooth seront sauvegardés.</translation>
+    </message>
+    <message>
+        <location filename="../playlistpage.cpp" line="215"/>
         <source>Allow microphone recordings here</source>
         <translation>Autoriser les enregistrements par microphone ici</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="221"/>
+        <location filename="../playlistpage.cpp" line="224"/>
         <source>Allow internet radio recordings here</source>
         <translation>Autorisez les enregistrements radio sur Internet ici</translation>
     </message>
@@ -1947,37 +1975,37 @@ Créer une sauvegarde maintenant ?</translation>
         <translation type="vanished">Afficher/Masquer les colonnes</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="350"/>
+        <location filename="../playlistpage.cpp" line="353"/>
         <source>Please select the files you want to move.</source>
         <translation>Veuillez sélectionner les fichiers que vous souhaitez déplacer.</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="350"/>
+        <location filename="../playlistpage.cpp" line="353"/>
         <source>Move</source>
         <translation>Déplacer</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="445"/>
+        <location filename="../playlistpage.cpp" line="448"/>
         <source>Audio Files (%1)</source>
         <translation>Fichiers audio (%1)</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="467"/>
+        <location filename="../playlistpage.cpp" line="470"/>
         <source>Remove</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="467"/>
+        <location filename="../playlistpage.cpp" line="470"/>
         <source>Please select the files you want to remove.</source>
         <translation>Veuillez sélectionner les fichiers que vous souhaitez supprimer.</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="572"/>
+        <location filename="../playlistpage.cpp" line="575"/>
         <source>Playlist</source>
         <translation>Liste de lecture</translation>
     </message>
     <message>
-        <location filename="../playlistpage.cpp" line="572"/>
+        <location filename="../playlistpage.cpp" line="575"/>
         <source>You have unsaved changes.
  Do you want to cancel all changes?</source>
         <translation>Vous avez des modifications non sauvegardées.
@@ -1987,40 +2015,40 @@ Voulez-vous annuler tous les changements ?</translation>
 <context>
     <name>PlaylistView</name>
     <message>
-        <location filename="../playlistview.cpp" line="214"/>
+        <location filename="../playlistview.cpp" line="216"/>
         <source>Memory card is full</source>
         <translation>La carte mémoire est pleine</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="214"/>
+        <location filename="../playlistview.cpp" line="216"/>
         <source>The card is already full, you can&apos;t add more files to it.</source>
         <translation>La carte est déjà pleine, vous ne pouvez pas y ajouter d&apos;autres fichiers.</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="466"/>
+        <location filename="../playlistview.cpp" line="477"/>
         <source>http://enter_radio_URL_here</source>
         <translation>http://Entrez_URL_de_la_radio_Internet_ici</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="630"/>
+        <location filename="../playlistview.cpp" line="641"/>
         <source>Ripping Audio CD</source>
         <translation>Extraction d&apos;un CD audio</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="631"/>
-        <location filename="../playlistview.cpp" line="669"/>
+        <location filename="../playlistview.cpp" line="642"/>
+        <location filename="../playlistview.cpp" line="680"/>
         <source>Ripping audio tracks...</source>
         <translation>Extracter des pistes audio ...</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="640"/>
-        <location filename="../playlistview.cpp" line="827"/>
+        <location filename="../playlistview.cpp" line="651"/>
+        <location filename="../playlistview.cpp" line="838"/>
         <source>Abort</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="649"/>
-        <location filename="../playlistview.cpp" line="836"/>
+        <location filename="../playlistview.cpp" line="660"/>
+        <location filename="../playlistview.cpp" line="847"/>
         <source>Aborting...</source>
         <translation>Annuler ...</translation>
     </message>
@@ -2029,12 +2057,12 @@ Voulez-vous annuler tous les changements ?</translation>
         <translation type="vanished">Extraction des fichiers audio ... (%1%)</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="817"/>
+        <location filename="../playlistview.cpp" line="828"/>
         <source>Converting Audio Book</source>
         <translation>Conversion d&apos;un livre audio</translation>
     </message>
     <message>
-        <location filename="../playlistview.cpp" line="818"/>
+        <location filename="../playlistview.cpp" line="829"/>
         <source>Converting...</source>
         <translation>Conversion ...</translation>
     </message>

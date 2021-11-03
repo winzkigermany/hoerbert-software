@@ -18,9 +18,9 @@ ManifestDPIAware true
 !define COMPANYNAME "WINZKI GmbH & Co. KG"
 !define DESCRIPTION "Simply manage playlists of your hörbert"
 # These three must be integers
-!define VERSIONMAJOR 2
-!define VERSIONMINOR 1
-!define VERSIONBUILD 7
+!define VERSIONMAJOR 3
+!define VERSIONMINOR 0
+!define VERSIONBUILD 0
 # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
 # It is possible to use "mailto:" links in here to open the email client
 !define HELPURL "https://www.hoerbert.com/service/" # "Support Information" link

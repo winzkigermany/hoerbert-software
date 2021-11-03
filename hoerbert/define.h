@@ -50,7 +50,7 @@ const QString BAR_STYLE_TEMPLATE = "#CardSizeBar {background: qlineargradient(sp
 
 //qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 rgba(255,30,30,255), stop: 0.2 rgba(255,30,30,144), stop: 0.4 rgba(255,30,30,32)
 
-const QString SUPPORTED_FILES = "*.wav *.mp3 *.ogg *.flac *.m4a *.m4b *.wma *.aif *.aiff *cda *.m3u *.m3u8 *.wpl *.xml *.xspf";
+const QString SUPPORTED_FILES = "*.wav *.mp3 *.ogg *.flac *.m4a *.m4b *.wma *.aif *.aiff *cda *.m3u *.m3u8 *.wpl *.xml *.xspf *.url";
 
 const QColor CL_DIR0 = QColor(60, 40, 43);
 const QColor CL_DIR1 = QColor(169, 21, 11);
@@ -92,6 +92,7 @@ struct AudioEntry {
     MetaData metadata; // user modified text or original file name
     int duration; // in seconds
     int flag = -1; // -1: default, 0: added, 1: metadata, 2: split on silence, 3: split per 3, 4: renamed, 5: silence, 6: URL
+    QString fileSuffix;
 };
 
 typedef QMap<int, AudioEntry> AudioList;
@@ -128,6 +129,7 @@ const QString DESTINATION_FORMAT_AAC         = ".AAC";
 const QString DESTINATION_FORMAT_M4A         = ".M4A";
 const QString DESTINATION_FORMAT_MP4         = ".MP4";
 const QString DESTINATION_FORMAT_FLAC        = ".FLAC";
+const QString DESTINATION_FORMAT_OGG         = ".OGG";
 
 const QString FFMPEG_PATH_WIN                = "/ffmpeg/";
 const QString FFMPEG_PATH_MAC                = "/../Resources/ffmpeg/";

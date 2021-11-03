@@ -164,14 +164,16 @@ void XmlMetadataReader::processItem(int folderID)
             m_xml.skipCurrentElement();
     }
     qDebug() << guid << sequence << source << userLabel << byteSize;
+    QFileInfo info(source);
 
     AudioEntry entry;
     entry.id = m_entryID;
     entry.order = sequence.toInt();
+    entry.fileSuffix = info.suffix();
     if( qApp->property("hoerbertModel")==2011 ){
         entry.path = m_path + QString::number(folderID) + "/" + sequence + DESTINATION_FORMAT_WAV;
     } else {
-        entry.path = m_path + QString::number(folderID) + "/" + sequence + DESTINATION_FORMAT_MP3;
+        entry.path = m_path + QString::number(folderID) + "/" + sequence + info.suffix();
     }
     entry.metadata.title = userLabel;
     entry.metadata.comment = QUrl::fromPercentEncoding(source.toUtf8());

@@ -97,6 +97,8 @@ public:
 
     bool isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber );
 
+    void backupCard();
+
 signals:
     /**
      * @brief changeAlbumColumnVisibility is a signal that's sent when the user toggles visibility of the album column
@@ -121,7 +123,6 @@ private slots:
     void moveToAnotherPlaylist(quint8 toDir, bool toBeginning);
 
     void printTableOfContent(const QString &outputPath = QString(), bool showOnBrowser = true);
-    void backupCard();
     void restoreBackupQuestion();
     void formatCard();
     void advancedFeatures();
