@@ -196,7 +196,7 @@ CardPage::CardPage(QWidget *parent)
 
     connect(m_selectDriveButton, &QPushButton::clicked, [this] () {
         this->selectDrive(this->m_driveList->currentText());
-        if( qApp->property("hoerbertModel")!=2011 ){
+        if( qApp->property("hoerbertModel")!=2011 && !isDiagnosticsModeEnabled() ){
             convertAllToMp3();
         }
     });
