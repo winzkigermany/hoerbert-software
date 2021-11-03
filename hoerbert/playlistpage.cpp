@@ -206,6 +206,9 @@ PlaylistPage::PlaylistPage(QWidget *parent)
         m_bluetoothRecordingsRadioButton->setChecked( ((MainWindow*)parent)->getBluetoothRecordingPlaylist() == m_dirNum );
         qDebug() << "bluetooth record set to: " << ((MainWindow*)parent)->getBluetoothRecordingPlaylist();
     });
+    connect( m_bluetoothRecordingsRadioButton, &QRadioButton::clicked, this, [this]() {
+        QMessageBox::information(this, tr("Change of bluetooth recording directory"), QString(tr("There can be only one single bluetooth recording playlist. This is now the playlist where all bluetooth recordings will be saved to.")), QMessageBox::Ok);
+    });
 
 
     m_microphoneRecordingsCheckbox = new QCheckBox(this);
@@ -306,7 +309,7 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
         if (m_originalList[dir_num].keys().contains(key))
         {
             // check whether it is moved or not.
-            auto file_name = getFileNameWithoutExtension(initial_list[key].path);
+            auto file_name = getFileNumber(initial_list[key].path);
             if (file_name != initial_list[key].order)
             {
                 implicit_list.insert(key, initial_list.value(key));
@@ -387,7 +390,7 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
     }
 
     // read the destination directory and get last number in names
-    auto max_number = getLastNumberInDirectory(dest_dir);
+    auto max_number = getHighestNumberInDirectory(dest_dir);
 
     max_number++;
 
@@ -526,7 +529,7 @@ void PlaylistPage::onClosePage(bool doCommitChanges)
         if (original_key_list.contains(key))
         {
             // check whether it is moved or not.
-            auto file_name = getFileNameWithoutExtension(changed_list[key].path);
+            auto file_name = getFileNumber(changed_list[key].path);
             if (file_name != changed_list[key].order)
             {
                 moved_entries.insert(key, changed_list.value(key));

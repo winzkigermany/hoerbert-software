@@ -201,6 +201,8 @@ void PlaylistView::insertBatchAt(const AudioList &list, int index, bool readFrom
 
 bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=false)
 {
+    qDebug() << entry.path << " " << entry.fileSuffix;
+
     if (!readFromDrive) {
         quint64 expectedFileSizeInBytes;
         if( qApp->property("hoerbertModel")==2011){
@@ -316,10 +318,13 @@ bool PlaylistView::insertEntry(AudioEntry entry, int index, bool readFromDrive=f
     if (!readFromDrive) {
         entry.metadata.comment = entry.path;
     }
-    this->setText(index, METADATA_TITLE_COLUMN_INDEX, entry.metadata.title);
-    this->setText(index, METADATA_ALBUM_COLUMN_INDEX, entry.metadata.album);
-    this->setText(index, METADATA_COMMENT_COLUMN_INDEX, entry.metadata.comment);
+
     this->setText(index, ID_COLUMN_INDEX, QString::number(entry.id));
+    this->setText(index, METADATA_TITLE_COLUMN_INDEX, entry.metadata.title);
+    if( entry.fileSuffix.toLower()!="url"){
+        this->setText(index, METADATA_ALBUM_COLUMN_INDEX, entry.metadata.album);
+        this->setText(index, METADATA_COMMENT_COLUMN_INDEX, entry.metadata.comment);
+    }
 
     entry.order = index;
 
@@ -438,6 +443,11 @@ void PlaylistView::insertSilence(int secs, int index)
     entry.duration = secs;
     entry.metadata.title = "silence";
     entry.flag = 5; // silence flag
+    if( qApp->property("hoerbertModel")==2011){
+        entry.fileSuffix = "wav";
+    } else {
+        entry.fileSuffix = "mp3";
+    }
 
     m_data[entry.id] = entry;
     insertEntry(entry, index);
@@ -460,6 +470,7 @@ void PlaylistView::insertUrl(const QString& newUrl, int index)
     entry.path = "";
     entry.state = 0;
     entry.duration = 0;
+    entry.fileSuffix = "url";
     if( newUrl!="" ){
         entry.metadata.title = newUrl;
     } else {

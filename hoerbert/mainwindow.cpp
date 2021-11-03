@@ -877,8 +877,8 @@ void MainWindow::printTableOfContent(const QString &outputPath, bool showOnBrows
     if (file_info_list.count() <= 0)
     {
         qDebug() << "No audio file detected on the drive.";
-        QMessageBox::information(this, tr("Print table of contents"), tr("No audio file detected on the drive."));
-        setCursor(Qt::ArrowCursor);
+//        QMessageBox::information(this, tr("Print table of contents"), tr("No audio file detected on the drive."));
+//        setCursor(Qt::ArrowCursor);
         return;
     }
 
@@ -1408,7 +1408,7 @@ void MainWindow::backupCard()
 
     destPath = tailPath(destPath) + backup_dir;
 
-    printTableOfContent(destPath);
+//    printTableOfContent(destPath);
 
     m_backupManager = new BackupManager(sourcePath, destPath);
     m_backupManager->addStamp("app_version", VER_PRODUCTVERSION_STR);

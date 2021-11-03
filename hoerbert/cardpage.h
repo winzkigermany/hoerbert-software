@@ -370,6 +370,11 @@ private:
      */
     void sendDriveCapacity();
 
+    void cleanupDoubleFiles(const QString &driveName);
+
+    bool cardContainsMp3FilesAlready( QString &drive_path );
+
+
     void openWifiDialog();
 
     bool hasAudioFiles( QString );

@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "functions.h"
+#include "define.h"
 
 #include <QDir>
 #include <QDebug>
@@ -39,8 +40,12 @@ int sortByNumber(const QFileInfo &fileName1, const QFileInfo &fileName2)
 int getFirstNumberInDirectory(const QString &dirPath)
 {
     QDir dir(dirPath);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    if(qApp->property("hoerbertModel")==2011){
+        dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+    }
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();
@@ -55,34 +60,40 @@ int getFirstNumberInDirectory(const QString &dirPath)
     return first_number;
 }
 
-int getLastNumberInDirectory(const QString &dirPath)
+int getHighestNumberInDirectory(const QString &dirPath)
 {
     QDir dir(dirPath);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    dir.refresh();
+    if(qApp->property("hoerbertModel")==2011){
+        dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+    }
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();
     int max_number = 0;
 
-    if (list.count() > 0) {
-        std::sort(list.begin(), list.end(), sortByNumber);
-        max_number = list.at(list.size() - 1).fileName().section(".", 0, 0).toInt();
-    } else {
-        max_number = -1;
+    for( int i=0; i<list.length(); i++){
+        int fileIndex = list[i].baseName().toInt();
+        if( fileIndex>max_number ){
+            max_number = fileIndex;
+        }
     }
+
     return max_number;
 }
 
-int getFileNameWithoutExtension(const QString &absoluteFilePath)
+int getFileNumber(const QString &absoluteFilePath)
 {
     QFileInfo fi(absoluteFilePath);
     if (!fi.exists())
     {
-        qDebug() << "(GetFileNameWithoutExtension)File does not exist:" << absoluteFilePath;
+        qDebug() << "(getFileNumber)File does not exist:" << absoluteFilePath;
         return -1;
     }
-    auto file_name = fi.fileName().section(".", 0, 0);
+    auto file_name = fi.baseName();
 
     if (file_name.isEmpty() || (file_name.compare("0") != 0 && file_name.toInt() == 0))
         return -1;
@@ -93,7 +104,7 @@ int getFileNameWithoutExtension(const QString &absoluteFilePath)
 QString increaseFileName(const QString &absoluteFilePath, int offset)
 {
     QFileInfo fi(absoluteFilePath);
-    auto file_number = getFileNameWithoutExtension(fi.absoluteFilePath());
+    auto file_number = getFileNumber(fi.absoluteFilePath());
     if (file_number == -1)
         return QString();
 
@@ -104,8 +115,12 @@ QString increaseFileName(const QString &absoluteFilePath, int offset)
 int getFileCount(const QString &absoluteDirPath)
 {
     QDir dir(absoluteDirPath);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    if(qApp->property("hoerbertModel")==2011){
+        dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+    }
     dir.setSorting(QDir::Name);
 
     return dir.entryInfoList().count();
@@ -236,11 +251,64 @@ bool copyRecursively(const QString &sourcePath, const QString &destPath, bool ov
 }
 
 
+void renumberDirectory( const QString &dirPath ){
+    QStringList nameFilter;
+    nameFilter << "*.*";
+
+    QDir directory(dirPath);
+    directory.setFilter(QDir::Files | QDir::NoSymLinks);
+    directory.setSorting(QDir::Name);
+
+    QFileInfoList allFileNames = directory.entryInfoList(nameFilter, QDir::Files | QDir::NoSymLinks);
+    int fileCount = allFileNames.length();
+
+    // start with 0 and always measure the distance to the next index
+    for( int currentIndex=0; currentIndex<fileCount; currentIndex++ ){
+
+        QStringList sameIndexFilter;
+        sameIndexFilter << QString().number(currentIndex)+".*";
+
+        QStringList filesOfSameIndex = directory.entryList(sameIndexFilter, QDir::Files | QDir::NoSymLinks);
+
+        if( filesOfSameIndex.length()>0 ){
+            // there is a file here, move on and look for the next gap
+            continue;
+        } else {
+            // there is no file at this index. Look for the next file
+
+            bool foundOne = false;
+            for( int j=currentIndex; j<65535; j++ ){
+                for( int k=0; k<allFileNames.length(); k++){
+                    if( allFileNames[k].baseName() == QString().number(j) ){
+                        moveFile( dirPath+allFileNames[k].completeBaseName()+"."+allFileNames[k].suffix(), dirPath+QString().number(currentIndex)+"."+allFileNames[k].suffix());
+                        allFileNames.removeAt(k);
+                        foundOne = true;
+                        break;
+                    }
+                }
+
+                if( foundOne ){
+                    break;
+                }
+            }
+
+        }
+
+    }
+}
+
+
+
+
 int batchRenameByIndex(const QString &dirPath, int from, int offset, int to)
 {
     QDir dir(dirPath);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    if(qApp->property("hoerbertModel")==2011){
+        dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+    }
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();
@@ -280,8 +348,12 @@ int batchRenameByIndex(const QString &dirPath, int from, int offset, int to)
 bool batchRenameByName(const QString &dirPath, int from, int offset, int to)
 {
     QDir dir(dirPath);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    if(qApp->property("hoerbertModel")==2011){
+        dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
+    } else {
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+    }
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();
@@ -294,7 +366,7 @@ bool batchRenameByName(const QString &dirPath, int from, int offset, int to)
     else
         return 0;
 
-    if ((from > getLastNumberInDirectory(dirPath))) {
+    if ((from > getHighestNumberInDirectory(dirPath))) {
         return true;
     }
 
@@ -343,7 +415,7 @@ int countSubfiles(const QString &dirPath, int prefixNumber, const QString &exten
     int count = 0;
 
     QDir dir(dirPath);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
     dir.setNameFilters(QStringList() << extension);
     dir.setSorting(QDir::Name);
 
@@ -377,11 +449,11 @@ int countSubfiles(const QString &dirPath, int prefixNumber, const QString &exten
 QString attachSuffixToFileName(const QString &absoluteFilePath, const QString &suffix)
 {
     QFileInfo fi(absoluteFilePath);
-    auto file_number = getFileNameWithoutExtension(fi.absoluteFilePath());
+    auto file_number = getFileNumber(fi.absoluteFilePath());
     if (file_number == -1)
         return QString();
 
-    QString new_file_name = fi.absolutePath() + "/" +  QString::number(file_number) + suffix + QString(DEFAULT_FORMAT).replace("*.", ".");
+    QString new_file_name = fi.absolutePath() + "/" +  QString::number(file_number) + suffix;
 
     bool moved = moveFile(absoluteFilePath, new_file_name);
     if (moved)
@@ -419,7 +491,7 @@ void recursivelyGetDirectoryContent(QStringList *list, const QString &destDir, i
 {
     QDir dir(destDir);
     if (dir.exists()) {
-        dir.setFilter(QDir::Dirs | QDir::Files | QDir::Hidden | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+        dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
         dir.setSorting(QDir::Name);
 
         QFileInfoList infoList = dir.entryInfoList();

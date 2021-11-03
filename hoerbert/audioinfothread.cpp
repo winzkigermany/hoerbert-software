@@ -124,6 +124,7 @@ void AudioInfoThread::run()
                 entry.metadata.title = line;
                 entry.path = info.absoluteFilePath();
                 entry.id = m_IDBeginsFrom++;
+                entry.fileSuffix = info.suffix();
 
                 urlFile.close();
             }
@@ -178,6 +179,8 @@ void AudioInfoThread::run()
             entry.metadata.comment = metadata_comment;
             entry.duration = static_cast<int>(duration);
             entry.flag = m_flag;
+            entry.fileSuffix = info.suffix();
+
         }
 
         entry_list[entry.id] = entry;
