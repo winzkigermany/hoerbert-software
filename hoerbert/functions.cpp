@@ -267,10 +267,8 @@ void renumberDirectory( const QString &dirPath ){
 
         QStringList sameIndexFilter;
         sameIndexFilter << QString().number(currentIndex)+".*";
-        qDebug() << "sameIndexFilter: " << sameIndexFilter;
 
         QStringList filesOfSameIndex = directory.entryList(sameIndexFilter, QDir::Files | QDir::NoSymLinks);
-        qDebug() << "files of same index: " << filesOfSameIndex;
 
         if( filesOfSameIndex.length()>0 ){
             // there is a file here, move on and look for the next gap

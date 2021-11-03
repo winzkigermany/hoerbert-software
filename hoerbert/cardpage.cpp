@@ -619,13 +619,10 @@ void CardPage::cleanupDoubleFiles(const QString &rootPath){
         QFileInfoList allFileNames = directory.entryInfoList(nameFilter, QDir::Files | QDir::NoSymLinks);
         for ( const auto& iterator : allFileNames  )
         {
-            qDebug() << "Processing file " << iterator.absoluteFilePath();
             QStringList sameIndexFilter;
             sameIndexFilter << iterator.baseName()+".*";
-            qDebug() << "sameIndexFilter: " << sameIndexFilter;
 
             QStringList filesOfSameIndex = directory.entryList(sameIndexFilter, QDir::Files | QDir::NoSymLinks);
-            qDebug() << "files of same index: " << filesOfSameIndex;
 
             if( filesOfSameIndex.length()>1 ){
                 for( int j=0; j<allFileNames.length(); j++){
@@ -637,6 +634,24 @@ void CardPage::cleanupDoubleFiles(const QString &rootPath){
             }
         }
     }
+}
+
+
+bool CardPage::cardContainsMp3FilesAlready( QString &drive_path ){
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        QDir dir(drive_path+QString().number(i));
+        dir.setFilter(QDir::Files | QDir::NoSymLinks);
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
+
+        QFileInfoList list = dir.entryInfoList();
+        qDebug() << "fileList: " << list;
+        if( list.length()>0 ){
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
@@ -711,9 +726,22 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
     QString drive_path = currentDrivePath();
 
     if( hasAudioFiles(drive_path) ){
-        auto selected = QMessageBox::question(this, tr("Convert files"), tr("There are large files on the card.")+"\n"+tr("Free some space by converting all files to mp3?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+        bool backupFirst = false;
+        QString backupString = "";
+        if( !cardContainsMp3FilesAlready(drive_path) ){
+            backupFirst = true;
+            backupString = "\n\n"+tr("In the next step, you will need to select a folder on your computer for a backup of this card.");
+        }
+
+        auto selected = QMessageBox::question(this, tr("Convert files"), tr("Audio files need to be converted for this hörbert.")+"\n\n"+tr("After converting files, this card will NOT WORK in the older hörbert model 2011")+"\n\n"+tr("Do you want this?")+backupString, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
         if (selected == QMessageBox::Yes)
         {
+
+            if( backupFirst ){
+                qDebug()<< "Force a backup";
+                m_mainWindow->backupCard();
+            }
+
             m_pleaseWaitDialog = new PleaseWaitDialog();
             connect( m_pleaseWaitDialog, &QDialog::finished, m_pleaseWaitDialog, &PleaseWaitDialog::close);
             m_pleaseWaitDialog->setParent( this );
@@ -731,6 +759,10 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
             convertAllAudioFilesToMp3(drive_path);
 
             m_pleaseWaitDialog->setResultString(tr("Finished converting all files."));
+        } else {
+            selectDrive("");
+            updateDriveList();
+            return;
         }
     }
 
