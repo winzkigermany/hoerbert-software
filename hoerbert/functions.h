@@ -50,14 +50,14 @@ int getFirstNumberInDirectory(const QString &dirPath);
  * @param dirPath absolute directory path
  * @return last file's number
  */
-int getLastNumberInDirectory(const QString &dirPath);
+int getHighestNumberInDirectory(const QString &dirPath);
 
 /**
  * @brief Get filename as number by removing extension
  * @param absoluteFilePath absolute file path
  * @return file number
  */
-int getFileNameWithoutExtension(const QString &absoluteFilePath);
+int getFileNumber(const QString &absoluteFilePath);
 
 /**
  * @brief increase a file number by an offset
@@ -174,5 +174,7 @@ quint64 bytesToSeconds(quint64 byteSize);
  * @return
  */
 quint64 secondsToBytes(int seconds);
+
+void renumberDirectory(const QString &drive_path);
 
 #endif // FUNCTIONS_H

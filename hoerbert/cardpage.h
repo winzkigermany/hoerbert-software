@@ -370,6 +370,9 @@ private:
      */
     void sendDriveCapacity();
 
+    void cleanupDoubleFiles(const QString &driveName);
+
+
     void openWifiDialog();
 
     bool hasAudioFiles( QString );

@@ -107,7 +107,7 @@ void BackupManager::process()
                 if( qApp->property("hoerbertModel")==2011 ){
                     sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
                 } else {
-                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+                    sub_dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);      // don't use * here. For safety.
                 }
                 sub_dir.setFilter(QDir::Files);
                 for (const auto& file : sub_dir.entryList())

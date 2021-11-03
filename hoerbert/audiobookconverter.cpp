@@ -129,7 +129,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         if( qApp->property("hoerbertModel")==2011 ){
             output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_WAV;
         } else {
-            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_MP3;
+            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_MP3.toLower();
         }
         arguments.replace(lastArgumentIndex, output_path);
 

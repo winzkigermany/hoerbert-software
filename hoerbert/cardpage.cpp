@@ -411,14 +411,18 @@ bool CardPage::ejectDrive()
 
         if(doGenerateHoerbertXml)
         {
-            m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer.")+"\n\n"+tr("If you do not need hoerbert.xml for the old hoerbert app 1.x,\nskip this step by ticking the check box below."));
-            connect( m_pleaseWaitDialog, &PleaseWaitDialog::checkboxIsClicked, this, [=](bool onOff){
-                QSettings settings;
-                settings.beginGroup("Global");
-                settings.setValue("regenerateHoerbertXml", !onOff);
-                settings.endGroup();
-            });
-            m_pleaseWaitDialog->setCheckBoxLabel(tr("I only will use my memory cards with this new software from now on."));
+            if( qApp->property("hoerbertModel")=="2011" ){
+                m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer.")+"\n\n"+tr("If you do not need hoerbert.xml for the old hoerbert app 1.x,\nskip this step by ticking the check box below."));
+                connect( m_pleaseWaitDialog, &PleaseWaitDialog::checkboxIsClicked, this, [=](bool onOff){
+                    QSettings settings;
+                    settings.beginGroup("Global");
+                    settings.setValue("regenerateHoerbertXml", !onOff);
+                    settings.endGroup();
+                });
+                m_pleaseWaitDialog->setCheckBoxLabel(tr("I only will use my memory cards with this new software from now on."));
+            } else {
+                m_pleaseWaitDialog->setResultString(tr("[%1] has been ejected.").arg(currentDevice)+"\n"+tr("It is now safe to remove it from your computer."));
+            }
         }
         else
         {
@@ -536,7 +540,7 @@ void CardPage::deselectDrive()
 */
 bool CardPage::hasAudioFiles( QString rootPath){
     QStringList nameFilter;
-    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4;
+    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_OGG;
 
     bool foundOne = false;
     for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
@@ -557,25 +561,80 @@ bool CardPage::hasAudioFiles( QString rootPath){
 }
 
 
+
 void CardPage::convertAllAudioFilesToMp3( QString rootPath){
     QStringList nameFilter;
-    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4;
+    nameFilter << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_OGG;
 
     for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
         qDebug() << "Searching for audio files in " << rootPath+QString::number(i);
         QDir directory(rootPath+QString::number(i));
         QStringList txtFilesAndDirectories = directory.entryList(nameFilter, QDir::AllEntries|QDir::NoDotAndDotDot);
+        int indexCount = 0;
         for ( const auto& iterator : txtFilesAndDirectories  )
         {
             HoerbertProcessor *processor = new HoerbertProcessor(rootPath+QString::number(i)+"/"+iterator, -1);
             QFileInfo audioFile( rootPath+QString::number(i) +"/"+ iterator);
-            qDebug()<<audioFile.absoluteFilePath();
-            QString mp3FileName = audioFile.path() + "/" + audioFile.completeBaseName() + ".mp3";
+            qDebug() << "Processing file " << audioFile.absoluteFilePath();
+            QString mp3FileName;
+
+            QDir checkDir(rootPath+QString::number(i));
+            QStringList sameIndexFilter;
+            sameIndexFilter << QString().number(indexCount)+".*";
+            QStringList numberOfSameIndex = checkDir.entryList(sameIndexFilter, QDir::Files | QDir::NoSymLinks);
+            qDebug() << "file info list: " << numberOfSameIndex;
+
+            if( numberOfSameIndex.length()>1 ){     // more files with the same index number exist -> append this file to the end of the playlist.
+                QDir countDir(rootPath+QString::number(i));
+                countDir.setFilter(QDir::Files | QDir::NoSymLinks);
+                mp3FileName = audioFile.path() + "/" + QString().number(countDir.count()) + ".mp3";
+            } else {
+                mp3FileName = audioFile.path() + "/" + audioFile.completeBaseName() + ".mp3";
+            }
             mp3FileName.toLower().replace( audioFile.suffix(), ".mp3" );
 
             emit convertingCurrentFile(audioFile.absoluteFilePath());
 
             processor->convertToMp3( audioFile.absoluteFilePath(), mp3FileName, true);
+            indexCount++;
+        }
+    }
+}
+
+
+/**
+ * @brief CardPage::cleanupDoubleFiles
+ * @param driveName
+ * clean up. Important: Don't leave url files and other files with the same index.
+ */
+void CardPage::cleanupDoubleFiles(const QString &rootPath){
+    QStringList nameFilter;
+    nameFilter << "*.*";
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        qDebug() << "Searching for double files in " << rootPath+QString::number(i);
+        QDir directory(rootPath+QString::number(i));
+        directory.setSorting(QDir::Name);
+
+        QFileInfoList allFileNames = directory.entryInfoList(nameFilter, QDir::Files | QDir::NoSymLinks);
+        for ( const auto& iterator : allFileNames  )
+        {
+            qDebug() << "Processing file " << iterator.absoluteFilePath();
+            QStringList sameIndexFilter;
+            sameIndexFilter << iterator.baseName()+".*";
+            qDebug() << "sameIndexFilter: " << sameIndexFilter;
+
+            QStringList filesOfSameIndex = directory.entryList(sameIndexFilter, QDir::Files | QDir::NoSymLinks);
+            qDebug() << "files of same index: " << filesOfSameIndex;
+
+            if( filesOfSameIndex.length()>1 ){
+                for( int j=0; j<allFileNames.length(); j++){
+                    if( allFileNames[j].baseName() == iterator.baseName()){
+                        uint num = getHighestNumberInDirectory(iterator.absolutePath()) + 1;
+                        moveFile( iterator.absoluteFilePath(), iterator.absolutePath() + "/" + QString().number(num) + "." + iterator.suffix() );
+                    }
+                }
+            }
         }
     }
 }
@@ -663,6 +722,12 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
             m_pleaseWaitDialog->show();
 
             connect( this, &CardPage::convertingCurrentFile, m_pleaseWaitDialog, &PleaseWaitDialog::setWaitMessage);
+
+            cleanupDoubleFiles(drive_path);
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+                renumberDirectory(drive_path+QString().number(i)+"/");
+            }
+
             convertAllAudioFilesToMp3(drive_path);
 
             m_pleaseWaitDialog->setResultString(tr("Finished converting all files."));
@@ -781,6 +846,13 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                     emit migrationNeeded(drive_path);
                     m_migrationSuggested = true;
                 }
+            }
+        }
+
+        if( qApp->property("hoerbertModel")!=2011){
+            cleanupDoubleFiles(drive_path);
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+                renumberDirectory(drive_path+QString().number(i)+"/");
             }
         }
     }
@@ -1035,7 +1107,7 @@ void CardPage::onPlaylistButtonClicked(qint8 dir_num)
 
     QDir dir(sub_dir);
 
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
     if( qApp->property("hoerbertModel")==2011 ){
         dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
     } else {
