@@ -448,10 +448,35 @@ void MainWindow::readIndexM3u(){
             searchString = "#hoerbert:set_bluetooth_recordings_playlist";
             if( newLine.toLower().startsWith(searchString) ){
                 dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
-                int playlistNumber = dataString.toInt();
-                if( playlistNumber>=0 && playlistNumber<MAX_PLAYLIST_COUNT ){
-                    m_bluetoothRecordingPlaylist = playlistNumber;
-                }
+                m_bluetoothRecordingPlaylist = 255;
+
+                if( dataString.trimmed()=="0.0")
+                    m_bluetoothRecordingPlaylist = 0;
+
+                if( dataString.trimmed()=="0.1")
+                    m_bluetoothRecordingPlaylist = 1;
+
+                if( dataString.trimmed()=="0.2")
+                    m_bluetoothRecordingPlaylist = 2;
+
+                if( dataString.trimmed()=="0.3")
+                    m_bluetoothRecordingPlaylist = 3;
+
+                if( dataString.trimmed()=="0.4")
+                    m_bluetoothRecordingPlaylist = 4;
+
+                if( dataString.trimmed()=="0.5")
+                    m_bluetoothRecordingPlaylist = 5;
+
+                if( dataString.trimmed()=="0.6")
+                    m_bluetoothRecordingPlaylist = 6;
+
+                if( dataString.trimmed()=="0.7")
+                    m_bluetoothRecordingPlaylist = 7;
+
+                if( dataString.trimmed()=="0.8")
+                    m_bluetoothRecordingPlaylist = 8;
+
             }
 
             searchString = "#hoerbert:allow_microphone_recordings_in_playlist";

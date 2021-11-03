@@ -285,7 +285,7 @@ bool HoerbertProcessor::addEntry(const AudioEntry &entry)
     QString destPath;
 
 
-    if (entry.fileSuffix.toLower()=="url"){ // this is an url
+    if  (entry.flag==6){ // this is an url
         destPath = QString("%1/%2.%3").arg(m_dirPath/*.replace("//", "/")*/).arg(entry.order).arg(entry.fileSuffix);
         return createUrlFile(destPath, entry.metadata);
 
@@ -942,11 +942,12 @@ bool HoerbertProcessor::changeMetaData(const QString &sourceFilePath, const Meta
 bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
 {
     QDir dir(destDir);
+    dir.refresh();
     dir.setFilter(QDir::Files | QDir::NoSymLinks);
     if( qApp->property("hoerbertModel")==2011 ){
         dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
     } else {
-        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3);
+        dir.setNameFilters(QStringList() << "*.*");
     }
     dir.setSorting(QDir::Name);
 
@@ -955,12 +956,7 @@ bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
     std::sort(file_info_list.begin(), file_info_list.end(), sortByNumber);
     for (int i = file_info_list.count() - 1; i >= 0 ; i--)
     {
-        QString fileNameBeforeSeparator;
-        if( qApp->property("hoerbertModel")==2011 ){
-            fileNameBeforeSeparator = file_info_list[i].fileName().toUpper().section(DESTINATION_FORMAT_WAV.toLower(), 0, 0);
-        } else {
-            fileNameBeforeSeparator = file_info_list[i].fileName().toUpper().section(DESTINATION_FORMAT_MP3.toLower(), 0, 0);
-        }
+        QString fileNameBeforeSeparator = file_info_list[i].baseName();
         qDebug() << "file name before separator: " << fileNameBeforeSeparator;
 
         QString destPath;
@@ -973,16 +969,16 @@ bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
         QRegExp re("\\d*");  // a digit (\d), zero or more times (*)
         bool needsRename = false;
 
-        if (! re.exactMatch(fileNameBeforeSeparator))
-        {   // the file contains non-digit characters -> rename it.
-            needsRename = true;
-        }
-        else
+        if ( re.exactMatch(fileNameBeforeSeparator) )
         {   // the file contains only digits -> check if we need to rename it
             if( fileNameBeforeSeparator.toInt() != i )
             {
                 needsRename = true;
             }
+        }
+        else
+        {   // the file contains non-digit characters -> rename it.
+            needsRename = true;
         }
 
         if( needsRename )

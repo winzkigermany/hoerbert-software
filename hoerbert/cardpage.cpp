@@ -196,6 +196,9 @@ CardPage::CardPage(QWidget *parent)
 
     connect(m_selectDriveButton, &QPushButton::clicked, [this] () {
         this->selectDrive(this->m_driveList->currentText());
+        if( qApp->property("hoerbertModel")!=2011 ){
+            convertAllToMp3();
+        }
     });
     connect(m_ejectDriveButton, &QPushButton::clicked, this, &CardPage::ejectDrive);
 
@@ -580,18 +583,17 @@ void CardPage::convertAllAudioFilesToMp3( QString rootPath){
 
             QDir checkDir(rootPath+QString::number(i));
             QStringList sameIndexFilter;
-            sameIndexFilter << QString().number(indexCount)+".*";
+            sameIndexFilter << audioFile.baseName()+".*";
             QStringList numberOfSameIndex = checkDir.entryList(sameIndexFilter, QDir::Files | QDir::NoSymLinks);
             qDebug() << "file info list: " << numberOfSameIndex;
 
             if( numberOfSameIndex.length()>1 ){     // more files with the same index number exist -> append this file to the end of the playlist.
-                QDir countDir(rootPath+QString::number(i));
-                countDir.setFilter(QDir::Files | QDir::NoSymLinks);
-                mp3FileName = audioFile.path() + "/" + QString().number(countDir.count()) + ".mp3";
+                uint newNumber = getHighestNumberInDirectory(rootPath+QString::number(i)) + 1;
+                mp3FileName = audioFile.path() + "/" + QString().number(newNumber) + ".mp3";
             } else {
-                mp3FileName = audioFile.path() + "/" + audioFile.completeBaseName() + ".mp3";
+                mp3FileName = audioFile.path() + "/" + audioFile.baseName() + ".mp3";
             }
-            mp3FileName.toLower().replace( audioFile.suffix(), ".mp3" );
+//            mp3FileName.toLower().replace( audioFile.suffix(), ".mp3" );
 
             emit convertingCurrentFile(audioFile.absoluteFilePath());
 
@@ -619,6 +621,7 @@ void CardPage::cleanupDoubleFiles(const QString &rootPath){
         QFileInfoList allFileNames = directory.entryInfoList(nameFilter, QDir::Files | QDir::NoSymLinks);
         for ( const auto& iterator : allFileNames  )
         {
+            directory.refresh();
             QStringList sameIndexFilter;
             sameIndexFilter << iterator.baseName()+".*";
 
@@ -653,6 +656,52 @@ bool CardPage::cardContainsMp3FilesAlready( QString &drive_path ){
 
     return false;
 }
+
+
+void CardPage::convertAllToMp3(){
+
+    QString drive_path = currentDrivePath();
+
+    if( hasAudioFiles(drive_path) ){
+        bool backupFirst = false;
+        QString backupString = "";
+        if( !cardContainsMp3FilesAlready(drive_path) ){
+            backupFirst = true;
+            backupString = "\n\n"+tr("In the next step, you will need to select a folder on your computer for a backup of this card.");
+        }
+
+        auto selected = QMessageBox::question(this, tr("Convert files"), tr("Audio files need to be converted for this hörbert.")+"\n\n"+tr("After converting files, this card will NOT WORK in the older hörbert model 2011")+"\n\n"+tr("Do you want this?")+backupString, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+        if (selected == QMessageBox::Yes)
+        {
+
+            if( backupFirst ){
+                qDebug()<< "Force a backup";
+                m_mainWindow->backupCard();
+            }
+
+            m_pleaseWaitDialog = new PleaseWaitDialog();
+            connect( m_pleaseWaitDialog, &QDialog::finished, m_pleaseWaitDialog, &PleaseWaitDialog::close);
+            m_pleaseWaitDialog->setParent( this );
+            m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+            m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
+            m_pleaseWaitDialog->show();
+
+            connect( this, &CardPage::convertingCurrentFile, m_pleaseWaitDialog, &PleaseWaitDialog::setWaitMessage);
+
+            cleanupDoubleFiles(drive_path);
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+                renumberDirectory(drive_path+QString().number(i)+"/");
+            }
+
+            convertAllAudioFilesToMp3(drive_path);
+
+            m_pleaseWaitDialog->setResultString(tr("Finished converting all files."));
+        } else {
+            selectDrive("");
+            updateDriveList();
+            return;
+        }
+    }}
 
 
 void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
@@ -725,47 +774,6 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 
     QString drive_path = currentDrivePath();
 
-    if( hasAudioFiles(drive_path) ){
-        bool backupFirst = false;
-        QString backupString = "";
-        if( !cardContainsMp3FilesAlready(drive_path) ){
-            backupFirst = true;
-            backupString = "\n\n"+tr("In the next step, you will need to select a folder on your computer for a backup of this card.");
-        }
-
-        auto selected = QMessageBox::question(this, tr("Convert files"), tr("Audio files need to be converted for this hörbert.")+"\n\n"+tr("After converting files, this card will NOT WORK in the older hörbert model 2011")+"\n\n"+tr("Do you want this?")+backupString, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
-        if (selected == QMessageBox::Yes)
-        {
-
-            if( backupFirst ){
-                qDebug()<< "Force a backup";
-                m_mainWindow->backupCard();
-            }
-
-            m_pleaseWaitDialog = new PleaseWaitDialog();
-            connect( m_pleaseWaitDialog, &QDialog::finished, m_pleaseWaitDialog, &PleaseWaitDialog::close);
-            m_pleaseWaitDialog->setParent( this );
-            m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-            m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
-            m_pleaseWaitDialog->show();
-
-            connect( this, &CardPage::convertingCurrentFile, m_pleaseWaitDialog, &PleaseWaitDialog::setWaitMessage);
-
-            cleanupDoubleFiles(drive_path);
-            for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
-                renumberDirectory(drive_path+QString().number(i)+"/");
-            }
-
-            convertAllAudioFilesToMp3(drive_path);
-
-            m_pleaseWaitDialog->setResultString(tr("Finished converting all files."));
-        } else {
-            selectDrive("");
-            updateDriveList();
-            return;
-        }
-    }
-
     QDir dir(drive_path);
     if (dir.exists(DIAGMODE_FILE))
         m_stackWidget->setCurrentIndex(1);
@@ -781,8 +789,8 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 
             sub_dir = drive_path + QString::number(i);
 
-            QDir dir(sub_dir);
-            if (!dir.exists()) {
+            QDir inner(sub_dir);
+            if (!inner.exists()) {
                 subdir_not_exist = true;
                 break;
             }
@@ -800,14 +808,14 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 
             for (int i = 0; i < 9; i++)
             {
-                QDir dir(drive_path);
+                QDir innerDir(drive_path);
 
-                if (dir.exists(QString::number(i)))
+                if (innerDir.exists(QString::number(i)))
                     continue;
 
-                if (!dir.mkdir(QString::number(i)))
+                if (!innerDir.mkdir(QString::number(i)))
                 {
-                    qDebug() << "Failed creating sub-directory" << dir.absolutePath() << i;
+                    qDebug() << "Failed creating sub-directory" << innerDir.absolutePath() << i;
                     perror("Creating directory");
                     deselectDrive();
                     return;
@@ -824,21 +832,21 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
 
             sub_dir = drive_path + QString::number(i);
 
-            QDir dir(sub_dir);
-            if (!dir.exists()) {
+            QDir inner(sub_dir);
+            if (!inner.exists()) {
                 qDebug() << "Sub-directory does not exist - " << i;
                 deselectDrive();
                 return;
             }
-            dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+            inner.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
             if( qApp->property("hoerbertModel")==2011 ){
-                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
+                inner.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
             } else {
-                dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+                inner.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
             }
-            dir.setSorting(QDir::Name);
+            inner.setSorting(QDir::Name);
 
-            QFileInfoList list = dir.entryInfoList();
+            QFileInfoList list = inner.entryInfoList();
 
             std::sort(list.begin(), list.end(), sortByNumber);
             // check plausibility at this point.
@@ -880,13 +888,6 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                 }
             }
         }
-
-        if( qApp->property("hoerbertModel")!=2011){
-            cleanupDoubleFiles(drive_path);
-            for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
-                renumberDirectory(drive_path+QString().number(i)+"/");
-            }
-        }
     }
 
     if (isPlausible)
@@ -910,6 +911,10 @@ void CardPage::selectDriveByPath(const QString &path)
 
     QString driveName = m_deviceManager->getDriveName(path);
     selectDrive(driveName, false);
+    if( qApp->property("hoerbertModel")!=2011 ){
+        convertAllToMp3();
+    }
+
     m_driveList->addItems(m_deviceManager->getDeviceList());
     m_driveList->setCurrentText(driveName);
 

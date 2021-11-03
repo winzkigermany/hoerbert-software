@@ -471,12 +471,12 @@ void PlaylistView::insertUrl(const QString& newUrl, int index)
     entry.state = 0;
     entry.duration = 0;
     entry.fileSuffix = "url";
+    entry.flag = 6; // URL flag
     if( newUrl!="" ){
         entry.metadata.title = newUrl;
     } else {
         entry.metadata.title = tr("http://enter_radio_URL_here");
     }
-    entry.flag = 6; // URL flag
 
     m_data[entry.id] = entry;
     insertEntry(entry, index);
