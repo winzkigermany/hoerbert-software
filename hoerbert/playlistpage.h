@@ -169,6 +169,7 @@ private slots:
      */
     void onClosePage(bool doCommitChanges);
 
+    void show();
 
 private:
     /**
@@ -191,8 +192,11 @@ private:
      */
     bool columnVisibleFromSettings(const QString &columnName);
 
+
     quint8 m_dirNum;
     QString m_dir;
+
+    MainWindow* m_mainWindow;
 
     AudioList m_clipBoard;
 

@@ -58,6 +58,8 @@ PlaylistPage::PlaylistPage(QWidget *parent)
 
     m_pal = palette();
 
+    m_mainWindow = (MainWindow*) parent;
+
     // set black background
     setAutoFillBackground(true);
     setPalette(m_pal);
@@ -202,12 +204,10 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_bluetoothRecordingsRadioButton->setStyleSheet("QRadioButton{ color:#ffffff; }");
     m_bluetoothRecordingsRadioButton->setCheckable(true);
     connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setEnabled);
-    connect( m_bluetoothRecordingsRadioButton, &QRadioButton::show, this, [this, parent]() {
-        m_bluetoothRecordingsRadioButton->setChecked( ((MainWindow*)parent)->getBluetoothRecordingPlaylist() == m_dirNum );
-        qDebug() << "bluetooth record set to: " << ((MainWindow*)parent)->getBluetoothRecordingPlaylist();
-    });
     connect( m_bluetoothRecordingsRadioButton, &QRadioButton::clicked, this, [this]() {
-        QMessageBox::information(this, tr("Change of bluetooth recording directory"), QString(tr("There can be only one single bluetooth recording playlist. This is now the playlist where all bluetooth recordings will be saved to.")), QMessageBox::Ok);
+        if(m_bluetoothRecordingsRadioButton->isChecked()){
+            QMessageBox::information(this, tr("Change of bluetooth recording directory"), QString(tr("There can be only one single bluetooth recording playlist. This is now the playlist where all bluetooth recordings will be saved to.")), QMessageBox::Ok);
+        }
     });
 
 
@@ -225,6 +225,9 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_wifiRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_wifiRecordingsCheckbox->setStyleSheet("QCheckBox{ color:#ffffff; }");
     connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QCheckBox::setEnabled);
+    connect(m_wifiRecordingsCheckbox, &QCheckBox::toggled, this, [this] () {
+        m_playlistView->m_allowWifiRecordings = m_wifiRecordingsCheckbox->isChecked();
+    });
 
     m_authorizationsLayout->addWidget(m_bluetoothRecordingsRadioButton);
     m_authorizationsLayout->addSpacing(10);
@@ -274,6 +277,13 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     connect(m_playlistView, &PlaylistView::errorOccurred, this, &PlaylistPage::errorOccurred);
 }
 
+
+void PlaylistPage::show() {
+    QWidget::show();
+    //your code here
+}
+
+
 void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const AudioList &result, MainWindow* mw)
 {
     m_dir = dir_path;
@@ -322,9 +332,9 @@ void PlaylistPage::setListData(const QString &dir_path, quint8 dir_num, const Au
     m_commitButton->setEnabled(true);
     m_cancelButton->setEnabled(true);
 
-    m_bluetoothRecordingsRadioButton->setChecked( m_dirNum == mw->getBluetoothRecordingPlaylist()  );
-    m_wifiRecordingsCheckbox->setChecked( mw->isWifiRecordingAllowedInPlaylist(m_dirNum) );
-    m_microphoneRecordingsCheckbox->setChecked( mw->isMicrophoneRecordingAllowedInPlaylist(m_dirNum) );
+    m_bluetoothRecordingsRadioButton->setChecked( m_dirNum == m_mainWindow->getBluetoothRecordingPlaylist()  );
+    m_wifiRecordingsCheckbox->setChecked( m_mainWindow->isWifiRecordingAllowedInPlaylist(m_dirNum) );
+    m_microphoneRecordingsCheckbox->setChecked( m_mainWindow->isMicrophoneRecordingAllowedInPlaylist(m_dirNum) );
 }
 
 quint8 PlaylistPage::directory()
