@@ -174,13 +174,13 @@ void BackupManager::process()
                 if( qApp->property("hoerbertModel")==2011 ){
                     dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV);
                 } else {
-                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL);
+                    dir.setNameFilters(QStringList() << "*.*" );
                 }
             } else {
                 if( qApp->property("hoerbertModel")==2011 ){
-                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_FLAC.toLower() << "*" + DESTINATION_FORMAT_URL.toLower() );
+                    dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_FLAC.toLower());
                 } else {
-                    dir.setNameFilters(QStringList() << "*" );
+                    dir.setNameFilters(QStringList() << "*.*" );
                 }
             }
 

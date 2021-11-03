@@ -593,7 +593,6 @@ void CardPage::convertAllAudioFilesToMp3( QString rootPath){
             } else {
                 mp3FileName = audioFile.path() + "/" + audioFile.baseName() + ".mp3";
             }
-//            mp3FileName.toLower().replace( audioFile.suffix(), ".mp3" );
 
             emit convertingCurrentFile(audioFile.absoluteFilePath());
 
