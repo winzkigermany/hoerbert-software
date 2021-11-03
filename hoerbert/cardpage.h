@@ -374,6 +374,7 @@ private:
 
     bool cardContainsMp3FilesAlready( QString &drive_path );
 
+    void convertAllToMp3();
 
     void openWifiDialog();
 

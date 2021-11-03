@@ -98,6 +98,8 @@ void BackupManager::process()
             return;
         }
 
+        dir.refresh();
+
         for (int i = 0; i < 9; i++)
         {
             QDir sub_dir(m_destPath + QString::number(i));
@@ -112,6 +114,8 @@ void BackupManager::process()
                 sub_dir.setFilter(QDir::Files);
                 for (const auto& file : sub_dir.entryList())
                 {
+                    sub_dir.refresh();
+
                     if (!sub_dir.remove(file))
                     {
                         qDebug() << "Failed deleting file on card";

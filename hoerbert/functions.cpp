@@ -165,7 +165,6 @@ bool moveDirectory(const QString &sourcePath, const QString &destPath, bool over
     QStringList sourceFiles = sourceDir.entryList();
     foreach(QString filename, sourceFiles)
     {
-        QDir destinationDir(destPath);
         qDebug() << "move file from ["+sourcePath+"/"+filename+"] to ["+destPath+"/"+filename+"]";
 
         if( overwrite && destinationDir.exists(filename) )
