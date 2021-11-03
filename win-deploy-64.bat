@@ -11,8 +11,8 @@ set PATH=""
 
 @echo Running windeployqt for 64 bit build from PATH
 call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" amd64
-set path="C:\Users\rainer\Documents\hoerbert\Build64\hoerbert\..\Build\lib_win_;C:\Qt\5.15.2\msvc2017_64\bin";%PATH%
-C:\Qt\5.15.2\msvc2017_64\bin\windeployqt.exe ..\Build64\Build\bin\hoerbert.exe --release --force --no-system-d3d-compiler -core -gui -xml -network -concurrent --no-compiler-runtime
+set path="C:\Users\rainer\Documents\hoerbert\Build64\hoerbert\..\Build\lib_win_;C:\Qt\5.15.2\msvc2019_64\bin";%PATH%
+C:\Qt\5.15.2\msvc2019_64\bin\windeployqt.exe ..\Build64\Build\bin\hoerbert.exe --release --force --no-system-d3d-compiler -core -gui -xml -network -concurrent --no-compiler-runtime
 
 %signtoolexe% sign ..\Build64\Build\bin\hoerbert.exe
 %signtoolexe% timestamp /t http://timestamp.comodoca.com ..\Build64\Build\bin\hoerbert.exe
