@@ -417,11 +417,7 @@ void PlaylistPage::moveSelectedEntriesTo(quint8 toDirNum, bool add2Beginning)
             new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_WAV;
         } else {
             QFileInfo info(entry.path);
-            if( info.suffix().toLower()=="url" ){
-                new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_URL;
-            } else {
-                new_file_name = dest_dir + QString::number(index++) + DESTINATION_FORMAT_MP3;
-            }
+            new_file_name = dest_dir + QString::number(index++) + "." + info.suffix().toLower();
         }
 
         if (moveFile(entry.path, new_file_name))

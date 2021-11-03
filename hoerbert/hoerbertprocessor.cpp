@@ -152,8 +152,7 @@ void HoerbertProcessor::run()
                     }
                 } else {
                     QFileInfo info(entry.path);
-                    QString fileSuffix = info.suffix();
-                    moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + fileSuffix);
+                    moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + "." +info.suffix());
                 }
             }
             auto tmp_file = attachSuffixToFileName(entry.path, "A");

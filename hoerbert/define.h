@@ -130,6 +130,7 @@ const QString DESTINATION_FORMAT_M4A         = ".M4A";
 const QString DESTINATION_FORMAT_MP4         = ".MP4";
 const QString DESTINATION_FORMAT_FLAC        = ".FLAC";
 const QString DESTINATION_FORMAT_OGG         = ".OGG";
+const QString DESTINATION_FORMAT_M3U         = ".M3U";
 
 const QString FFMPEG_PATH_WIN                = "/ffmpeg/";
 const QString FFMPEG_PATH_MAC                = "/../Resources/ffmpeg/";

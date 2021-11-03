@@ -41,23 +41,25 @@ int getFirstNumberInDirectory(const QString &dirPath)
 {
     QDir dir(dirPath);
     dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    dir.refresh();
     if(qApp->property("hoerbertModel")==2011){
         dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
     } else {
-        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_M3U << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
     }
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();
-    int first_number = 0;
+    int min_number = list[0].baseName().toInt();    // take any index to start with
 
-    if (list.count() > 0) {
-        std::sort(list.begin(), list.end(), sortByNumber);
-        first_number = list.at(0).fileName().section(".", 0, 0).toInt();
-    } else {
-        first_number = -1;
+    for( int i=0; i<list.length(); i++){
+        int fileIndex = list[i].baseName().toInt();
+        if( fileIndex<min_number ){
+            min_number = fileIndex;
+        }
     }
-    return first_number;
+
+    return min_number;
 }
 
 int getHighestNumberInDirectory(const QString &dirPath)
@@ -68,7 +70,7 @@ int getHighestNumberInDirectory(const QString &dirPath)
     if(qApp->property("hoerbertModel")==2011){
         dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
     } else {
-        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_M3U << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
     }
     dir.setSorting(QDir::Name);
 
@@ -108,7 +110,7 @@ QString increaseFileName(const QString &absoluteFilePath, int offset)
     if (file_number == -1)
         return QString();
 
-    QString increased_file_name = fi.absolutePath() + "/" +  QString::number(file_number + offset) + ".wav";
+    QString increased_file_name = fi.absolutePath() + "/" +  QString::number(file_number + offset) + "." + fi.suffix();
     return increased_file_name;
 }
 
@@ -119,7 +121,7 @@ int getFileCount(const QString &absoluteDirPath)
     if(qApp->property("hoerbertModel")==2011){
         dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
     } else {
-        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_M3U << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
     }
     dir.setSorting(QDir::Name);
 
@@ -306,7 +308,7 @@ int batchRenameByIndex(const QString &dirPath, int from, int offset, int to)
     if(qApp->property("hoerbertModel")==2011){
         dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
     } else {
-        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_M3U << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
     }
     dir.setSorting(QDir::Name);
 
@@ -315,7 +317,7 @@ int batchRenameByIndex(const QString &dirPath, int from, int offset, int to)
 
     if (list.count() > 0) {
         std::sort(list.begin(), list.end(), sortByNumber);
-        max_number = list.at(list.size() - 1).fileName().section(".", 0, 0).toInt();
+        max_number = list.at(list.size() - 1).baseName().toInt();
     }
     else
         return max_number;
@@ -351,7 +353,7 @@ bool batchRenameByName(const QString &dirPath, int from, int offset, int to)
     if(qApp->property("hoerbertModel")==2011){
         dir.setNameFilters(QStringList() << DEFAULT_FORMAT);
     } else {
-        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
+        dir.setNameFilters(QStringList() << "*" + DESTINATION_FORMAT_URL << "*" + DESTINATION_FORMAT_WAV << "*" + DESTINATION_FORMAT_MP3 << "*" + DESTINATION_FORMAT_M3U << "*" + DESTINATION_FORMAT_AAC << "*" + DESTINATION_FORMAT_MP4 << "*" + DESTINATION_FORMAT_M4A << "*" + DESTINATION_FORMAT_FLAC << "*" + DESTINATION_FORMAT_OGG);
     }
     dir.setSorting(QDir::Name);
 
