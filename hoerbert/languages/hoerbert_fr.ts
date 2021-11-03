@@ -636,7 +636,7 @@ sautez cette étape en cochant la case ci-dessous.</translation>
     <message>
         <location filename="../cardpage.cpp" line="736"/>
         <source>Audio files need to be converted for this hörbert.</source>
-        <translation>Les fichiers audio doivent être convertis pour ce hörbert.</translation>
+        <translation type="unfinished">Les fichiers audio doivent être convertis pour cet hörbert.</translation>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="736"/>

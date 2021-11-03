@@ -652,7 +652,7 @@ skip this step by ticking the check box below.</source>
     <message>
         <location filename="../cardpage.cpp" line="736"/>
         <source>Audio files need to be converted for this hörbert.</source>
-        <translation>Audiodateien müssen für dieses Hörbert konvertiert werden.</translation>
+        <translation type="unfinished">Audiodateien müssen für diesen hörbert konvertiert werden.</translation>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="736"/>
@@ -853,7 +853,7 @@ Soll wirklich auf diesem Laufwerk gearbeitet werden? (%1)</translation>
     <message>
         <location filename="../choosehoerbertdialog.cpp" line="43"/>
         <source>hoerbert model 2011 with a mechanical switch</source>
-        <translation>hoerbert modell 2011 mit einem mechanischen schalter</translation>
+        <translation type="unfinished">hoerbert modell 2011 mit einem mechanischen Schalter</translation>
     </message>
     <message>
         <location filename="../choosehoerbertdialog.cpp" line="55"/>
