@@ -74,7 +74,6 @@ PlaylistPage::PlaylistPage(QWidget *parent)
 
     m_authorizationsLayout = new QHBoxLayout();
     m_authorizationsLayout->setAlignment(Qt::AlignCenter);
-    m_authorizationsLayout->setMargin(0);
     m_authorizationsLayout->setSpacing(5);
 
     m_leftToolLayout = new QHBoxLayout();

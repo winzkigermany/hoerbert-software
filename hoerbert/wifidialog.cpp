@@ -183,7 +183,7 @@ void WifiDialog::saveWifiSettings(){
     QFile file( m_mainWindow->getCurrentDrivePath() + WIFI_INI_FILE );
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        qDebug() << "Writing wifi.ini file: " << file;
+        qDebug() << "Writing wifi.ini file: " << file.fileName();
         // overwrite the file every time.
         QTextStream out(&file);
         out << wifiIniContents;
