@@ -129,10 +129,8 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_showLargeDriveCheck = new QCheckBox(this);
     m_showLargeDriveCheck->setText(tr("Show drives larger than %1GB").arg(VOLUME_SIZE_LIMIT));
 
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_regenerateXmlCheck = new QCheckBox(this);
-        m_regenerateXmlCheck->setText( tr("Always regenerate hoerbert.xml for the old hoerbert app versions 1.x") );
-    }
+    m_regenerateXmlCheck = new QCheckBox(this);
+    m_regenerateXmlCheck->setText( tr("Always regenerate hoerbert.xml for the old hoerbert app versions 1.x") );
 
     m_checkLayout = new QVBoxLayout;
     m_checkLayout->setAlignment(Qt::AlignCenter);
@@ -140,9 +138,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_checkLayout->addWidget(m_increaseVolumeOption);
     m_checkLayout->addWidget(m_reminderOption);
     m_checkLayout->addWidget(m_showLargeDriveCheck);
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_checkLayout->addWidget(m_regenerateXmlCheck);
-    }
+    m_checkLayout->addWidget(m_regenerateXmlCheck);
 
     m_closeButton = new QPushButton(this);
     m_closeButton->setText(tr("Close"));
@@ -253,10 +249,8 @@ void AdvancedFeaturesDialog::readSettings()
     bool showLarge = settings.value("showLargeDrives").toBool();
     m_showLargeDriveCheck->setChecked(showLarge);
 
-    if( qApp->property("hoerbertModel")==2011 ){
-        bool generateXml = settings.value("regenerateHoerbertXml").toBool();
-        m_regenerateXmlCheck->setChecked(generateXml);
-    }
+    bool generateXml = settings.value("regenerateHoerbertXml").toBool();
+    m_regenerateXmlCheck->setChecked(generateXml);
 
     settings.endGroup();
 }
@@ -267,4 +261,9 @@ void AdvancedFeaturesDialog::writeVolumeSettings(const QString &volume)
     settings.beginGroup("Global");
     settings.setValue("volume", volume);
     settings.endGroup();
+}
+
+void AdvancedFeaturesDialog::showEvent(QShowEvent *event)
+{
+    m_regenerateXmlCheck->setVisible(qApp->property("hoerbertModel")==2011);
 }

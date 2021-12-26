@@ -69,6 +69,9 @@ signals:
      */
     void buttonSettingsChanged();
 
+protected:
+    virtual void	showEvent(QShowEvent *event) override;
+
 private:
     QLabel *m_versionLabel;
     QLabel *m_companyLabel;
