@@ -32,6 +32,7 @@
 #include <QLineEdit>
 #include <QApplication>
 #include <QDirIterator>
+#include <QRegularExpression>
 
 
 #ifdef _WIN32
@@ -80,12 +81,12 @@ bool DeviceManager::isRemovable(const QString &volumeRoot)
     QString cmd = "diskutil info " + volumeRoot;
     QString output = m_processExecutor.executeCommand(cmd).second;
 
-    return output.contains(QRegExp("Removable Media:.*Removable", Qt::CaseInsensitive));
+    return output.contains(QRegularExpression("Removable Media:.*Removable", QRegularExpression::PatternOption::CaseInsensitiveOption));
 #elif defined (Q_OS_LINUX)
     QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
     QString output = m_processExecutor.executeCommand(cmd).second;
 
-    return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
+    return output.contains(QRegularExpression("ID_USB_DRIVER='usb-storage'", QRegularExpression::PatternOption::CaseInsensitiveOption));
 #endif
 }
 
@@ -99,12 +100,12 @@ bool DeviceManager::isEjectable(const QString &volumeRoot)
     QString cmd = "diskutil info " + volumeRoot;
     QString output = m_processExecutor.executeCommand(cmd).second;
 
-    return output.contains(QRegExp("Ejectable", Qt::CaseInsensitive));
+    return output.contains(QRegularExpression("Ejectable", QRegularExpression::PatternOption::CaseInsensitiveOption));
 #elif defined (Q_OS_LINUX)
     QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
     QString output = m_processExecutor.executeCommand(cmd).second;
 
-    return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
+    return output.contains(QRegularExpression("ID_USB_DRIVER='usb-storage'", QRegularExpression::PatternOption::CaseInsensitiveOption));
 #endif
 }
 

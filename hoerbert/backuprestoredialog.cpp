@@ -121,18 +121,18 @@ bool BackupRestoreDialog::parseXml(const QString &fileName)
         if(token == QXmlStreamReader::StartElement)
         {
 
-            if(xml.name() == "hoerbert")
+            if(xml.name() == QString("hoerbert"))
             {
                 continue;
             }
 
-            if(xml.name() == "app_version")
+            if(xml.name() == QString("app_version"))
             {
                 xml.readNext();
                 m_infoAppVersion = xml.text().toString();
             }
 
-            if(xml.name() == "last_write_date")
+            if(xml.name() == QString("last_write_date"))
             {
                 xml.readNext();
                 QString dateTimeString = xml.text().toString();
@@ -143,13 +143,13 @@ bool BackupRestoreDialog::parseXml(const QString &fileName)
                 }
             }
 
-            if(xml.name() == "drive_name")
+            if(xml.name() == QString("drive_name"))
             {
                 xml.readNext();
                 m_infoDriveName = xml.text().toString();
             }
 
-            if(xml.name() == "by_whom")
+            if(xml.name() == QString("by_whom"))
             {
                 xml.readNext();
                 m_infoByWhom = xml.text().toString();

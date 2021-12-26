@@ -103,7 +103,7 @@ bool XmlWriter::create()
     if (file.open(QIODevice::WriteOnly))
     {
         QTextStream stream(&file);
-        stream << header << content << tail << endl;
+        stream << header << content << tail << Qt::endl;
 
         // pad the file to  a size of 100kb. This is enough empty space for any xml data,
         // AND it reserves the space on the card, so it's always possible to write a new hoerbert.xml file.
@@ -112,7 +112,7 @@ bool XmlWriter::create()
 
         if( paddingByteCount>0 ){
             QString padding = QString( paddingByteCount, ' ' );
-            stream << padding << endl;
+            stream << padding << Qt::endl;
         }
 
         file.close();

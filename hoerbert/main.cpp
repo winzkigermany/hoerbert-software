@@ -32,7 +32,6 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QDir>
-#include <QTextCodec>
 #include <QSslSocket> //To use QSslSocket Class
 
 #include "define.h"
@@ -68,8 +67,6 @@ QStringList PROCESS_ERROR;
 
 int main(int argc, char *argv[])
 {
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-
     signal(SIGINT, signalHandler);
     signal(SIGABRT, signalHandler);
     signal(SIGSEGV, signalHandler);
@@ -80,13 +77,12 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QMap<ENTRY_LIST_TYPE,AudioList> >("QMap<ENTRY_LIST_TYPE, AudioList>");
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 
-    QCoreApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication a(argc, argv);
 
     QString localeName = QLocale::system().name();
 
     QTranslator qtTranslator;
-    qtTranslator.load("qt_" + localeName.mid(0,2), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    qtTranslator.load("qt_" + localeName.mid(0,2), QLibraryInfo::path(QLibraryInfo::TranslationsPath));
     a.installTranslator(&qtTranslator);
 
     QTranslator qtBaseTranslator;
@@ -137,7 +133,7 @@ int main(int argc, char *argv[])
 #endif
 
     }
-    else if (platform.compare("osx") == 0)
+    else if (platform.compare("osx") == 0 || platform.compare("macos") == 0)
     {
         FFMPEG_PATH  = QCoreApplication::applicationDirPath() + FFMPEG_PATH_MAC + "ffmpeg";
 

@@ -41,7 +41,6 @@ CardPage::CardPage(QWidget *parent)
     m_cardMngContainer->setFixedHeight(42);
 
     m_cardMngLayout = new QHBoxLayout(m_cardMngContainer);
-    m_cardMngLayout->setMargin(0);
     m_cardMngLayout->setSpacing(10);
 
     m_driveList = new QComboBox(this);
@@ -305,7 +304,7 @@ void CardPage::formatSelectedDrive(bool retry)
     }
 
     QString nameProposal = selectedDrive.split(" ").at(0);    // get only the first word up to the first whitespace
-    nameProposal = nameProposal.replace(QRegExp("[^A-Z^a-z^0-9^_]{1,11}"), "").toUpper();
+    nameProposal = nameProposal.replace(QRegularExpression("[^A-Z^a-z^0-9^_]{1,11}"), "").toUpper();
 
     if (!retry)
     {
@@ -337,7 +336,7 @@ void CardPage::formatSelectedDrive(bool retry)
 
     QLineEdit *lineEdit = dialog.findChild<QLineEdit *>();
     lineEdit->setMaxLength(11);
-    lineEdit->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_ ]{1,11}"), lineEdit));
+    lineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("[A-Za-z0-9_ ]{1,11}"), lineEdit));
     connect(lineEdit, &QLineEdit::textChanged, this, [=]( QString currentText ){
         lineEdit->setText(currentText.replace(" ", "_").toUpper());       // intentionally replace spaces by underscores while the user is typing.
     });
