@@ -67,7 +67,7 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     QFont font;
     font.setBold(true);
-    font.setWeight(75);
+    font.setWeight(QFont::Weight::Bold);
 
     m_company = new QLabel(this);
     m_company->setObjectName(QString("company"));
@@ -93,8 +93,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     m_checkForUpdateButton->setText(tr("Check for newer version"));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setMargin(20);
-//    layout->setSpacing(10);
+    layout->setSpacing(20);
     layout->addWidget(m_company);
     layout->addWidget(m_copyright);
     layout->addWidget(m_companysite);

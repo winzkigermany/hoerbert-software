@@ -66,7 +66,6 @@ PlaylistPage::PlaylistPage(QWidget *parent)
 
     m_toolLayout = new QHBoxLayout();
     m_toolLayout->setAlignment(Qt::AlignCenter);
-    m_toolLayout->setMargin(0);
     m_toolLayout->setSpacing(5);
 
     m_leftToolLayout = new QHBoxLayout();

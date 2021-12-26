@@ -39,7 +39,6 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QDesktopWidget>
 #include <QSettings>
 #include <QDebug>
 #include <QLocale>
@@ -59,8 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_migrationPath = QString("");
     m_hasBeenRemindedOfBackup = false;
 
-    QDesktopWidget dw;
-    setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
+    //QDesktopWidget dw;
+    //setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
     setWindowTitle("hörbert");
     setWindowIcon(QIcon(":/images/hoerbert.ico"));
     setObjectName("MainWindow");

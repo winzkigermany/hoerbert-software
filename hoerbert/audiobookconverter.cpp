@@ -118,7 +118,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         auto output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DEFAULT_DESTINATION_FORMAT;
         arguments.replace(lastArgumentIndex, output_path);
 
-        info_list.append(output_path);
+        info_list.push_back(QFileInfo(output_path));
 
         QString output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments).second;
 
@@ -174,7 +174,7 @@ QStringList AudioBookConverter::parseForChapters(const QString &output)
 
         bool metadata_detected = false;
 
-        auto lines = chapter.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+        auto lines = chapter.split(QRegularExpression("[\r\n]"), Qt::SkipEmptyParts);
         for (auto line : lines)
         {
             line = line.trimmed();
@@ -269,7 +269,7 @@ double AudioBookConverter::getVolumeDifference(const QString &sourceFilePath)
 
     QString output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments).second;
 
-    QStringList lines = output.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    QStringList lines = output.split(QRegularExpression("[\r\n]"), Qt::SkipEmptyParts);
 
     // extract the maximum volume from ffmpeg output
     // [Parsed_volumedetect_0 @ 0x7fd4c3604080] n_samples: 89795187

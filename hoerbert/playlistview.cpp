@@ -470,9 +470,9 @@ void PlaylistView::setRowBackground(const QBrush &brush, QAbstractItemModel *mod
 QString PlaylistView::convertSecToDesired(int secs)
 {
     if (secs > 60 * 60)
-        return QDateTime::fromTime_t(static_cast<uint>(secs)).toUTC().toString("[hh:mm:ss]");
+        return QDateTime::fromSecsSinceEpoch(static_cast<uint>(secs)).toUTC().toString("[hh:mm:ss]");
     else
-        return QDateTime::fromTime_t(static_cast<uint>(secs)).toUTC().toString("[mm:ss]");
+        return QDateTime::fromSecsSinceEpoch(static_cast<uint>(secs)).toUTC().toString("[mm:ss]");
 }
 
 int PlaylistView::getRowIndexFromEntryID(int id)
@@ -840,14 +840,14 @@ void PlaylistView::dragMoveEvent(QDragMoveEvent *event)
 {
     int indicator_row = -1;
 
-    auto y_pos = event->pos().y();
+    auto y_pos = event->position().y();
 
     QModelIndex index;
     // rootIndex() (i.e. the viewport) might be a valid index
-    if (viewport()->rect().contains(event->pos()))
+    if (viewport()->rect().contains(event->position().toPoint()))
     {
-        index = this->indexAt(event->pos());
-        if (!index.isValid() || !this->visualRect(index).contains(event->pos()))
+        index = this->indexAt(event->position().toPoint());
+        if (!index.isValid() || !this->visualRect(index).contains(event->position().toPoint()))
         {
             index = rootIndex();
         }

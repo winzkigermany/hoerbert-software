@@ -302,8 +302,7 @@ void PieButton::paintEvent(QPaintEvent *e)
     {
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
-        //painter.setRenderHint(QPainter::SmoothPixmapTransform);
-        painter.setRenderHint(QPainter::HighQualityAntialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
         painter.setBrush(QBrush(m_fillColor));
         painter.setPen(Qt::NoPen);

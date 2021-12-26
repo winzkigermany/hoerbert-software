@@ -23,6 +23,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QRegularExpression>
 
 PlaylistParser::PlaylistParser(QObject *parent)
     : QObject(parent)
@@ -67,7 +68,7 @@ QStringList PlaylistParser::get(const QString &filePath)
         return list;
     }
 
-    QStringList content = QString::fromUtf8(file.readAll()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    QStringList content = QString::fromUtf8(file.readAll()).split(QRegularExpression("\r\n"), Qt::SkipEmptyParts);
     QTextStream stream(&file);
     QString line = QString();
     QString path = QString();

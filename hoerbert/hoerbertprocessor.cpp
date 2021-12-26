@@ -463,7 +463,7 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
     QStringList lines;
     QString duration_string;
 
-    for (auto line : result_output.split(QRegExp("[\r\n]"), QString::SkipEmptyParts))
+    for (auto line : result_output.split(QRegularExpression("\r\n"), Qt::SkipEmptyParts))
     {
         line = line.trimmed();
         if (line.startsWith("[silencedetect"))
@@ -638,7 +638,7 @@ double HoerbertProcessor::getVolumeDifference(const QString &sourceFilePath)
         return false;
 
     QString result_output = output.second;
-    QStringList lines = result_output.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    QStringList lines = result_output.split(QRegularExpression("[\r\n]"), Qt::SkipEmptyParts);
 
     // extract the maximum volume from ffmpeg output
     // [Parsed_volumedetect_0 @ 0x7fd4c3604080] n_samples: 89795187
@@ -774,10 +774,10 @@ bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
 
         QString destPath = tailPath(file_info_list[i].absolutePath()) + QString("%1%2").arg(i).arg(DEFAULT_DESTINATION_FORMAT);
 
-        QRegExp re("\\d*");  // a digit (\d), zero or more times (*)
+        QRegularExpression re("\\d*");  // a digit (\d), zero or more times (*)
         bool needsRename = false;
 
-        if (! re.exactMatch(fileNameBeforeSeparator))
+        if (! re.match(fileNameBeforeSeparator).hasMatch())
         {   // the file contains non-digit characters -> rename it.
             needsRename = true;
         }

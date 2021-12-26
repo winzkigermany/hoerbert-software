@@ -65,7 +65,7 @@ void TripleCheckBox::paintEvent(QPaintEvent *e)
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
     int side = qMin(width(), height());
     painter.scale(side / 32.0, side / 32.0);
