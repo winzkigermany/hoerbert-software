@@ -126,6 +126,7 @@ private slots:
     void restoreBackupQuestion();
     void formatCard();
     void advancedFeatures();
+    void chooseHoerbert();
     void selectDestinationManually();
 
     void switchDiagnosticsMode();
@@ -206,7 +207,6 @@ private:
     QGraphicsDropShadowEffect *m_shadow;
 
     QMenu *m_moveToPlaylistMenu;
-    QMenu *m_hoerbertModelMenu;
     QMenu *m_subMenuBegin;
     QMenu *m_subMenuEnd;
     QMenu *m_backupMenu;
@@ -224,12 +224,11 @@ private:
     QAction *m_restoreAction;
     QAction *m_formatAction;
     QAction *m_advancedFeaturesAction;
+    QAction *m_hoerbertModelAction;
     QAction *m_selectManually;
     QAction *m_showAlbumAction;
     QAction *m_showPathAction;
     QAction *m_darkModeAction;
-    QAction *m_hoerbertModel2011Action;
-    QAction *m_hoerbertModel2021Action;
     QAction *m_wifiAction;
 
     QAction *m_moveToB1;

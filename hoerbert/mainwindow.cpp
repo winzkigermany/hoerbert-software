@@ -261,11 +261,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_backupManager = nullptr;
     m_dbgDlg = new DebugDialog(this);
 
-    m_chooseHoerbertDialog = new ChooseHoerbertDialog(this);
-    m_chooseHoerbertDialog->setModal(true);
-    m_chooseHoerbertDialog->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);     // disable the close button. We NEED the user to choose.
-    connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, &MainWindow::setHoerbertModel);
-    m_chooseHoerbertDialog->show();
+    chooseHoerbert();
 }
 
 void MainWindow::updateActionAvailability( bool ANDed )
@@ -306,21 +302,11 @@ void MainWindow::updateActionAvailability( bool ANDed )
     }
 
     // The wifi settings action
-    if( m_cardPage->getSelectedDrive().isEmpty() )
-    {
-        m_hoerbertModel2011Action->setEnabled(true);
-        m_hoerbertModel2021Action->setEnabled(true);
+    if( getHoerbertVersion()==2011 ){
         m_wifiAction->setEnabled(false);
     } else {
-        m_hoerbertModel2011Action->setEnabled(false);
-        m_hoerbertModel2021Action->setEnabled(false);
-        if( getHoerbertVersion()==2011 ){
-            m_wifiAction->setEnabled(false);
-        } else {
-            m_wifiAction->setEnabled(true);
-        }
+        m_wifiAction->setEnabled(true);
     }
-
 }
 
 MainWindow::~MainWindow()
@@ -1575,6 +1561,11 @@ void MainWindow::advancedFeatures()
     m_featuresDlg->readSettings();
 }
 
+void MainWindow::chooseHoerbert()
+{
+    m_chooseHoerbertDialog->open();
+}
+
 void MainWindow::selectDestinationManually()
 {
     QString default_path = QString();
@@ -2427,31 +2418,11 @@ void MainWindow::createActions()
     m_viewMenu = new QMenu(tr("View"), this);
     menuBar()->addMenu(m_viewMenu);
 
-    m_hoerbertModelMenu = new QMenu(tr("Select hoerbert model..."), this);
-    m_hoerbertModelMenu->setEnabled(true);
-    m_viewMenu->addMenu( m_hoerbertModelMenu );
-
-
-    m_hoerbertModel2021Action = new QAction(tr("Latest hörbert model"), this);
-    m_hoerbertModel2021Action->setCheckable(true);
-    m_hoerbertModel2021Action->setStatusTip(tr("The latest model (starting October 2021). This model has no mechanical on/off switch"));
-    connect(m_hoerbertModel2021Action, &QAction::triggered, this, [this] () {
-        setHoerbertModel(2021);
-        updateActionAvailability();
-    });
-    connect( this, &MainWindow::isLatestHoerbert, m_hoerbertModel2021Action, &QAction::setChecked);
-    m_hoerbertModelMenu->addAction(m_hoerbertModel2021Action);
-
-
-    m_hoerbertModel2011Action = new QAction(tr("hörbert 2011"), this);
-    m_hoerbertModel2011Action->setCheckable(true);
-    m_hoerbertModel2011Action->setStatusTip(tr("All hörbert models starting from 2011 that have a mechanical on/off switch"));
-    connect(m_hoerbertModel2011Action, &QAction::triggered, this, [this] () {
-        setHoerbertModel(2011);
-        updateActionAvailability();
-    });
-    connect( this, &MainWindow::isNotLatestHoerbert, m_hoerbertModel2011Action, &QAction::setChecked);
-    m_hoerbertModelMenu->addAction(m_hoerbertModel2011Action);
+    m_chooseHoerbertDialog = new ChooseHoerbertDialog(this);
+    m_hoerbertModelAction = new QAction(tr("Select hoerbert model..."), this);
+    m_hoerbertModelAction->setEnabled(true);
+    connect(m_hoerbertModelAction, &QAction::triggered, this, &MainWindow::chooseHoerbert);
+    m_viewMenu->addAction( m_hoerbertModelAction );
 
     {
         QSettings settings;
@@ -2815,15 +2786,11 @@ void MainWindow::setHoerbertModel( int modelIdentifier )
 {
     if( modelIdentifier==2021 ){
         m_hoerbertVersion = 2021;
-        m_hoerbertModel2021Action->setChecked(true);
-        m_hoerbertModel2011Action->setChecked(false);
         setWindowTitle("hörbert");
         emit isLatestHoerbert(true);
         emit isNotLatestHoerbert(false);
     } else {
         m_hoerbertVersion = 2011;
-        m_hoerbertModel2021Action->setChecked(false);
-        m_hoerbertModel2011Action->setChecked(true);
         setWindowTitle("hörbert 2011");
         emit isLatestHoerbert(false);
         emit isNotLatestHoerbert(true);
