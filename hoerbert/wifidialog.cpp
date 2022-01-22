@@ -41,11 +41,11 @@ WifiDialog::WifiDialog(QWidget* parent)
     resize(480, 480);
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setSizePolicy(sizePolicy);
-    setWindowTitle(tr("WiFi settings"));
+    setWindowTitle(tr("Configure up to 5 WiFi networks for use with hörbert"));
 
-    QLabel instructionLabel(this);
-    instructionLabel.setText(tr("Configure up to 5 WiFi networks for use with hörbert"));
-    instructionLabel.setAlignment(Qt::AlignHCenter);
+    m_instructionLabel = new QLabel(this);
+    m_instructionLabel->setText(tr("Please enter the wireless network's name in the SSID field, and its password in the passkey field. Remember that hörbert can only connect to wireless networks with 2.4 GHz."));
+    m_instructionLabel->setWordWrap(true);
 
     m_wifiSsid0 = new QLineEdit(this);
     m_wifiKey0 = new QLineEdit(this);
@@ -62,8 +62,6 @@ WifiDialog::WifiDialog(QWidget* parent)
     m_wifiSsid4 = new QLineEdit(this);
     m_wifiKey4 = new QLineEdit(this);
     m_wifiKey4->setEchoMode(QLineEdit::Password);
-
-    QVBoxLayout* layout = new QVBoxLayout(this);
 
     QFormLayout *formLayout = new QFormLayout;
     formLayout->addRow(tr("SSID:"), m_wifiSsid0);
@@ -85,7 +83,8 @@ WifiDialog::WifiDialog(QWidget* parent)
     QWidget* formWidget = new QWidget(this);
     formWidget->setLayout( formLayout );
 
-    layout->addWidget( &instructionLabel );
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget( m_instructionLabel );
     layout->addWidget( formWidget );
 
     QHBoxLayout* bottomLine = new QHBoxLayout(this);

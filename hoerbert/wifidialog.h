@@ -47,6 +47,8 @@ signals:
 private:
     MainWindow* m_mainWindow;
 
+    QLabel* m_instructionLabel;
+
     QLineEdit *m_wifiSsid0;
     QLineEdit *m_wifiKey0;
     QLineEdit *m_wifiSsid1;
