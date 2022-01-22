@@ -61,7 +61,9 @@ private:
     QPushButton *m_saveButton;
     QPushButton *m_cancelButton;
 
+    void readWifiSettings();
     void saveWifiSettings();
+    void showEvent(QShowEvent * event);
 };
 
 #endif // WIFIDIALOG_H

@@ -108,87 +108,117 @@ WifiDialog::WifiDialog(QWidget* parent)
     layout->addItem( bottomLine );
 }
 
+void WifiDialog::showEvent(QShowEvent * event){
+    Q_UNUSED(event);
+    readWifiSettings();
+}
+
+
+void WifiDialog::readWifiSettings(){
+
+    QString iniFileName = m_mainWindow->getCurrentDrivePath() + WIFI_INI_FILE;
+
+    if( QFile(iniFileName).exists() ){
+        QSettings settings( iniFileName, QSettings::IniFormat);
+        settings.beginGroup("network1");
+        m_wifiSsid0->setText( settings.value("ssid").toString() );
+        m_wifiKey0->setText( settings.value("password").toString() );
+        settings.endGroup();
+
+        settings.beginGroup("network2");
+        m_wifiSsid1->setText( settings.value("ssid").toString() );
+        m_wifiKey1->setText( settings.value("password").toString() );
+        settings.endGroup();
+
+        settings.beginGroup("network3");
+        m_wifiSsid2->setText( settings.value("ssid").toString() );
+        m_wifiKey2->setText( settings.value("password").toString() );
+        settings.endGroup();
+
+        settings.beginGroup("network4");
+        m_wifiSsid3->setText( settings.value("ssid").toString() );
+        m_wifiKey3->setText( settings.value("password").toString() );
+        settings.endGroup();
+
+        settings.beginGroup("network5");
+        m_wifiSsid4->setText( settings.value("ssid").toString() );
+        m_wifiKey4->setText( settings.value("password").toString() );
+        settings.endGroup();
+    } else {
+        qDebug() << "ini file: " << iniFileName << " does not exist.";
+    }
+
+}
+
 
 void WifiDialog::saveWifiSettings(){
-/*
-    [network1]
-    ssid=cyberspace24
-    password=dubiduaa
-*/
+
     QString s;
     QString p;
-    QString wifiIniContents = "";
+    QString iniFileName = m_mainWindow->getCurrentDrivePath() + WIFI_INI_FILE;
+    QSettings* settings = new QSettings( iniFileName, QSettings::IniFormat, nullptr);
 
-    // create wifi.ini on the memory card
+    settings->beginGroup("network1");
     s = m_wifiSsid0->text().trimmed();
     s.truncate(32);
     if( !s.isEmpty() ){
         p = m_wifiKey0->text().trimmed();
         p.truncate(63);
 
-        wifiIniContents += "[network1]\n";
-        wifiIniContents += "ssid="+s+"\n";
-        wifiIniContents += "password="+p+"\n";
-        wifiIniContents += "\n";
+        settings->setValue("password", p);
+        settings->setValue("ssid", s);
     }
+    settings->endGroup();
 
+    settings->beginGroup("network2");
     s = m_wifiSsid1->text().trimmed();
     s.truncate(32);
     if( !s.isEmpty() ){
         p = m_wifiKey1->text().trimmed();
         p.truncate(63);
 
-        wifiIniContents += "[network2]\n";
-        wifiIniContents += "ssid="+s+"\n";
-        wifiIniContents += "password="+p+"\n";
-        wifiIniContents += "\n";
+        settings->setValue("password", p);
+        settings->setValue("ssid", s);
     }
+    settings->endGroup();
 
+    settings->beginGroup("network3");
     s = m_wifiSsid2->text().trimmed();
     s.truncate(32);
     if( !s.isEmpty() ){
         p = m_wifiKey2->text().trimmed();
         p.truncate(63);
 
-        wifiIniContents += "[network3]\n";
-        wifiIniContents += "ssid="+s+"\n";
-        wifiIniContents += "password="+p+"\n";
-        wifiIniContents += "\n";
+        settings->setValue("password", p);
+        settings->setValue("ssid", s);
     }
+    settings->endGroup();
 
+    settings->beginGroup("network4");
     s = m_wifiSsid3->text().trimmed();
     s.truncate(32);
     if( !s.isEmpty() ){
         p = m_wifiKey3->text().trimmed();
         p.truncate(63);
 
-        wifiIniContents += "[network4]\n";
-        wifiIniContents += "ssid="+s+"\n";
-        wifiIniContents += "password="+p+"\n";
-        wifiIniContents += "\n";
+        settings->setValue("password", p);
+        settings->setValue("ssid", s);
     }
+    settings->endGroup();
 
+    settings->beginGroup("network5");
     s = m_wifiSsid4->text().trimmed();
     s.truncate(32);
     if( !s.isEmpty() ){
         p = m_wifiKey4->text().trimmed();
         p.truncate(63);
 
-        wifiIniContents += "[network5]\n";
-        wifiIniContents += "ssid="+s+"\n";
-        wifiIniContents += "password="+p+"\n";
-        wifiIniContents += "\n";
+        settings->setValue("password", p);
+        settings->setValue("ssid", s);
     }
+    settings->endGroup();
 
-    QFile file( m_mainWindow->getCurrentDrivePath() + WIFI_INI_FILE );
-    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qDebug() << "Writing wifi.ini file: " << file;
-        // overwrite the file every time.
-        QTextStream out(&file);
-        out << wifiIniContents;
-        file.close();
-    }
+    delete settings;    // forces the ini file to be written
 
     this->close();     // close the dialog
 }
