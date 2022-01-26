@@ -60,7 +60,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_hasBeenRemindedOfBackup = false;
 
     m_hoerbertVersion = 0;
-    m_bluetoothRecordingPlaylist = 255;
 
     QDesktopWidget dw;
     setWindowTitle("hörbert");
@@ -152,11 +151,15 @@ MainWindow::MainWindow(QWidget *parent)
                 m_migrationPath = QString("");
             }
 
-            readIndexM3u();
+            m_cardPage->readIndexM3u();
         }
 
         updateActionAvailability(true);
     });
+
+    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, m_cardPage, &CardPage::setBluetoothRecordingPlaylist);
+    connect(m_playlistPage, &PlaylistPage::setWifiRecordingPermission, m_cardPage, &CardPage::setWifiRecordingPermission);
+    connect(m_playlistPage, &PlaylistPage::setMicrophoneRecordingPermission, m_cardPage, &CardPage::setMicrophoneRecordingPermission);
 
     connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
         m_stackWidget->setCurrentIndex(1);
@@ -199,34 +202,10 @@ MainWindow::MainWindow(QWidget *parent)
         m_cardPage->updateEstimatedDuration( playlistIndex, durationInSeconds );
     });
 
-    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, this, [=]( quint8 playlistIndex, bool onOff ) {
-        qDebug() << "Setting bluetooth recording playlist: " << playlistIndex << ", value: " << onOff;
-
-        if( onOff ){
-            m_bluetoothRecordingPlaylist = playlistIndex;
-        } else {
-            if( m_bluetoothRecordingPlaylist == playlistIndex ){
-                m_bluetoothRecordingPlaylist = 255;
-            }
-        }
-    });
-
-    connect(m_playlistPage, &PlaylistPage::setWifiRecordingPermission, this, [=]( quint8 playlistIndex, bool onOff ) {
-        qDebug() << "Setting Wifi recording permission: " << playlistIndex << ", value: " << onOff;
-
-        if( playlistIndex<MAX_PLAYLIST_COUNT ){
-            m_wifiRecordingPermissions[playlistIndex] = onOff;
-        }
-    });
-
-    connect(m_playlistPage, &PlaylistPage::setMicrophoneRecordingPermission, this, [=]( quint8 playlistIndex, bool onOff ) {
-        qDebug() << "Setting Microphone recording permission: " << playlistIndex << ", value: " << onOff;
-
-        if( playlistIndex<MAX_PLAYLIST_COUNT ){
-            m_microphoneRecordingPermissions[playlistIndex] = onOff;
-        }
-    });
-
+    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, m_cardPage, &CardPage::setBluetoothRecordingPlaylist );
+    connect(m_playlistPage, &PlaylistPage::setWifiRecordingPermission, m_cardPage, &CardPage::setWifiRecordingPermission );
+    connect(m_playlistPage, &PlaylistPage::setMicrophoneRecordingPermission, m_cardPage, &CardPage::setMicrophoneRecordingPermission );
+    connect(m_playlistPage, &PlaylistPage::commitChanges, m_cardPage, &CardPage::generateIndexM3u, Qt::QueuedConnection);
     connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
 
     m_shadow = new QGraphicsDropShadowEffect(this);
@@ -266,6 +245,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, &MainWindow::setHoerbertModel);
     m_chooseHoerbertDialog->show();
 }
+
+
+
 
 void MainWindow::updateActionAvailability( bool ANDed )
 {
@@ -417,238 +399,6 @@ void MainWindow::makePlausible(std::list <int> fixList)
 
 
 /**
- * @brief MainWindow::readIndexM3U read the index.m3u file
- * @param rootPath
- */
-void MainWindow::readIndexM3u(){
-
-    QString rootPath = getCurrentDrivePath();
-    qDebug() << "root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
-
-    // reset all values
-    m_bluetoothRecordingPlaylist = 255;
-    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
-        m_microphoneRecordingPermissions[i] = false;
-        m_wifiRecordingPermissions[i] = false;
-    }
-
-    // Open file to read contents
-    QFile file(rootPath + INDEX_M3U_FILE);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream stream(&file);
-
-        while (!stream.atEnd())
-        {
-            QString newLine = stream.readLine();
-            QString dataString = "";
-            QString searchString;
-
-            searchString = "#hoerbert:set_bluetooth_recordings_playlist";
-            if( newLine.toLower().startsWith(searchString) ){
-                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
-                m_bluetoothRecordingPlaylist = 255;
-
-                if( dataString.trimmed()=="0.0")
-                    m_bluetoothRecordingPlaylist = 0;
-
-                if( dataString.trimmed()=="0.1")
-                    m_bluetoothRecordingPlaylist = 1;
-
-                if( dataString.trimmed()=="0.2")
-                    m_bluetoothRecordingPlaylist = 2;
-
-                if( dataString.trimmed()=="0.3")
-                    m_bluetoothRecordingPlaylist = 3;
-
-                if( dataString.trimmed()=="0.4")
-                    m_bluetoothRecordingPlaylist = 4;
-
-                if( dataString.trimmed()=="0.5")
-                    m_bluetoothRecordingPlaylist = 5;
-
-                if( dataString.trimmed()=="0.6")
-                    m_bluetoothRecordingPlaylist = 6;
-
-                if( dataString.trimmed()=="0.7")
-                    m_bluetoothRecordingPlaylist = 7;
-
-                if( dataString.trimmed()=="0.8")
-                    m_bluetoothRecordingPlaylist = 8;
-
-            }
-
-            searchString = "#hoerbert:allow_microphone_recordings_in_playlist";
-            if( newLine.toLower().startsWith(searchString) ){
-                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
-                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
-                for ( const auto& i : list  )
-                {
-                    if( i.trimmed()=="0.0")
-                        m_microphoneRecordingPermissions[0] = true;
-
-                    if( i.trimmed()=="0.1")
-                        m_microphoneRecordingPermissions[1] = true;
-
-                    if( i.trimmed()=="0.2")
-                        m_microphoneRecordingPermissions[2] = true;
-
-                    if( i.trimmed()=="0.3")
-                        m_microphoneRecordingPermissions[3] = true;
-
-                    if( i.trimmed()=="0.4")
-                        m_microphoneRecordingPermissions[4] = true;
-
-                    if( i.trimmed()=="0.5")
-                        m_microphoneRecordingPermissions[5] = true;
-
-                    if( i.trimmed()=="0.6")
-                        m_microphoneRecordingPermissions[6] = true;
-
-                    if( i.trimmed()=="0.7")
-                        m_microphoneRecordingPermissions[7] = true;
-
-                    if( i.trimmed()=="0.8")
-                        m_microphoneRecordingPermissions[8] = true;
-                }
-            }
-
-            searchString = "#hoerbert:allow_wifi_recordings_in_playlist";
-            if( newLine.toLower().startsWith(searchString) ){
-                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
-                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
-                for ( const auto& i : list  )
-                {
-                    if( i.trimmed()=="0.0")
-                        m_wifiRecordingPermissions[0] = true;
-
-                    if( i.trimmed()=="0.1")
-                        m_wifiRecordingPermissions[1] = true;
-
-                    if( i.trimmed()=="0.2")
-                        m_wifiRecordingPermissions[2] = true;
-
-                    if( i.trimmed()=="0.3")
-                        m_wifiRecordingPermissions[3] = true;
-
-                    if( i.trimmed()=="0.4")
-                        m_wifiRecordingPermissions[4] = true;
-
-                    if( i.trimmed()=="0.5")
-                        m_wifiRecordingPermissions[5] = true;
-
-                    if( i.trimmed()=="0.6")
-                        m_wifiRecordingPermissions[6] = true;
-
-                    if( i.trimmed()=="0.7")
-                        m_wifiRecordingPermissions[7] = true;
-
-                    if( i.trimmed()=="0.8")
-                        m_wifiRecordingPermissions[8] = true;
-                }
-            }
-        }
-
-        file.close();
-    }
-}
-
-/**
- * @brief MainWindow::generateIndexM3u
- * @param rootPath
- */
-void MainWindow::generateIndexM3u(){
-
-    QString rootPath = getCurrentDrivePath();
-    qDebug() << "root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
-
-    // Open file to copy contents
-    bool isNewFile = false;
-    QFile file(rootPath + INDEX_M3U_FILE);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        // create the file to keep the rest working as if it existed.
-        file.open(QIODevice::ReadWrite | QIODevice::Text);
-        isNewFile = true;
-    }
-    file.close();
-
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        // Open new file to write
-        uint32_t lineNumber = 0;
-        QFile temp(rootPath + INDEX_M3U_FILE_BAK);
-        if( temp.open(QIODevice::ReadWrite | QIODevice::Text) )
-        {
-            QTextStream stream(&file);
-            QTextStream out(&temp);
-            bool foundOne = false;
-
-            out << "#EXTM3U" << "\n";
-
-            if( m_bluetoothRecordingPlaylist<MAX_PLAYLIST_COUNT ){
-                out << "#hoerbert:set_bluetooth_recordings_playlist" << " 0." << m_bluetoothRecordingPlaylist << "\n";
-            }
-
-            QString microphonePermissionsString = "";
-            foundOne = false;
-            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
-                if( m_microphoneRecordingPermissions[i] ){
-                    microphonePermissionsString += " 0."+QString::number(i);
-                    foundOne = true;
-                }
-            }
-            if( foundOne ){
-                out << "#hoerbert:allow_microphone_recordings_in_playlist" << microphonePermissionsString << "\n";
-            }
-
-            QString wifiPermissionsString = "";
-            foundOne = false;
-            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
-                if( m_wifiRecordingPermissions[i] ){
-                    wifiPermissionsString += " 0."+QString::number(i);
-                    foundOne = true;
-                }
-                foundOne = true;
-            }
-            if( foundOne ){
-                out << "#hoerbert:allow_wifi_recordings_in_playlist" << wifiPermissionsString << "\n";
-            }
-
-            while (!stream.atEnd())
-            {
-                QString newLine = stream.readLine();
-
-                if( newLine.toLower().startsWith("#extm3u") ){
-                    lineNumber++;
-                    continue;
-                }
-                if( newLine.toLower().startsWith("#hoerbert:set_bluetooth_recordings_playlist") ){
-                    lineNumber++;
-                    continue;
-                }
-                if( newLine.toLower().startsWith("#hoerbert:allow_microphone_recordings_in_playlist") ){
-                    lineNumber++;
-                    continue;
-                }
-                if( newLine.toLower().startsWith("#hoerbert:allow_wifi_recordings_in_playlist") ){
-                    lineNumber++;
-                    continue;
-                }
-
-                out << newLine  << "\n";
-                lineNumber++;
-            }
-            temp.close();
-            file.close();
-
-            file.remove();
-            temp.rename(rootPath + INDEX_M3U_FILE);
-         }
-    }
-}
-
-
-/**
  * @brief MainWindow::processCommit
  * @param list
  * @param dir_index
@@ -658,8 +408,6 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     m_cardPage->enableButtons(true);
     showHideEditMenuEntries(false);
     updateActionAvailability(false);
-
-    generateIndexM3u();
 
     if (list.count() == 0) {
         m_cardPage->update();
@@ -1566,6 +1314,10 @@ void MainWindow::doRestoreBackup(const QString &sourcePath, bool doMerge)
 void MainWindow::formatCard()
 {
     m_cardPage->formatSelectedDrive();
+}
+
+CardPage* MainWindow::getCardPage(){
+    return m_cardPage;
 }
 
 void MainWindow::advancedFeatures()
@@ -2843,24 +2595,6 @@ QString MainWindow::getCurrentDrivePath(){
     return m_cardPage->currentDrivePath();
 }
 
-quint8 MainWindow::getBluetoothRecordingPlaylist(){
-    return m_bluetoothRecordingPlaylist;
-}
-
 void MainWindow::openWifiDialog(){
     m_wifiDialog->show();
-}
-
-bool MainWindow::isWifiRecordingAllowedInPlaylist( quint8 playlistNumber ){
-    if( playlistNumber<MAX_PLAYLIST_COUNT && m_wifiRecordingPermissions[playlistNumber] ){
-        return true;
-    }
-    return false;
-}
-
-bool MainWindow::isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber ){
-    if( playlistNumber<MAX_PLAYLIST_COUNT && m_microphoneRecordingPermissions[playlistNumber] ){
-        return true;
-    }
-    return false;
 }

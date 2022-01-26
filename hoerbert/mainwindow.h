@@ -53,8 +53,6 @@
 #include "choosehoerbertdialog.h"
 #include "wifidialog.h"
 
-#define MAX_PLAYLIST_COUNT 9
-
 class CardPage;
 class WifiDialog;
 class PlaylistPage;
@@ -91,13 +89,9 @@ public:
 
     QString getCurrentDrivePath();
 
-    quint8 getBluetoothRecordingPlaylist();
-
-    bool isWifiRecordingAllowedInPlaylist( quint8 playlistNumber );
-
-    bool isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber );
-
     void backupCard();
+
+    CardPage* getCardPage();
 
 signals:
     /**
@@ -115,7 +109,6 @@ signals:
     void isLatestHoerbert(bool latestOlder );
 
     void isNotLatestHoerbert(bool latestOlder );
-
 
 private slots:
     void addTitle();
@@ -164,10 +157,6 @@ private:
     void setHoerbertModel( int modelIdentifier);
 
     bool m_hasBeenRemindedOfBackup = false;  // we set this flag once the user has been reminded of a backup for this card. Then we will keep from reminding him unless a new card is selected.
-
-    void readIndexM3u();
-
-    void generateIndexM3u();
 
     /**
      * @brief updateFormatActionAvailability The format action needs special care as of when to enable or disable it.
@@ -266,10 +255,6 @@ private:
     PleaseWaitDialog* m_pleaseWaitDialog;
     WifiDialog* m_wifiDialog;
     void openWifiDialog();
-
-    quint8 m_bluetoothRecordingPlaylist;
-    bool m_wifiRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
-    bool m_microphoneRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
 };
 
 #endif // MAINWINDOW_H

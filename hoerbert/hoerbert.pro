@@ -73,6 +73,7 @@ SOURCES += \
         playsymbolbutton.cpp \
         pleasewaitdialog.cpp \
         processexecutor.cpp \
+        recordingselector.cpp \
         removabledrivelistener.cpp \
         runguard.cpp \
         triplecheckbox.cpp \
@@ -108,6 +109,7 @@ HEADERS += \
         playsymbolbutton.h \
         pleasewaitdialog.h \
         processexecutor.h \
+        recordingselector.h \
         removabledrivelistener.h \
         runguard.h \
         triplecheckbox.h \
