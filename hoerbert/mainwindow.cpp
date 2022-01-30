@@ -247,8 +247,6 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
-
-
 void MainWindow::updateActionAvailability( bool ANDed )
 {
     bool isVisible = true;
@@ -286,22 +284,22 @@ void MainWindow::updateActionAvailability( bool ANDed )
         m_backupAction->setEnabled(false);
     }
 
-    // The wifi settings action
-    if( m_cardPage->getSelectedDrive().isEmpty() )
-    {
-        m_hoerbertModel2011Action->setEnabled(true);
-        m_hoerbertModel2021Action->setEnabled(true);
+    if( m_cardPage->getSelectedDrive().isEmpty()){
+        m_hoerbertModelMenu->setEnabled(true);
+    } else {
+        m_hoerbertModelMenu->setEnabled(false);
+    }
+
+
+    if( getHoerbertVersion()==2011 ){
         m_wifiAction->setEnabled(false);
     } else {
-        m_hoerbertModel2011Action->setEnabled(false);
-        m_hoerbertModel2021Action->setEnabled(false);
-        if( getHoerbertVersion()==2011 ){
+        if( m_cardPage->getSelectedDrive().isEmpty() ){
             m_wifiAction->setEnabled(false);
         } else {
             m_wifiAction->setEnabled(true);
         }
     }
-
 }
 
 MainWindow::~MainWindow()
@@ -2201,7 +2199,7 @@ void MainWindow::createActions()
         setHoerbertModel(2011);
         updateActionAvailability();
     });
-    connect( this, &MainWindow::isNotLatestHoerbert, m_hoerbertModel2011Action, &QAction::setChecked);
+    connect( this, &MainWindow::isHoerbert2011, m_hoerbertModel2011Action, &QAction::setChecked);
     m_hoerbertModelMenu->addAction(m_hoerbertModel2011Action);
 
     {
@@ -2295,12 +2293,11 @@ void MainWindow::createActions()
 
     m_wifiAction = new QAction(tr("Configure WiFi connections"), this);
     m_wifiAction->setStatusTip(tr("Configure WiFi connections"));
-    m_wifiAction->setEnabled(true);
     m_wifiAction->setMenuRole(QAction::NoRole);
+    m_extrasMenu->addAction(m_wifiAction);
     connect(m_wifiAction, &QAction::triggered, this, [this] () {
         openWifiDialog();
     });
-    m_extrasMenu->addAction(m_wifiAction);
 
 
     m_printAction = new QAction(tr("Print table of contents"), this);
@@ -2570,14 +2567,14 @@ void MainWindow::setHoerbertModel( int modelIdentifier )
         m_hoerbertModel2011Action->setChecked(false);
         setWindowTitle("hörbert");
         emit isLatestHoerbert(true);
-        emit isNotLatestHoerbert(false);
+        emit isHoerbert2011(false);
     } else {
         m_hoerbertVersion = 2011;
         m_hoerbertModel2021Action->setChecked(false);
         m_hoerbertModel2011Action->setChecked(true);
         setWindowTitle("hörbert 2011");
         emit isLatestHoerbert(false);
-        emit isNotLatestHoerbert(true);
+        emit isHoerbert2011(true);
     }
 
     qApp->setProperty("hoerbertModel", m_hoerbertVersion);

@@ -434,27 +434,10 @@ private:
     QLabel *m_diagModeHint;
     QPushButton *m_return2Normal;
 
-    PieButton *m_dir0;
-    PieButton *m_dir1;
-    PieButton *m_dir2;
-    PieButton *m_dir3;
-    PieButton *m_dir4;
-    PieButton *m_dir5;
-    PieButton *m_dir6;
-    PieButton *m_dir7;
-    PieButton *m_dir8;
-    QMap<int, PieButton*> m_dirs;
-
-    RecordingSelector *m_recordingSelector0;
-    RecordingSelector *m_recordingSelector1;
-    RecordingSelector *m_recordingSelector2;
-    RecordingSelector *m_recordingSelector3;
-    RecordingSelector *m_recordingSelector4;
-    RecordingSelector *m_recordingSelector5;
-    RecordingSelector *m_recordingSelector6;
-    RecordingSelector *m_recordingSelector7;
-    RecordingSelector *m_recordingSelector8;
-    QMap<int, RecordingSelector*> m_recordingSelectors;
+    QWidget* m_buttonArea[MAX_PLAYLIST_COUNT];
+    QHBoxLayout* m_hbl[MAX_PLAYLIST_COUNT];
+    PieButton *m_dirs[MAX_PLAYLIST_COUNT];
+    RecordingSelector* m_recordingSelectors[MAX_PLAYLIST_COUNT];
 
     QSpacerItem *m_horizontalGridSpacer1;
     QSpacerItem *m_horizontalGridSpacer2;

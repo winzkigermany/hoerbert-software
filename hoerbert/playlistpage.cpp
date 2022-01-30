@@ -137,7 +137,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_urlLabel = new QLabel(this);
     m_urlLabel->setFont(QFont("Monospace", 10, QFont::DemiBold));
     m_urlLabel->setText(tr("URL:"));
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, &QLabel::setEnabled);
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_urlLabel, &QLabel::setVisible);
     m_urlLabel->setStyleSheet("QLabel{ color:#ffffff; }");
 
     m_addUrlButton = new PieButton(this);
@@ -145,16 +145,12 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_addUrlButton->setOverlayPixmap(QPixmap(":/images/pie_overlay.png"));
     m_addUrlButton->setMainPixmap(QPixmap(":/images/plus.png"));
     m_addUrlButton->setShadowEnabled(false);
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_addUrlButton, &PieButton::setEnabled);
-
-    connect ( (MainWindow*)parent, SIGNAL(isLatestHoerbert(bool)), m_addUrlButton, SLOT(setEnabled(bool)));
-//    m_addSilenceButton->setShortcut(QKeySequence("Ctrl+S"));    // not ideal, not adjusted for different OSs
     m_addUrlButton->setToolTip(tr("Add Internet radio URL"));
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_addUrlButton, &PieButton::setVisible);
 
     m_leftToolLayout->addSpacing(10);
     m_leftToolLayout->addWidget(m_urlLabel);
     m_leftToolLayout->addWidget(m_addUrlButton);
-
 
     m_leftToolLayout->addSpacing(30);
 
@@ -202,11 +198,11 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_bluetoothRecordingsRadioButton->setCheckable(true);
     m_bluetoothRecordingsRadioButton->setChecked(false);
     m_bluetoothRecordingsRadioButton->setIcon(QIcon(":/images/rec_mic_inactive_512.png"));
-    m_bluetoothRecordingsRadioButton->setIconSize(QSize(16, 16));
+    m_bluetoothRecordingsRadioButton->setIconSize(QSize(18, 18));
     m_bluetoothRecordingsRadioButton->setText(tr("Store Bluetooth recordings here"));
     m_bluetoothRecordingsRadioButton->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_bluetoothRecordingsRadioButton->setStyleSheet("background: transparent; border: none; color:#ffffff;");
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setEnabled);
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_bluetoothRecordingsRadioButton, &QRadioButton::setVisible);
     connect( m_bluetoothRecordingsRadioButton, &QRadioButton::clicked, this, [this]() {
         if(m_bluetoothRecordingsRadioButton->isChecked()){
             QMessageBox::information(this, tr("Change of bluetooth recording directory"), QString(tr("There can be only one single bluetooth recording playlist. This is now the playlist where all bluetooth recordings will be saved to.")), QMessageBox::Ok);
@@ -224,7 +220,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_microphoneRecordingsCheckbox->setCheckable(true);
     m_microphoneRecordingsCheckbox->setChecked(false);
     m_microphoneRecordingsCheckbox->setIcon(QIcon(":/images/rec_mic_inactive_512.png"));
-    m_microphoneRecordingsCheckbox->setIconSize(QSize(16, 16));
+    m_microphoneRecordingsCheckbox->setIconSize(QSize(18, 18));
     m_microphoneRecordingsCheckbox->setText(tr("Allow microphone recordings here"));
     m_microphoneRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_microphoneRecordingsCheckbox->setStyleSheet("background: transparent; border: none; color:#ffffff;");
@@ -235,7 +231,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
             m_microphoneRecordingsCheckbox->setIcon(QIcon(":/images/rec_mic_inactive_512.png"));
         }
     });
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, &QCheckBox::setEnabled);
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_microphoneRecordingsCheckbox, &QCheckBox::setVisible);
 
 
 
@@ -243,7 +239,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
     m_wifiRecordingsCheckbox->setCheckable(true);
     m_wifiRecordingsCheckbox->setChecked(false);
     m_wifiRecordingsCheckbox->setIcon(QIcon(":/images/rec_mic_inactive_512.png"));
-    m_wifiRecordingsCheckbox->setIconSize(QSize(16, 16));
+    m_wifiRecordingsCheckbox->setIconSize(QSize(18, 18));
     m_wifiRecordingsCheckbox->setText(tr("Allow internet radio recordings here"));
     m_wifiRecordingsCheckbox->setFont(QFont("Monospace", 11, QFont::DemiBold));
     m_wifiRecordingsCheckbox->setStyleSheet("background: transparent; border: none; color:#ffffff;");
@@ -254,7 +250,7 @@ PlaylistPage::PlaylistPage(QWidget *parent)
             m_wifiRecordingsCheckbox->setIcon(QIcon(":/images/rec_wifi_inactive_512.png"));
         }
     });
-    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QCheckBox::setEnabled);
+    connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_wifiRecordingsCheckbox, &QCheckBox::setVisible);
 
 
     m_authorizationsLayout->addWidget(m_microphoneRecordingsCheckbox);

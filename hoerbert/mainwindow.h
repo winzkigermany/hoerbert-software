@@ -108,7 +108,7 @@ signals:
 
     void isLatestHoerbert(bool latestOlder );
 
-    void isNotLatestHoerbert(bool latestOlder );
+    void isHoerbert2011(bool latestOlder );
 
 private slots:
     void addTitle();

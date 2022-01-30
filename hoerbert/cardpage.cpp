@@ -87,64 +87,21 @@ CardPage::CardPage(QWidget *parent)
     m_gridLayout->setHorizontalSpacing(30);
     m_gridLayout->setVerticalSpacing(30);
 
-    m_dir0 = new PieButton(m_gridWidget, 0);
-    m_dir1 = new PieButton(m_gridWidget, 1);
-    m_dir2 = new PieButton(m_gridWidget, 2);
-    m_dir3 = new PieButton(m_gridWidget, 3);
-    m_dir4 = new PieButton(m_gridWidget, 4);
-    m_dir5 = new PieButton(m_gridWidget, 5);
-    m_dir6 = new PieButton(m_gridWidget, 6);
-    m_dir7 = new PieButton(m_gridWidget, 7);
-    m_dir8 = new PieButton(m_gridWidget, 8);
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        m_dirs[i] = new PieButton(m_gridWidget, i);
+        m_recordingSelectors[i] = new RecordingSelector(m_gridWidget, i);
+        m_recordingSelectors[i]->setEnabled(false);
+    }
 
-    m_recordingSelector0 = new RecordingSelector(m_gridWidget, 0);
-    m_recordingSelector0->setEnabled(false);
-    m_recordingSelector1 = new RecordingSelector(m_gridWidget, 1);
-    m_recordingSelector1->setEnabled(false);
-    m_recordingSelector2 = new RecordingSelector(m_gridWidget, 2);
-    m_recordingSelector2->setEnabled(false);
-    m_recordingSelector3 = new RecordingSelector(m_gridWidget, 3);
-    m_recordingSelector3->setEnabled(false);
-    m_recordingSelector4 = new RecordingSelector(m_gridWidget, 4);
-    m_recordingSelector4->setEnabled(false);
-    m_recordingSelector5 = new RecordingSelector(m_gridWidget, 5);
-    m_recordingSelector5->setEnabled(false);
-    m_recordingSelector6 = new RecordingSelector(m_gridWidget, 6);
-    m_recordingSelector6->setEnabled(false);
-    m_recordingSelector7 = new RecordingSelector(m_gridWidget, 7);
-    m_recordingSelector7->setEnabled(false);
-    m_recordingSelector8 = new RecordingSelector(m_gridWidget, 8);
-    m_recordingSelector8->setEnabled(false);
-
-    m_dir0->setBackgroundColor(CL_DIR0);
-    m_dir1->setBackgroundColor(CL_DIR1);
-    m_dir2->setBackgroundColor(CL_DIR2);
-    m_dir3->setBackgroundColor(CL_DIR3);
-    m_dir4->setBackgroundColor(CL_DIR4);
-    m_dir5->setBackgroundColor(CL_DIR5);
-    m_dir6->setBackgroundColor(CL_DIR6);
-    m_dir7->setBackgroundColor(CL_DIR7);
-    m_dir8->setBackgroundColor(CL_DIR8);
-
-    m_dirs[DIR0] = m_dir0;
-    m_dirs[DIR1] = m_dir1;
-    m_dirs[DIR2] = m_dir2;
-    m_dirs[DIR3] = m_dir3;
-    m_dirs[DIR4] = m_dir4;
-    m_dirs[DIR5] = m_dir5;
-    m_dirs[DIR6] = m_dir6;
-    m_dirs[DIR7] = m_dir7;
-    m_dirs[DIR8] = m_dir8;
-
-    m_recordingSelectors[DIR0] = m_recordingSelector0;
-    m_recordingSelectors[DIR1] = m_recordingSelector1;
-    m_recordingSelectors[DIR2] = m_recordingSelector2;
-    m_recordingSelectors[DIR3] = m_recordingSelector3;
-    m_recordingSelectors[DIR4] = m_recordingSelector4;
-    m_recordingSelectors[DIR5] = m_recordingSelector5;
-    m_recordingSelectors[DIR6] = m_recordingSelector6;
-    m_recordingSelectors[DIR7] = m_recordingSelector7;
-    m_recordingSelectors[DIR8] = m_recordingSelector8;
+    m_dirs[0]->setBackgroundColor(CL_DIR0);
+    m_dirs[1]->setBackgroundColor(CL_DIR1);
+    m_dirs[2]->setBackgroundColor(CL_DIR2);
+    m_dirs[3]->setBackgroundColor(CL_DIR3);
+    m_dirs[4]->setBackgroundColor(CL_DIR4);
+    m_dirs[5]->setBackgroundColor(CL_DIR5);
+    m_dirs[6]->setBackgroundColor(CL_DIR6);
+    m_dirs[7]->setBackgroundColor(CL_DIR7);
+    m_dirs[8]->setBackgroundColor(CL_DIR8);
 
 // not ideal, not adjusted for different OSs
 /*    for (const auto& dir_button : m_dirs)
@@ -167,121 +124,38 @@ CardPage::CardPage(QWidget *parent)
     m_verticalGridSpacer1 = new QSpacerItem(GRID_SPACING, GRID_SPACING, QSizePolicy::Minimum, QSizePolicy::Fixed);
     m_verticalGridSpacer2 = new QSpacerItem(GRID_SPACING, GRID_SPACING, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        m_buttonArea[i] = new QWidget();
+        m_hbl[i] = new QHBoxLayout();
+        m_hbl[i]->setSpacing(0);
+        m_hbl[i]->addWidget(m_dirs[i]);
+        m_hbl[i]->addWidget(m_recordingSelectors[i]);
+        m_buttonArea[i]->setLayout( m_hbl[i] );
+    }
+
     m_gridLayout->addItem(m_leftGridSpacer, 0, 0, 1, 1);
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir0, 0, 1, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir0);
-        hbl->addWidget(m_recordingSelector0);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 0, 1, 1, 1);
-    }
 
+    m_gridLayout->addWidget( m_buttonArea[0], 0, 1, 1, 1 );
     m_gridLayout->addItem(m_horizontalGridSpacer1, 0, 2, 1, 1);
-
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir1, 0, 3, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir1);
-        hbl->addWidget(m_recordingSelector1);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 0, 3, 1, 1);
-    }
-
+    m_gridLayout->addWidget( m_buttonArea[1], 0, 3, 1, 1 );
     m_gridLayout->addItem(m_horizontalGridSpacer1, 0, 4, 1, 1);
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir2, 0, 5, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir2);
-        hbl->addWidget(m_recordingSelector2);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 0, 5, 1, 1);
-    }
-
+    m_gridLayout->addWidget( m_buttonArea[2], 0, 5, 1, 1 );
     m_gridLayout->addItem(m_rightGridSpacer, 0, 6, 1, 1);
+
     m_gridLayout->addItem(m_verticalGridSpacer1, 1, 1, 1, 1);
 
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir3, 2, 1, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir3);
-        hbl->addWidget(m_recordingSelector3);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 2, 1, 1, 1);
-    }
-
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir4, 2, 3, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir4);
-        hbl->addWidget(m_recordingSelector4);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 2, 3, 1, 1);
-    }
-
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir5, 2, 5, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir5);
-        hbl->addWidget(m_recordingSelector5);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 2, 5, 1, 1);
-    }
+    m_gridLayout->addWidget( m_buttonArea[3], 2, 1, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[4], 2, 3, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[5], 2, 5, 1, 1 );
 
     m_gridLayout->addItem(m_verticalGridSpacer2, 3, 1, 1, 1);
 
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir6, 4, 1, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir6);
-        hbl->addWidget(m_recordingSelector6);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 4, 1, 1, 1);
-    }
+    m_gridLayout->addWidget( m_buttonArea[6], 4, 1, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[7], 4, 3, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[8], 4, 5, 1, 1 );
 
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir7, 4, 3, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir7);
-        hbl->addWidget(m_recordingSelector7);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 4, 3, 1, 1);
-    }
-
-    if( qApp->property("hoerbertModel")==2011 ){
-        m_gridLayout->addWidget(m_dir8, 4, 5, 1, 1);
-    } else {
-        QWidget* w = new QWidget();
-        QHBoxLayout* hbl = new QHBoxLayout();
-        hbl->setSpacing(0);
-        hbl->addWidget(m_dir8);
-        hbl->addWidget(m_recordingSelector8);
-        w->setLayout( hbl );
-        m_gridLayout->addWidget(w, 4, 5, 1, 1);
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_recordingSelectors[i], &RecordingSelector::setVisible);
     }
 
     m_diagWidget = new QWidget(this);
@@ -314,26 +188,23 @@ CardPage::CardPage(QWidget *parent)
     m_driveList->addItems(m_deviceManager->getDeviceList());
     updateButtons();
 
-    for (const auto& key : m_dirs.keys())
-    {
-        connect(m_dirs.value(key), &QPushButton::clicked, [this, key] (){
-            if (m_dirs[key]->percentage() > 0)
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        connect(m_dirs[i], &QPushButton::clicked, this, [this, i](){
+            if (m_dirs[i]->percentage() > 0){
                 return;
-            if (!getSelectedDrive().isEmpty())
-                this->onPlaylistButtonClicked(static_cast<qint8>(key));
+            }
+            if (!getSelectedDrive().isEmpty()){
+                onPlaylistButtonClicked(i);
+            }
         });
+        connect( m_recordingSelectors[i], &RecordingSelector::selectedBluetooth, this, &CardPage::setBluetoothRecordingPlaylist );
+        connect( m_recordingSelectors[i], &RecordingSelector::selectedMicrophone, this, &CardPage::setMicrophoneRecordingPermission );
+        connect( m_recordingSelectors[i], &RecordingSelector::selectedWifi, this, &CardPage::setWifiRecordingPermission );
+        connect( m_recordingSelectors[i], &RecordingSelector::valuesHaveChanged, this, &CardPage::generateIndexM3u );
     }
 
-    for (const auto& key : m_recordingSelectors.keys())
-    {
-        connect( m_recordingSelectors.value(key), &RecordingSelector::selectedBluetooth, this, &CardPage::setBluetoothRecordingPlaylist );
-        connect( m_recordingSelectors.value(key), &RecordingSelector::selectedMicrophone, this, &CardPage::setMicrophoneRecordingPermission );
-        connect( m_recordingSelectors.value(key), &RecordingSelector::selectedWifi, this, &CardPage::setWifiRecordingPermission );
-        connect( m_recordingSelectors.value(key), &RecordingSelector::valuesHaveChanged, this, &CardPage::generateIndexM3u );
-    }
-
-    connect(m_selectDriveButton, &QPushButton::clicked, [this] () {
-        this->selectDrive(this->m_driveList->currentText());
+    connect(m_selectDriveButton, &QPushButton::clicked, this, [this]() {
+        selectDrive(m_driveList->currentText());
         if( qApp->property("hoerbertModel")!=2011 && !isDiagnosticsModeEnabled() ){
             convertAllToMp3();
         }
@@ -341,7 +212,7 @@ CardPage::CardPage(QWidget *parent)
     connect(m_ejectDriveButton, &QPushButton::clicked, this, &CardPage::ejectDrive);
 
     connect(m_return2Normal, &QPushButton::clicked, this, [this] () {
-        toggleDiagnosticsMode();
+        emit toggleDiagnosticsMode();
     });
 
     m_windowsDriveListener = new RemovableDriveListener();
@@ -1091,47 +962,34 @@ void CardPage::updateButtons()
     int buttonCount = settings.value("buttons").toInt();
     settings.endGroup();
 
-    for (const auto & btn : m_dirs) {
-        auto id_= btn->ID();
-
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
         switch( buttonCount ){
             case 3:
-                btn->setOverlaySize(128, 128);
-                btn->setFixedSize(128, 128);
-                if ( id_ != 1 && id_ != 6 && id_ != 8){
-                    btn->hide();
-                    m_recordingSelectors[id_]->hide();
+                m_dirs[i]->setOverlaySize(128, 128);
+                m_dirs[i]->setFixedSize(128, 128);
+                if ( i!=1 && i!=6 && i!=8 ){
+                    m_buttonArea[i]->hide();
                 } else {
-                    btn->show();
-                    if( qApp->property("hoerbertModel")!=2011 ){
-                        m_recordingSelectors[id_]->show();
-                    }
+                    m_buttonArea[i]->show();
                 }
 
                 m_horizontalGridSpacer1->changeSize(0,80);
             break;
             case 1:
-                btn->setOverlaySize(128, 128);
-                btn->setFixedSize(128, 128);
-                if (id_ != 4){
-                    btn->hide();
-                    m_recordingSelectors[id_]->hide();
+                m_dirs[i]->setOverlaySize(128, 128);
+                m_dirs[i]->setFixedSize(128, 128);
+                if ( i != 4 ){
+                    m_buttonArea[i]->hide();
                 } else {
-                    btn->show();
-                    if( qApp->property("hoerbertModel")!=2011 ){
-                        m_recordingSelectors[id_]->show();
-                    }
+                    m_buttonArea[i]->show();
                 }
+
             break;
             default:
-                btn->setOverlaySize(96, 96);
-                btn->setFixedSize(96, 96);
-                btn->show();
-                if( qApp->property("hoerbertModel")!=2011 ){
-                    m_recordingSelectors[id_]->show();
-                }
-        }
-
+                m_dirs[i]->setOverlaySize(96, 96);
+                m_dirs[i]->setFixedSize(96, 96);
+                m_buttonArea[i]->show();
+            }
     }
 }
 

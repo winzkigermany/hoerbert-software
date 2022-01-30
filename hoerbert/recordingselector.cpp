@@ -40,7 +40,7 @@ RecordingSelector::RecordingSelector(QWidget *parent, int id) : QWidget(parent)
     m_allowMicrophone = new QPushButton(this);
     m_allowMicrophone->setCheckable(true);
     m_allowMicrophone->setIcon(QIcon(":/images/rec_mic_inactive_512.png"));
-    m_allowMicrophone->setIconSize(QSize(16, 16));
+    m_allowMicrophone->setIconSize(QSize(18, 18));
     m_allowMicrophone->setStyleSheet("background: transparent; border: none");
     connect( m_allowMicrophone, &QCheckBox::clicked, this, [=] (){
         emit selectedMicrophone( m_id, m_allowMicrophone->isChecked());
@@ -51,7 +51,7 @@ RecordingSelector::RecordingSelector(QWidget *parent, int id) : QWidget(parent)
     m_allowBluetooth = new QPushButton(this);
     m_allowBluetooth->setCheckable(true);
     m_allowBluetooth->setIcon(QIcon(":/images/rec_bt_inactive_512.png"));
-    m_allowBluetooth->setIconSize(QSize(16, 16));
+    m_allowBluetooth->setIconSize(QSize(18, 18));
     m_allowBluetooth->setStyleSheet("background: transparent; border: none");
     connect( m_allowBluetooth, &QCheckBox::clicked, this, [=] (){
         emit selectedBluetooth( m_id, m_allowBluetooth->isChecked());
@@ -62,7 +62,7 @@ RecordingSelector::RecordingSelector(QWidget *parent, int id) : QWidget(parent)
     m_allowWifi = new QPushButton(this);
     m_allowWifi->setCheckable(true);
     m_allowWifi->setIcon(QIcon(":/images/rec_wifi_inactive_512.png"));
-    m_allowWifi->setIconSize(QSize(16, 16));
+    m_allowWifi->setIconSize(QSize(18, 18));
     m_allowWifi->setStyleSheet("background: transparent; border: none");
 
     connect( m_allowWifi, &QCheckBox::clicked, this, [=] (){
