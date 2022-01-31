@@ -428,9 +428,6 @@ bool SetModeDialog::getBluetoothResetSettingsLine( QString* line ){
     if( m_bluetoothDeletePairingsCheckbox->isChecked() ){
         line->append( SET_SETTING_DELETE_PAIRINGS+QString::number(1) );
         return true;
-    } else {
-        line->append( SET_SETTING_DELETE_PAIRINGS+QString::number(0) );
-        return true;
     }
 
     return false;
@@ -603,26 +600,32 @@ void SetModeDialog::writeIndexM3uSettings(){
         }
 
         // maybe some settings were not found OR maybe there was no input file at all.
+        outLine = "";
         if( !foundSleepTimerSettings && getSleepTimerSettingsLine(&outLine) ){
             outputFile.write( outLine.toUtf8()+"\n" );
         }
 
+        outLine = "";
         if( !foundBluetoothSettings && getBluetoothSettingsLine(&outLine) ){
             outputFile.write( outLine.toUtf8()+"\n" );
         }
 
+        outLine = "";
         if( !foundBluetoothResetSettings && getBluetoothResetSettingsLine(&outLine) ){
             outputFile.write( outLine.toUtf8()+"\n" );
         }
 
+        outLine = "";
         if( !foundVolumeLimiterSettings && getVolumeLimiterSettingsLine(&outLine) ){
             outputFile.write( outLine.toUtf8()+"\n" );
         }
 
+        outLine = "";
         if( !foundWifiSettings && getWifiSettingsLine(&outLine) ){
             outputFile.write( outLine.toUtf8()+"\n" );
         }
 
+        outLine = "";
         if( !foundMicrophoneSettings && getMicrophoneSettingsLine(&outLine) ){
             outputFile.write( outLine.toUtf8()+"\n" );
         }
