@@ -415,9 +415,11 @@ int countSubfiles(const QString &dirPath, int prefixNumber, const QString &exten
 {
     int count = 0;
 
+    QString extensionFilterString = "*."+extension;
+
     QDir dir(dirPath);
     dir.setFilter(QDir::Files | QDir::NoSymLinks);
-    dir.setNameFilters(QStringList() << extension);
+    dir.setNameFilters(QStringList() << extensionFilterString);
     dir.setSorting(QDir::Name);
 
     QFileInfoList list = dir.entryInfoList();
