@@ -95,6 +95,9 @@ public:
 
     CardPage* getCardPage();
 
+    void checkForFirmwareUpdates( bool silentCheck );
+
+
 signals:
     /**
      * @brief changeAlbumColumnVisibility is a signal that's sent when the user toggles visibility of the album column
@@ -144,6 +147,7 @@ private:
     void closeEvent(QCloseEvent *e) override;
 
     void showVersion(const QString &version);
+    void showFirmwareVersion(const QString &version, bool silentCheck );
 
     void remindBackup();
 
@@ -170,6 +174,7 @@ private:
      * @return 0 if the same, -1 if app version is lower than the online version, +1 if app version is higher than the online version
      */
     int compareVersionWithThisApp( const QString& onlineVersionString );
+    int compareFirmwareVersionWithThisApp( const QString& onlineVersionString, const QString& localVersionString );
 
     uint m_hoerbertVersion;
     QString m_migrationPath;

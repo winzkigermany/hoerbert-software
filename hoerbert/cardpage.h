@@ -276,6 +276,10 @@ public:
 
     void clearRecordingSettings();
 
+    QString getHoerbertFirmwareString();
+
+    void removeFirmwareInfoFile();
+
 signals:
 
     /**
@@ -333,6 +337,7 @@ signals:
     void convertingCurrentFile( QString );
 
     void updateBluetoothRecordingPlaylist( quint8 index, bool onOff );
+
 
 
 public slots:

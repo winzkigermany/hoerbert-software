@@ -152,6 +152,7 @@ const QString CARD_INFO_FILE                 = "info.xml";
 const QString WIFI_INI_FILE                  = "wifi.ini";
 const QString INDEX_M3U_FILE                 = "index.m3u";
 const QString INDEX_M3U_FILE_BAK             = "index.m3u.bak";
+const QString FIRMWARE_VERSION_FILE          = "ver_fw.txt";
 const QString CONTENT_HTML                   = "contents.html";
 const QString DIAGMODE_FILE                  = "diag.txt";
 const QString DIAGMODE_ORIGINALS_DIR         = "originals";

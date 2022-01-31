@@ -207,6 +207,10 @@ CardPage::CardPage(QWidget *parent)
         selectDrive(m_driveList->currentText());
         if( qApp->property("hoerbertModel")!=2011 && !isDiagnosticsModeEnabled() ){
             convertAllToMp3();
+
+            if( QFile::exists(m_mainWindow->getCurrentDrivePath() + FIRMWARE_VERSION_FILE) ){
+                m_mainWindow->checkForFirmwareUpdates(true);
+            }
         }
     });
     connect(m_ejectDriveButton, &QPushButton::clicked, this, &CardPage::ejectDrive);
@@ -1593,3 +1597,51 @@ void CardPage::generateIndexM3u(){
 }
 
 
+/**
+ * @brief try to read ver_fw.txt from the memory card and extract the firmware version from it.
+ * @return
+ */
+QString CardPage::getHoerbertFirmwareString(){
+
+    QString extractedVersionString = "";
+
+    if (!getSelectedDrive().isEmpty()){
+        QString firmwareVersionFile = m_mainWindow->getCurrentDrivePath() + FIRMWARE_VERSION_FILE;
+
+        if( QFile(firmwareVersionFile).exists() ){
+            QFile inputFile(firmwareVersionFile);
+            if (inputFile.open(QIODevice::ReadOnly))
+            {
+                QTextStream in(&inputFile);
+                while (!in.atEnd())
+                {
+                    QString line = in.readLine();
+                    if( line.startsWith("App version:") ){
+                        extractedVersionString = line.mid(13).trimmed();
+                    }
+                }
+                inputFile.close();
+            }
+        }
+    }
+
+    return extractedVersionString;
+}
+
+
+/**
+ * @brief backup fw_ver.txt on the memory card if it is there.
+ */
+void CardPage::removeFirmwareInfoFile(){
+
+    QString firmwareVersionFileName = m_mainWindow->getCurrentDrivePath()+FIRMWARE_VERSION_FILE;
+    QString firmwareVersionBakFileName = firmwareVersionFileName+".bak";
+
+    if (!getSelectedDrive().isEmpty() && QFile::exists(firmwareVersionFileName) ){
+
+        if( QFile::exists( firmwareVersionBakFileName ) ){
+            QFile::remove( firmwareVersionBakFileName );
+        }
+        QFile::rename( firmwareVersionFileName, firmwareVersionBakFileName );
+    }
+}

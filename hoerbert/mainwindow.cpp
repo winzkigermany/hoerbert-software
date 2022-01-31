@@ -1701,6 +1701,26 @@ void MainWindow::checkForUpdates()
     manager->get(request);
 }
 
+
+void MainWindow::checkForFirmwareUpdates( bool silentCheck=false )
+{
+    QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkFirmwareVersion"));
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+
+    connect(manager, &QNetworkAccessManager::finished, this, [this, silentCheck] (QNetworkReply *reply) {
+        if (reply->error()) {
+            qDebug() << "Failed retrieving version code:" << reply->errorString();
+            return;
+        }
+
+        QString result = reply->readAll();
+        QString version = result.section(":", 1);
+        showFirmwareVersion(version, silentCheck);
+    });
+
+    manager->get(request);
+}
+
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     bool isClosing = true;
@@ -1735,17 +1755,20 @@ void MainWindow::closeEvent(QCloseEvent *e)
     e->ignore();
 }
 
+
+/**
+ * @brief The dialog that shows app version information to the user.
+ * @param version
+ */
 void MainWindow::showVersion(const QString &version)
 {
-
-
     QDialog *dlg = new QDialog();
     connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
 
     dlg->setModal(true);
     dlg->setFixedSize(320, 198);
 
-    QString infoText = tr("This version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version);
+    QString infoText = tr("This app version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version);
     if( compareVersionWithThisApp(version)<0 )
     {
         infoText += "\n\n"+tr("There is a never version of this app available. Do you want do download it?");
@@ -1761,7 +1784,87 @@ void MainWindow::showVersion(const QString &version)
         QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
     }
 
+    if( m_cardPage->getSelectedDrive()!="" ){
+        checkForFirmwareUpdates();
+    }
 }
+
+
+/**
+ * @brief compare firmware version dates
+ * @param onlineVersionString
+ * @return
+ */
+int MainWindow::compareFirmwareVersionWithThisApp( const QString& onlineVersionString, const QString& localVersionString ){
+
+    // both strings begin with yyyy-mm-dd hh:mm
+    // and we need to find out which is the newer one.
+    if( onlineVersionString.length()>=16 && localVersionString.length()>=16){
+        QString onlineDateString = onlineVersionString.trimmed().left(16);
+        QString localDateString = localVersionString.trimmed().left(16);
+
+        QDateTime onlineDate = QDateTime::fromString(onlineDateString,"yyyy-MM-dd HH:mm");
+        QDateTime localDate = QDateTime::fromString(localDateString,"yyyy-MM-dd HH:mm");
+
+        if( onlineDate>localDate){
+            return -1;
+        } else if( onlineDate<localDate ){
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+
+/**
+ * @brief The dialog that shows firmware version information to the user.
+ * @param version
+ */
+void MainWindow::showFirmwareVersion(const QString &version, bool silentCheck=false )
+{
+    QDialog *dlg = new QDialog();
+    connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
+
+    dlg->setModal(true);
+    dlg->setFixedSize(320, 198);
+
+    QString hoerbertFirmwareVersionString = m_cardPage->getHoerbertFirmwareString();
+    QString infoText = "";
+
+    if( hoerbertFirmwareVersionString.isEmpty() ){
+        if( !silentCheck ){
+            infoText = tr("There is no firmware version on the selected memory card.\nTo get that information, please do the following:\n1) Eject the card properly from your computer\n2) Insert the memory card into hörbert\n3) Remove power or one battery from hörbert\n4) Add power or insert all batteries\n5) Plug the memory card back in your computer\n6) Repeat the firmware version check");
+            QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+        }
+    } else {
+        infoText = tr("Wait! Your hörbert may be missing bug fixes or new features.")+"\n\n"+tr("This hörbert seems to have firmware version:\n%1").arg(hoerbertFirmwareVersionString)+"\n"+tr("Latest available version online:\n%1").arg(version);
+        if( compareFirmwareVersionWithThisApp(version, hoerbertFirmwareVersionString)<0 )
+        {
+            if( silentCheck ){
+                infoText += "\n\n"+tr("Updating your hörbert is free and we strongly recommend it.\nPlease install the latest firmware now.");
+            } else {
+                infoText += "\n\n"+tr("There is a never hörbert firmware available.\nPlease install the latest firmware now.");
+            }
+            auto selected = QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore, QMessageBox::Yes  );
+            if (selected == QMessageBox::Ignore)
+            {
+                // remove the ver_fw.txt from the memory card, so the user is not nagged too often.
+                m_cardPage->removeFirmwareInfoFile();
+            } else if (selected == QMessageBox::Yes) {
+                QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/firmware-en/")));
+            }
+        }
+        else
+        {
+            if( !silentCheck ){
+                infoText += "\n\n"+tr("There is no never hörbert formware available.");
+                QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Ok );
+            }
+        }
+    }
+}
+
 
 void MainWindow::remindBackup()
 {
