@@ -146,7 +146,7 @@ SetModeDialog::SetModeDialog(QWidget* parent)
     formLayout->addRow(new QLabel(" "), (QWidget*)nullptr);
     formLayout->addRow(new QLabel(tr("Volume limit:")), m_volumeHBox);
     formLayout->addRow(new QLabel(" "), (QWidget*)nullptr);
-    formLayout->addRow(new QLabel(tr("Wifi:")), m_wifiHBox);
+    formLayout->addRow(new QLabel(tr("WiFi:")), m_wifiHBox);
     formLayout->addRow(new QLabel(tr("Configure?")), m_readWifiSettingsCheckbox);
     formLayout->addRow(new QLabel(" "), (QWidget*)nullptr);
     formLayout->addRow(new QLabel(tr("Microphone:")), microphoneHBox);
