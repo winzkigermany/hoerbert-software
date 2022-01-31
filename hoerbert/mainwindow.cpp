@@ -293,11 +293,14 @@ void MainWindow::updateActionAvailability( bool ANDed )
 
     if( getHoerbertVersion()==2011 ){
         m_wifiAction->setEnabled(false);
+        m_setModeAction->setEnabled(false);
     } else {
         if( m_cardPage->getSelectedDrive().isEmpty() ){
             m_wifiAction->setEnabled(false);
+            m_setModeAction->setEnabled(false);
         } else {
             m_wifiAction->setEnabled(true);
+            m_setModeAction->setEnabled(true);
         }
     }
 }
@@ -2308,6 +2311,8 @@ void MainWindow::createActions()
     connect(m_setModeAction, &QAction::triggered, this, [this] () {
         openSetModeDialog();
     });
+
+    m_extrasMenu->addSeparator();
 
     m_printAction = new QAction(tr("Print table of contents"), this);
     m_printAction->setStatusTip(tr("Print table of contents"));

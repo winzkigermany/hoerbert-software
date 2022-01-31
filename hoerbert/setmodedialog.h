@@ -50,14 +50,32 @@ signals:
 private:
     MainWindow* m_mainWindow;
 
+    QVBoxLayout* m_dialogLayout;
+    QHBoxLayout* m_bluetoothHBox;
+    QHBoxLayout* m_volumeHBox;
+    QHBoxLayout* m_wifiHBox;
+
     QLabel* m_instructionLabel;
+    QLabel* m_readInfoLabel;
 
     QComboBox* m_sleepTimerComboBox;
 
     QButtonGroup* m_bluetoothRadioButtons;
+    QRadioButton* m_bluetoothOnWithPairing;
+    QRadioButton* m_bluetoothOn;
+    QRadioButton* m_bluetoothOff;
+
     QButtonGroup* m_volumeLimiterRadioButtons;
+    QRadioButton* m_forteMode;
+    QRadioButton* m_pianissimoMode;
+
     QButtonGroup* m_wifiRadioButtons;
+    QRadioButton* m_wifiOn;
+    QRadioButton* m_wifiOff;
+
     QButtonGroup* m_microphoneRadioButtons;
+    QRadioButton* m_micOn;
+    QRadioButton* m_micOff;
 
     QCheckBox* m_bluetoothDeletePairingsCheckbox;
     QCheckBox* m_readWifiSettingsCheckbox;
@@ -68,6 +86,15 @@ private:
     void readIndexM3uSettings();
     void writeIndexM3uSettings();
     void showEvent(QShowEvent * event);
+
+    void extractSleepTimerSettings( QString& line );
+    void extractBluetoothSettings( QString& line );
+    void extractBluetoothResetSettings( QString& line );
+    void extractVolumeLimiterSettings( QString& line );
+    void extractWifiSettings( QString& line );
+    void extractMicrophoneSettings( QString& line );
+
+
 };
 
 #endif // SETMODEDIALOG_H
