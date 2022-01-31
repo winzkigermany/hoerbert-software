@@ -2290,7 +2290,6 @@ void MainWindow::createActions()
 
     m_wifiDialog = new WifiDialog(this);
     m_wifiDialog->setModal(true);
-
     m_wifiAction = new QAction(tr("Configure WiFi connections"), this);
     m_wifiAction->setStatusTip(tr("Configure WiFi connections"));
     m_wifiAction->setMenuRole(QAction::NoRole);
@@ -2299,6 +2298,16 @@ void MainWindow::createActions()
         openWifiDialog();
     });
 
+
+    m_setModeDialog = new SetModeDialog(this);
+    m_setModeDialog->setModal(true);
+    m_setModeAction = new QAction(tr("Configure SET mode"), this);
+    m_setModeAction->setStatusTip(tr("Configure SET mode"));
+    m_setModeAction->setMenuRole(QAction::NoRole);
+    m_extrasMenu->addAction(m_setModeAction);
+    connect(m_setModeAction, &QAction::triggered, this, [this] () {
+        openSetModeDialog();
+    });
 
     m_printAction = new QAction(tr("Print table of contents"), this);
     m_printAction->setStatusTip(tr("Print table of contents"));
@@ -2594,4 +2603,8 @@ QString MainWindow::getCurrentDrivePath(){
 
 void MainWindow::openWifiDialog(){
     m_wifiDialog->show();
+}
+
+void MainWindow::openSetModeDialog(){
+    m_setModeDialog->show();
 }

@@ -52,9 +52,11 @@
 #include "backuprestoredialog.h"
 #include "choosehoerbertdialog.h"
 #include "wifidialog.h"
+#include "setmodedialog.h"
 
 class CardPage;
 class WifiDialog;
+class SetModeDialog;
 class PlaylistPage;
 
 class MainWindow : public QMainWindow
@@ -220,6 +222,7 @@ private:
     QAction *m_hoerbertModel2011Action;
     QAction *m_hoerbertModel2021Action;
     QAction *m_wifiAction;
+    QAction *m_setModeAction;
 
     QAction *m_moveToB1;
     QAction *m_moveToB2;
@@ -255,6 +258,9 @@ private:
     PleaseWaitDialog* m_pleaseWaitDialog;
     WifiDialog* m_wifiDialog;
     void openWifiDialog();
+    SetModeDialog* m_setModeDialog;
+    void openSetModeDialog();
+
 };
 
 #endif // MAINWINDOW_H

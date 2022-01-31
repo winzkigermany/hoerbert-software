@@ -76,6 +76,7 @@ SOURCES += \
         recordingselector.cpp \
         removabledrivelistener.cpp \
         runguard.cpp \
+        setmodedialog.cpp \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         waitingspinnerwidget.cpp \
@@ -112,6 +113,7 @@ HEADERS += \
         recordingselector.h \
         removabledrivelistener.h \
         runguard.h \
+        setmodedialog.h \
         triplecheckbox.h \
         triplecheckboxwidget.h \
         version.h \
