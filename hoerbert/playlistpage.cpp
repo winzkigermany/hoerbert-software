@@ -609,10 +609,12 @@ void PlaylistPage::onClosePage(bool doCommitChanges)
                 emit cancelClicked();
             }
 
+            m_cancelButton->setEnabled(true);   // re-enable the cancel button
             return;
         }
         else {
             emit cancelClicked();
+            m_cancelButton->setEnabled(true);   // re-enable the cancel button
             return;
         }
     } else {
