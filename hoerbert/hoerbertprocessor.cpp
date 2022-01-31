@@ -112,8 +112,14 @@ void HoerbertProcessor::run()
     //connect(m_process, &QProcess::readyReadStandardOutput, this, &HoerbertProcessor::OnProcessReadyReadStandardOutput);
     connect(m_process, &QProcess::started, this, &HoerbertProcessor::OnProcessStarted);
     connect(m_process, &QProcess::stateChanged, this, &HoerbertProcessor::OnProcessStateChanged);
-    connect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [] (int exitCode, QProcess::ExitStatus exitStatus) {
-        qDebug() << " - FFmpeg process finished! Exit Code:" << exitCode << ", Exit Status:" << exitStatus;
+    connect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [=] (int exitCode, QProcess::ExitStatus exitStatus) {
+        qDebug() << " - process finished. Exit Code:" << exitCode << ", Exit Status:" << exitStatus;
+
+        // @TODO: Clarify: Can we _reliably_ use error codes!=0 to add the error to a user-visible error log?
+        if( 0!=exitCode || QProcess::CrashExit == exitStatus ){
+            QString errorString = "Process ended abnormally: " + m_process->program() + "\nParameters: " + m_process->arguments().join(" ");
+            emit failed( errorString );
+        }
     });
 
     m_counter = 0;
@@ -140,21 +146,28 @@ void HoerbertProcessor::run()
         // attach suffixes
         for (auto entry : m_entries[MOVED_ENTRIES])
         {
-            if (!QFile::exists(entry.path))
+            if (!QFile::exists(entry.path)){
                 continue;
+            }
 
             auto num = getFileNumber(entry.path);
             if (num == -1) {
                 auto max = getHighestNumberInDirectory(m_dirPath);
+                QString destinationFile = "";
                 if( qApp->property("hoerbertModel")==2011 ){
-                    if (moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_WAV)) {
-                        entry.path = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_WAV;
-                    }
+                    destinationFile = tailPath(m_dirPath) + QString::number(max + 1) + DESTINATION_FORMAT_WAV;
                 } else {
                     QFileInfo info(entry.path);
-                    moveFile(entry.path, tailPath(m_dirPath) + QString::number(max + 1) + "." +info.suffix());
+                    destinationFile = tailPath(m_dirPath) + QString::number(max + 1) + "." +info.suffix();
+                }
+
+                if( moveFile(entry.path, destinationFile) ) {
+                    entry.path = destinationFile;
+                } else {
+                    emit failed("Unable to move the file: "+entry.path+" to destination: "+destinationFile );
                 }
             }
+
             auto tmp_file = attachSuffixToFileName(entry.path, "A");
             if (!tmp_file.isEmpty()) {
                 entry.path = tmp_file;
@@ -255,10 +268,14 @@ bool HoerbertProcessor::removeEntry(const AudioEntry &entry)
     QFile file(entry.path);
     if (file.exists())
     {
-        return file.remove();
+        bool result = file.remove();
+        if( !result ){
+            emit failed("Failed to remove the file: "+file.fileName()+" - Reason: "+file.errorString() );
+        }
+        return result;
     }
-    else
-        return true;
+
+    return false;
 }
 
 bool HoerbertProcessor::createUrlFile( QString destinationPath, MetaData metaData){
@@ -273,6 +290,8 @@ bool HoerbertProcessor::createUrlFile( QString destinationPath, MetaData metaDat
         stream << urlString << "\n";
         file.close();
         return true;
+    } else {
+        emit failed("Failed to create url file: "+file.fileName()+" - Reason: "+file.errorString() );
     }
 
     return false;
@@ -308,10 +327,16 @@ bool HoerbertProcessor::addEntry(const AudioEntry &entry)
 bool HoerbertProcessor::moveEntry(const AudioEntry &entry)
 {
     bool result;
+    QString destinationPath = "";
     if( qApp->property("hoerbertModel")==2011){
-        result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_WAV);
+        destinationPath = m_dirPath + "/" + QString::number(entry.order) + DESTINATION_FORMAT_WAV;
     } else {
-        result = moveFile(entry.path, m_dirPath + "/" + QString::number(entry.order) + "." + entry.fileSuffix);
+        destinationPath = m_dirPath + "/" + QString::number(entry.order) + "." + entry.fileSuffix;
+    }
+
+    result = moveFile(entry.path, destinationPath);
+    if( !result ){
+        emit failed("Failed to move the file: "+entry.path+" to: "+destinationPath );
     }
     return result;
 }
@@ -324,16 +349,18 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
 
     if (entry.state == 2) // split per 3 minutes
     {
-        if (!splitPer3Mins(entry.path, m_dirPath, entry.order + m_splitOffset, entry.metadata))
+        if (!splitPer3Mins(entry.path, m_dirPath, entry.order + m_splitOffset, entry.metadata)){
             return false;
+        }
     }
     else if (entry.state == 1) // split on silence
     {
-        if (!splitOnSilence(entry.path, m_dirPath, entry.order + m_splitOffset, entry.metadata))
+        if (!splitOnSilence(entry.path, m_dirPath, entry.order + m_splitOffset, entry.metadata)){
             return false;
+        }
     }
 
-    auto segment_count = countSubfiles(m_dirPath, entry.order + m_splitOffset);
+    auto segment_count = countSubfiles(m_dirPath, entry.order + m_splitOffset, entry.fileSuffix );
 
     if (segment_count == 0)
     {
@@ -364,7 +391,7 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
         if (remove(entry.path.toLocal8Bit().data()))
         {
             perror("Failed to remove original file");
-            emit failed("Failed to remove original file");
+            emit failed("Failed to remove original file: "+entry.path );
             return false;
         }
     }
@@ -406,7 +433,7 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
                 if (!changeMetaData(fileInfo.absoluteFilePath(), entry.metadata, index))
                 {
                     qDebug() << "Failed attaching index to metadata!" << fileInfo.absoluteFilePath();
-                    emit failed("Failed attaching index to metadata!" + fileInfo.absoluteFilePath());
+                    emit failed("Failed attaching index to metadata for file: " + fileInfo.absoluteFilePath());
                     return false;
                 }
             }
@@ -425,8 +452,11 @@ bool HoerbertProcessor::changeEntryMetadata(const AudioEntry &entry)
             stream << entry.metadata.title << "\n";
             file.close();
             return true;
+        } else {
+            emit failed("Failed to change a file's metadata: "+entry.path+" - Reason: "+file.errorString() );
+            file.close();
+            return  false;
         }
-        return  false;
     }
 
     return changeMetaData(entry.path, entry.metadata);
@@ -985,8 +1015,8 @@ bool HoerbertProcessor::renameSplitFiles(const QString &destDir)
             qDebug() << "moving from " << file_info_list[i].absoluteFilePath() << " to " << destPath;
             if (!moveFile(file_info_list[i].absoluteFilePath(), destPath))
             {
-                qDebug() << "Failed to move split file" << file_info_list[i].absoluteFilePath() << "to" << destPath;
-                emit failed("Failed to move split file " + file_info_list[i].absoluteFilePath() + " to " + destPath);
+                qDebug() << "Failed to move split file " << file_info_list[i].absoluteFilePath() << "to " << destPath;
+                emit failed("Failed to move split file: " + file_info_list[i].absoluteFilePath() + " to: " + destPath);
                 return false;
             }
         }
