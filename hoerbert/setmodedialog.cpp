@@ -58,10 +58,11 @@ SetModeDialog::SetModeDialog(QWidget* parent)
     m_sleepTimerComboBox = new QComboBox();
     m_sleepTimerComboBox->setMaximumWidth( 60 );
     m_sleepTimerComboBox->addItem( tr("off"), 0 );
+    m_sleepTimerComboBox->setEditable(true);
+    m_sleepTimerComboBox->setValidator( new QIntValidator(1, 35000000, this) );     // must come after setEditable(true)
     for( int i=10; i<130; i+=10 ){
         m_sleepTimerComboBox->addItem( QString::number(i), i );
     }
-    m_sleepTimerComboBox->setEditable(true);
     sleepTime->addWidget( m_sleepTimerComboBox );
     sleepTime->addWidget( minutesLabel );
 
@@ -303,6 +304,12 @@ void SetModeDialog::extractMicrophoneSettings( QString& line ){
     }
 }
 
+#define SET_SETTING_SLEEP_TIMER_MINUTES "#hoerbert:set_mode_sleep_timer_minutes "
+#define SET_SETTING_BLUETOOTH_MODE "#hoerbert:set_mode_bluetooth "
+#define SET_SETTING_DELETE_PAIRINGS "#hoerbert:set_mode_bluetooth_delete_pairings "
+#define SET_SETTING_VOLUME_LIMITER "#hoerbert:set_mode_volume_limiter "
+#define SET_SETTING_WIFI_SETTINGS "#hoerbert:set_mode_wifi "
+#define SET_SETTING_MICROPHONE_MODE "#hoerbert:set_mode_microphone "
 
 void SetModeDialog::readIndexM3uSettings(){
 
@@ -321,32 +328,32 @@ void SetModeDialog::readIndexM3uSettings(){
 
               if( line.startsWith("#hoerbert:")){
 
-                  if( line.startsWith("#hoerbert:set_mode_sleep_timer_minutes ") ){
+                  if( line.startsWith(SET_SETTING_SLEEP_TIMER_MINUTES) ){
                       restOfLine = line.mid(39);
                       extractSleepTimerSettings(restOfLine);
                   }
 
-                  if( line.startsWith("#hoerbert:set_mode_bluetooth ") ){
+                  if( line.startsWith(SET_SETTING_BLUETOOTH_MODE) ){
                       restOfLine = line.mid(29);
                       extractBluetoothSettings(restOfLine);
                   }
 
-                  if( line.startsWith("#hoerbert:set_mode_bluetooth_delete_pairings ") ){
+                  if( line.startsWith(SET_SETTING_DELETE_PAIRINGS) ){
                       restOfLine = line.mid(45);
                       extractBluetoothResetSettings(restOfLine);
                   }
 
-                  if( line.startsWith("#hoerbert:set_mode_volume_limiter ") ){
+                  if( line.startsWith(SET_SETTING_VOLUME_LIMITER) ){
                       restOfLine = line.mid(34);
                       extractVolumeLimiterSettings(restOfLine);
                   }
 
-                  if( line.startsWith("#hoerbert:set_mode_wifi ") ){
+                  if( line.startsWith(SET_SETTING_WIFI_SETTINGS) ){
                       restOfLine = line.mid(24);
                       extractWifiSettings(restOfLine);
                   }
 
-                  if( line.startsWith("#hoerbert:set_mode_microphone ") ){
+                  if( line.startsWith(SET_SETTING_MICROPHONE_MODE) ){
                       restOfLine = line.mid(30);
                       extractMicrophoneSettings(restOfLine);
                   }
@@ -371,14 +378,263 @@ void SetModeDialog::readIndexM3uSettings(){
 }
 
 
+/**
+ * @brief Output the sleep timer setting as a string
+ * @param line
+ * @return true if it worked.
+ */
+bool SetModeDialog::getSleepTimerSettingsLine( QString* line ){
+
+    if( m_sleepTimerComboBox->currentIndex()>0 ){
+        QString currentValue = m_sleepTimerComboBox->currentText();
+        line->append( SET_SETTING_SLEEP_TIMER_MINUTES+QString::number(currentValue.toUInt()) );
+        return true;
+    } else {
+        line->append( SET_SETTING_SLEEP_TIMER_MINUTES+QString::number(0) );
+        return true;
+    }
+    return false;
+}
+
+
+/**
+ * @brief Output the bluetooth setting as a string
+ * @param line
+ * @return true if it worked.
+ */
+bool SetModeDialog::getBluetoothSettingsLine( QString* line ){
+
+    if( m_bluetoothOn->isChecked() ){
+        line->append( SET_SETTING_BLUETOOTH_MODE+QString::number(1) );
+        return true;
+    } else if( m_bluetoothOnWithPairing->isChecked() ){
+        line->append( SET_SETTING_BLUETOOTH_MODE+QString::number(2) );
+        return true;
+    } else if( m_bluetoothOff->isChecked() ){
+        line->append( SET_SETTING_BLUETOOTH_MODE+QString::number(0) );
+        return true;
+    }
+    return false;
+}
+
+
+/**
+ * @brief Output the bluetooth reset setting as a string
+ * @param line
+ * @return true if it worked.
+ */
+bool SetModeDialog::getBluetoothResetSettingsLine( QString* line ){
+
+    if( m_bluetoothDeletePairingsCheckbox->isChecked() ){
+        line->append( SET_SETTING_DELETE_PAIRINGS+QString::number(1) );
+        return true;
+    } else {
+        line->append( SET_SETTING_DELETE_PAIRINGS+QString::number(0) );
+        return true;
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief Output the volume limiter setting as a string
+ * @param line
+ * @return true if it worked.
+ */
+bool SetModeDialog::getVolumeLimiterSettingsLine( QString* line ){
+
+    if( m_pianissimoMode->isChecked() ){
+        line->append( SET_SETTING_VOLUME_LIMITER+QString::number(1) );
+        return true;
+    } else if( m_forteMode->isChecked() ) {
+        line->append( SET_SETTING_VOLUME_LIMITER+QString::number(0) );
+        return true;
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief Output the wifi setting as a string
+ * @param line
+ * @return true if it worked.
+ */
+bool SetModeDialog::getWifiSettingsLine( QString* line ){
+
+    if( m_readWifiSettingsCheckbox->isChecked() ){
+        line->append( SET_SETTING_WIFI_SETTINGS+QString::number(2) );
+        return true;
+    } else {
+        if( m_wifiOn->isChecked() ){
+            line->append( SET_SETTING_WIFI_SETTINGS+QString::number(1) );
+            return true;
+        } else if( m_wifiOff->isChecked() ){
+            line->append( SET_SETTING_WIFI_SETTINGS+QString::number(0) );
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * @brief Output the microphone setting as a string
+ * @param line
+ * @return true if it worked.
+ */
+bool SetModeDialog::getMicrophoneSettingsLine( QString* line ){
+
+    if( m_micOn->isChecked() ){
+        line->append( SET_SETTING_MICROPHONE_MODE+QString::number(1) );
+        return true;
+    } else if( m_micOff->isChecked() ) {
+        line->append( SET_SETTING_MICROPHONE_MODE+QString::number(0) );
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * @brief write our index.m3u and add/modify the settings from this dialog.
+ * We write the file to a temp file and on sucess overwrite the original file.
+ */
 void SetModeDialog::writeIndexM3uSettings(){
 
-    QString s;
-    QString p;
     QString indexM3uFileName = m_mainWindow->getCurrentDrivePath() + INDEX_M3U_FILE;
 
+    bool foundSleepTimerSettings = false;
+    bool foundBluetoothSettings = false;
+    bool foundBluetoothResetSettings = false;
+    bool foundVolumeLimiterSettings = false;
+    bool foundWifiSettings = false;
+    bool foundMicrophoneSettings = false;
 
+    QFile inputFile(indexM3uFileName);
+    QFile outputFile(indexM3uFileName+".tmp");
+    QString outLine = "";
 
+    bool writeSuccess = false;
+    if( outputFile.open(QIODevice::WriteOnly)){
+
+        if (inputFile.open(QIODevice::ReadOnly)){       // an input file exists. If we find our settings, modify them.
+            QTextStream in(&inputFile);
+            while (!in.atEnd())
+            {
+                outLine = "";
+                QString line = in.readLine();
+                bool handledLineInSomeWay = false;
+
+                if( line.startsWith(SET_SETTING_SLEEP_TIMER_MINUTES) ){
+
+                    if( !foundSleepTimerSettings  ){
+                        if( getSleepTimerSettingsLine(&outLine) ){
+                            outputFile.write(outLine.toUtf8()+"\n");
+                        }
+                    }
+                    foundSleepTimerSettings = true;
+                    handledLineInSomeWay = true;
+                }
+
+                if( line.startsWith(SET_SETTING_BLUETOOTH_MODE) ){
+                    if( !foundBluetoothSettings ){
+                        if( getBluetoothSettingsLine(&outLine) ){
+                            outputFile.write(outLine.toUtf8()+"\n");
+                        }
+                    }
+                    foundBluetoothSettings = true;
+                    handledLineInSomeWay = true;
+                }
+
+                if( line.startsWith(SET_SETTING_DELETE_PAIRINGS) ){
+                    if( !foundBluetoothResetSettings ){
+                        if( getBluetoothResetSettingsLine(&outLine) ){
+                            outputFile.write(outLine.toUtf8()+"\n");
+                        }
+                    }
+                    foundBluetoothResetSettings = true;
+                    handledLineInSomeWay = true;
+                }
+
+                if( line.startsWith(SET_SETTING_VOLUME_LIMITER) ){
+                    if( !foundVolumeLimiterSettings ){
+                        if( getVolumeLimiterSettingsLine(&outLine)){
+                            outputFile.write(outLine.toUtf8()+"\n");
+                        }
+                    }
+                    foundVolumeLimiterSettings = true;
+                    handledLineInSomeWay = true;
+                }
+
+                if( line.startsWith(SET_SETTING_WIFI_SETTINGS) ){
+                    if( !foundWifiSettings ){
+                        if( getWifiSettingsLine(&outLine) ){
+                            outputFile.write(outLine.toUtf8()+"\n");
+                        }
+                    }
+                    foundWifiSettings = true;
+                    handledLineInSomeWay = true;
+                }
+
+                if( line.startsWith(SET_SETTING_MICROPHONE_MODE) ){
+                    if( !foundMicrophoneSettings ){
+                        if( getMicrophoneSettingsLine(&outLine) ){
+                            outputFile.write(outLine.toUtf8()+"\n");
+                        }
+                    }
+                    foundMicrophoneSettings = true;
+                    handledLineInSomeWay = true;
+                }
+
+                if( !handledLineInSomeWay ){
+                    // just copy the line
+                    outputFile.write( line.toUtf8()+"\n" );
+                }
+            }
+
+            inputFile.close();
+            if( QFile::exists(indexM3uFileName+".bak") ){
+                QFile::remove(indexM3uFileName+".bak");
+            }
+            inputFile.rename(indexM3uFileName+".bak");
+        }
+
+        // maybe some settings were not found OR maybe there was no input file at all.
+        if( !foundSleepTimerSettings && getSleepTimerSettingsLine(&outLine) ){
+            outputFile.write( outLine.toUtf8()+"\n" );
+        }
+
+        if( !foundBluetoothSettings && getBluetoothSettingsLine(&outLine) ){
+            outputFile.write( outLine.toUtf8()+"\n" );
+        }
+
+        if( !foundBluetoothResetSettings && getBluetoothResetSettingsLine(&outLine) ){
+            outputFile.write( outLine.toUtf8()+"\n" );
+        }
+
+        if( !foundVolumeLimiterSettings && getVolumeLimiterSettingsLine(&outLine) ){
+            outputFile.write( outLine.toUtf8()+"\n" );
+        }
+
+        if( !foundWifiSettings && getWifiSettingsLine(&outLine) ){
+            outputFile.write( outLine.toUtf8()+"\n" );
+        }
+
+        if( !foundMicrophoneSettings && getMicrophoneSettingsLine(&outLine) ){
+            outputFile.write( outLine.toUtf8()+"\n" );
+        }
+
+        writeSuccess = true;
+
+        // we've got our output file with ".tmp" appended to its name.
+        // now rename it to its real file name, and overwrite the original.
+        if( !outputFile.rename(indexM3uFileName) ){
+            QMessageBox::warning(this, tr("Unable to write index.m3u"), tr("Failed to write the index.m3u file to the memory card. Changing hörbert settings will not work after this try. Error was: %1").arg( outputFile.errorString() ) );
+        }
+    }
 
     this->close();     // close the dialog
 }

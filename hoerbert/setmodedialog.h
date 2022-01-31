@@ -94,6 +94,13 @@ private:
     void extractWifiSettings( QString& line );
     void extractMicrophoneSettings( QString& line );
 
+    bool getSleepTimerSettingsLine( QString* line );
+    bool getBluetoothSettingsLine( QString* line );
+    bool getBluetoothResetSettingsLine( QString* line );
+    bool getVolumeLimiterSettingsLine( QString* line );
+    bool getWifiSettingsLine( QString* line );
+    bool getMicrophoneSettingsLine( QString* line );
+
 
 };
 
