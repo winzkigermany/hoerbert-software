@@ -538,7 +538,7 @@ void MainWindow::migrate(const QString &dirPath)
         m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         m_pleaseWaitDialog->setWindowTitle(tr("Updating card contents"));
         m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
-        m_pleaseWaitDialog->setWaitMessage(tr("Updating the card contents for this new hoerbert app version 2.x.\nThis needs to be done only once per card.\nPlease wait and do not interrupt this process!"));
+        m_pleaseWaitDialog->setWaitMessage(tr("Updating the card contents for this new hoerbert app version.\nThis needs to be done only once per card.\nPlease wait and do not interrupt this process!"));
         m_pleaseWaitDialog->setProgressRange(0, 100);
         m_pleaseWaitDialog->showButton(false);
         m_pleaseWaitDialog->show();

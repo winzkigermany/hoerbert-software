@@ -741,7 +741,7 @@ skip this step by ticking the check box below.</source>
     <message>
         <location filename="../cardpage.cpp" line="789"/>
         <source>Volume size is bigger than 64GB. This may not be a memory card at all.</source>
-        <translation>Die Größe der Speicherkarte is größer als 64 GB. Ist das überhaupt eine Speicherkarte? {64G?}</translation>
+        <translation>Die Größe der Speicherkarte is größer als 64 GB. Ist das überhaupt eine Speicherkarte?</translation>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="696"/>
@@ -848,12 +848,12 @@ Soll wirklich auf diesem Laufwerk gearbeitet werden? (%1)</translation>
     <message>
         <location filename="../choosehoerbertdialog.cpp" line="18"/>
         <source>There are two versions of hörbert: The newer model does not have a mechanical On/Off switch. Memory cards for the new hörbert do not work with hörbert 2011. For which model of hörbert do you want to edit the memory card? Please decide.</source>
-        <translation>Es gibt zwei Versionen von hörbert: Das neue Modell hat keinen mechanischen Ein/Aus-Schalter. Speicherkarten für das neue hörbert funktionieren nicht mit hörbert 2011. Für welches Modell von hörbert möchtest Du die Speicherkarte bearbeiten? Bitte wähle</translation>
+        <translation>Es gibt zwei Versionen von hörbert: Das neue Modell hat keinen mechanischen Ein/Aus-Schalter. Speicherkarten für den neuen hörbert funktionieren nicht mit hörbert 2011. Für welches hörbert-Modell möchtest Du die Speicherkarte bearbeiten? Bitte wähle</translation>
     </message>
     <message>
         <location filename="../choosehoerbertdialog.cpp" line="28"/>
         <source>Please click: For what kind of hörbert is your card?</source>
-        <translation>Bitte anklicken: Für welches hörbert Modell ist die Speicherkarte?</translation>
+        <translation>Bitte anklicken: Für welches hörbert-Modell ist die Speicherkarte?</translation>
     </message>
     <message>
         <location filename="../choosehoerbertdialog.cpp" line="43"/>
@@ -1193,10 +1193,10 @@ Willst Du die Dateien dieser Speicherkarte für die Benutzung mit diesem Program
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="541"/>
-        <source>Updating the card contents for this new hoerbert app version 2.x.
+        <source>Updating the card contents for this new hoerbert app version.
 This needs to be done only once per card.
 Please wait and do not interrupt this process!</source>
-        <translation>Aktualisierung des Karteninhalts für diese neue hoerbert app Version 2.x.
+        <translation>Aktualisierung des Karteninhalts für diese neue hoerbert app Version.
 Dies muss nur einmal pro Karte durchgeführt werden.
 Warte bitte, und unterbrich diesen Vorgang nicht!</translation>
     </message>
@@ -1212,8 +1212,8 @@ Warte bitte, und unterbrich diesen Vorgang nicht!</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="596"/>
-        <source>This card is now ready for use with this app version 2.x</source>
-        <translation>Diese Karte ist jetzt für die Verwendung mit dieser App-Version 2.x bereit</translation>
+        <source>This card is now ready for use with this app version</source>
+        <translation>Diese Karte ist jetzt für die Verwendung mit dieser App-Version bereit</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="596"/>
@@ -1322,7 +1322,7 @@ Willst Du dieses Programm wirklich schließen?</translation>
     <message>
         <location filename="../mainwindow.cpp" line="1812"/>
         <source>Latest available version online: %1</source>
-        <translation>Neueste Version im Netz: %1</translation>
+        <translation>Neueste Version online: %1</translation>
     </message>
     <message>
         <source>Current drive(%1) is being processed.
@@ -2403,7 +2403,7 @@ Möchtest Du alle Änderungen verwerfen?</translation>
         <translation>Um diese Einstellungen in hörbert zu aktivieren:
 1) Speichere Deine Änderungen und wirf die Speicherkarte aus
 2) Setze die Speicherkarte wieder in hörbert ein
-4) Schalten hörbert ein
+4) Schalte hörbert ein
 4) Drücke die SET-Taste in hörbert, damit das grüne Licht aufleuchtet
 5) Drücke erneut die SET-Taste, um diese Einstellungen zu speichern.</translation>
     </message>
@@ -2463,7 +2463,7 @@ Möchtest Du alle Änderungen verwerfen?</translation>
     <message>
         <location filename="../setmodedialog.cpp" line="142"/>
         <source>Sleep timer:</source>
-        <translation>Einschlaf Timer:</translation>
+        <translation>Einschlaf-Timer:</translation>
     </message>
     <message>
         <location filename="../setmodedialog.cpp" line="144"/>

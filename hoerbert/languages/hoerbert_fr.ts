@@ -725,7 +725,7 @@ sautez cette étape en cochant la case ci-dessous.</translation>
     <message>
         <location filename="../cardpage.cpp" line="789"/>
         <source>Volume size is bigger than 64GB. This may not be a memory card at all.</source>
-        <translation>La taille du volume est supérieure à 64 Go. Ce n&apos;est peut-être pas du tout une carte mémoire. {64G?}</translation>
+        <translation>La taille du volume est supérieure à 64 Go. Ce n&apos;est peut-être pas du tout une carte mémoire ?</translation>
     </message>
     <message>
         <location filename="../cardpage.cpp" line="696"/>
@@ -1049,10 +1049,10 @@ Cette application ne le formatera pas pour des raisons de sécurité.</translati
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="541"/>
-        <source>Updating the card contents for this new hoerbert app version 2.x.
+        <source>Updating the card contents for this new hoerbert app version.
 This needs to be done only once per card.
 Please wait and do not interrupt this process!</source>
-        <translation>Mise à jour du contenu de la carte pour ce nouveau logiciel hoerbert version 2.x.
+        <translation>Mise à jour du contenu de la carte pour ce nouveau logiciel hoerbert version.
 Cela ne doit être fait qu&apos;une seule fois par carte.
 Veuillez patienter et ne pas interrompre ce processus !</translation>
     </message>
@@ -1068,8 +1068,8 @@ Veuillez patienter et ne pas interrompre ce processus !</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="596"/>
-        <source>This card is now ready for use with this app version 2.x</source>
-        <translation>Cette carte est maintenant prête à être utilisée avec la version 2.x de cet logiciel</translation>
+        <source>This card is now ready for use with this app version</source>
+        <translation>Cette carte est maintenant prête à être utilisée avec la version de cet logiciel</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="596"/>

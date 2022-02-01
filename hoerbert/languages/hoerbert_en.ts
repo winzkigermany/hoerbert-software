@@ -686,7 +686,7 @@ You may want to split the file(s) in fixed 3-minute chunks</source>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="541"/>
-        <source>Updating the card contents for this new hoerbert app version 2.x.
+        <source>Updating the card contents for this new hoerbert app version.
 This needs to be done only once per card.
 Please wait and do not interrupt this process!</source>
         <translation type="unfinished"></translation>
@@ -698,7 +698,7 @@ Please wait and do not interrupt this process!</source>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="596"/>
-        <source>This card is now ready for use with this app version 2.x</source>
+        <source>This card is now ready for use with this app version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
