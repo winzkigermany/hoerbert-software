@@ -96,6 +96,7 @@ public:
     CardPage* getCardPage();
 
     void checkForFirmwareUpdates( bool silentCheck );
+    void checkForUpdates( bool silentCheck );
 
 
 signals:
@@ -129,7 +130,6 @@ private slots:
     void switchDiagnosticsMode();
 
     void about();
-    void checkForUpdates();
 
     void processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index);
     void processorErrorOccurred(const QString &errorString);
@@ -146,7 +146,7 @@ private:
 
     void closeEvent(QCloseEvent *e) override;
 
-    void showVersion(const QString &version);
+    void showVersion(const QString &version, bool silentCheck);
     void showFirmwareVersion(const QString &version, bool silentCheck );
 
     void remindBackup();

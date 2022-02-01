@@ -130,6 +130,9 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_showLargeDriveCheck = new QCheckBox(this);
     m_showLargeDriveCheck->setText(tr("Show drives larger than %1GB").arg(VOLUME_SIZE_LIMIT));
 
+    m_autoVersionCheck = new QCheckBox(this);
+    m_autoVersionCheck->setText(tr("Check for new updates automatically"));
+
     m_regenerateXmlCheck = new QCheckBox(this);
     m_regenerateXmlCheck->setText( tr("Always regenerate hoerbert.xml for the old hoerbert app versions 1.x") );
     connect( (MainWindow*)parent, &MainWindow::isHoerbert2011, m_regenerateXmlCheck, &QCheckBox::setVisible );
@@ -140,6 +143,7 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
     m_checkLayout->addWidget(m_increaseVolumeOption);
     m_checkLayout->addWidget(m_reminderOption);
     m_checkLayout->addWidget(m_showLargeDriveCheck);
+    m_checkLayout->addWidget(m_autoVersionCheck);
     m_checkLayout->addWidget(m_regenerateXmlCheck);
 
     m_closeButton = new QPushButton(this);
@@ -200,6 +204,14 @@ AdvancedFeaturesDialog::AdvancedFeaturesDialog(QWidget *parent)
         settings.endGroup();
     });
 
+    connect(m_autoVersionCheck, &QCheckBox::stateChanged, this, [this] (int state) {
+        Q_UNUSED(state)
+        QSettings settings;
+        settings.beginGroup("Global");
+        settings.setValue("skipUpdateCheck", !m_autoVersionCheck->isChecked());
+        settings.endGroup();
+    });
+
     connect(m_regenerateXmlCheck, &QCheckBox::stateChanged, this, [this] (int state) {
         Q_UNUSED(state)
         QSettings settings;
@@ -248,6 +260,9 @@ void AdvancedFeaturesDialog::readSettings()
 
     bool showLarge = settings.value("showLargeDrives").toBool();
     m_showLargeDriveCheck->setChecked(showLarge);
+
+    bool skipUpdateCheck = settings.value("skipUpdateCheck").toBool();
+    m_autoVersionCheck->setChecked(!skipUpdateCheck);
 
     bool generateXml = settings.value("regenerateHoerbertXml").toBool();
     m_regenerateXmlCheck->setChecked(generateXml);

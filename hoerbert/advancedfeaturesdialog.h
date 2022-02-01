@@ -91,6 +91,7 @@ private:
     QCheckBox *m_reminderOption;
     QCheckBox *m_showLargeDriveCheck;
     QCheckBox *m_regenerateXmlCheck;
+    QCheckBox *m_autoVersionCheck;
 
     QPushButton *m_closeButton;
 

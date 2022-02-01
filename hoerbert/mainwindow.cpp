@@ -217,7 +217,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_aboutDlg = new AboutDialog(this);
 
-    connect(m_aboutDlg, &AboutDialog::checkForUpdateRequested, this, &MainWindow::checkForUpdates);
+    connect(m_aboutDlg, &AboutDialog::checkForUpdateRequested, this, [=](){
+        this->checkForUpdates(false);
+    });
 
     m_featuresDlg = new AdvancedFeaturesDialog(this);
     m_featuresDlg->setModal(true);
@@ -242,7 +244,19 @@ MainWindow::MainWindow(QWidget *parent)
     m_chooseHoerbertDialog = new ChooseHoerbertDialog(this);
     m_chooseHoerbertDialog->setModal(true);
     m_chooseHoerbertDialog->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);     // disable the close button. We NEED the user to choose.
-    connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, &MainWindow::setHoerbertModel);
+    connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, [=]( int modelVersion ){
+        setHoerbertModel(modelVersion);
+
+        QSettings settings;
+        settings.beginGroup("Global");
+        bool skip_update_check = settings.value("skipUpdateCheck").toBool();
+        settings.endGroup();
+
+        if ( !skip_update_check ){
+            checkForUpdates(true);  // do a silent check
+        }
+
+    });
     m_chooseHoerbertDialog->show();
 }
 
@@ -1675,8 +1689,18 @@ void MainWindow::about()
     m_aboutDlg->open();
 }
 
-void MainWindow::checkForUpdates()
+void MainWindow::checkForUpdates( bool silentCheck=false )
 {
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool skip_update_check = settings.value("skipUpdateCheck").toBool();
+    settings.endGroup();
+
+    if ( silentCheck && skip_update_check ){
+        return;
+    }
+
 #if defined (Q_OS_MACOS)
     QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkMacVersion2"));
 #elif defined (_WIN32)
@@ -1686,7 +1710,7 @@ void MainWindow::checkForUpdates()
 #endif
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
-    connect(manager, &QNetworkAccessManager::finished, this, [this] (QNetworkReply *reply) {
+    connect(manager, &QNetworkAccessManager::finished, this, [=] (QNetworkReply *reply) {
         if (reply->error()) {
             qDebug() << "Failed retrieving version code:" << reply->errorString();
             return;
@@ -1695,15 +1719,29 @@ void MainWindow::checkForUpdates()
         QString result = reply->readAll();
         QString version = result.section(":", 1);
 
-        showVersion(version);
+        showVersion(version, silentCheck);
     });
 
     manager->get(request);
 }
 
 
+/**
+ * @brief MainWindow::checkForFirmwareUpdates
+ * @param silentCheck
+ */
 void MainWindow::checkForFirmwareUpdates( bool silentCheck=false )
 {
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool skip_firmware_check = settings.value("skipUpdateCheck").toBool();
+    settings.endGroup();
+
+    if ( silentCheck && skip_firmware_check ){
+        return;
+    }
+
     QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkFirmwareVersion"));
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
@@ -1715,7 +1753,10 @@ void MainWindow::checkForFirmwareUpdates( bool silentCheck=false )
 
         QString result = reply->readAll();
         QString version = result.section(":", 1);
-        showFirmwareVersion(version, silentCheck);
+        if( !version.isEmpty() ){
+            showFirmwareVersion(version, silentCheck);
+        }
+
     });
 
     manager->get(request);
@@ -1760,7 +1801,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
  * @brief The dialog that shows app version information to the user.
  * @param version
  */
-void MainWindow::showVersion(const QString &version)
+void MainWindow::showVersion(const QString &version, bool silentCheck=false )
 {
     QDialog *dlg = new QDialog();
     connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
@@ -1780,8 +1821,10 @@ void MainWindow::showVersion(const QString &version)
     }
     else
     {
-        infoText += "\n\n"+tr("There is no never version of this app available.");
-        QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+        if( !silentCheck ){
+            infoText += "\n\n"+tr("There is no never version of this app available.");
+            QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+        }
     }
 
     if( m_cardPage->getSelectedDrive()!="" ){
@@ -1834,31 +1877,47 @@ void MainWindow::showFirmwareVersion(const QString &version, bool silentCheck=fa
 
     if( hoerbertFirmwareVersionString.isEmpty() ){
         if( !silentCheck ){
-            infoText = tr("There is no firmware version on the selected memory card.\nTo get that information, please do the following:\n1) Eject the card properly from your computer\n2) Insert the memory card into hörbert\n3) Remove power or one battery from hörbert\n4) Add power or insert all batteries\n5) Plug the memory card back in your computer\n6) Repeat the firmware version check");
+            infoText = tr("There is no firmware version information on the selected memory card.<br>To get that information, please do the following:<br>1) Eject the card properly from your computer<br>2) Insert the memory card into hörbert<br>3) Remove power or one battery from hörbert<br>4) Add power or insert all batteries<br>5) Turn hörbert on and off again<br>6) Plug the memory card back in your computer<br>7) Repeat the firmware version check");
             QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
         }
     } else {
-        infoText = tr("Wait! Your hörbert may be missing bug fixes or new features.")+"\n\n"+tr("This hörbert seems to have firmware version:\n%1").arg(hoerbertFirmwareVersionString)+"\n"+tr("Latest available version online:\n%1").arg(version);
+        infoText = tr("Wait! Your hörbert may be missing bug fixes or new features.")+"<br><br>"+tr("This hörbert seems to have firmware version:<br>%1").arg(hoerbertFirmwareVersionString)+"<br>"+tr("Latest available version online:<br>%1").arg(version);
         if( compareFirmwareVersionWithThisApp(version, hoerbertFirmwareVersionString)<0 )
         {
             if( silentCheck ){
-                infoText += "\n\n"+tr("Updating your hörbert is free and we strongly recommend it.\nPlease install the latest firmware now.");
+                infoText += "<br><br>"+tr("Updating your hörbert is free and we strongly recommend to do it.<br>Please install the latest firmware now.");
             } else {
-                infoText += "\n\n"+tr("There is a never hörbert firmware available.\nPlease install the latest firmware now.");
+                infoText += "<br><br>"+tr("There is a newer hörbert firmware available.<br>We strongly recommend to always install the latest firmware.");
             }
-            auto selected = QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore, QMessageBox::Yes  );
-            if (selected == QMessageBox::Ignore)
+
+            QFont font;
+            font.setBold(true);
+
+            QMessageBox msgBox;
+            msgBox.setText( tr("Firmware version check") );
+            msgBox.setInformativeText( "<big><b>"+infoText+"</b></big>" );
+            QPushButton* yesButton = msgBox.addButton( tr("Install (recommended)"), QMessageBox::YesRole);
+            yesButton->setFont( font );
+            QPushButton* noButton = msgBox.addButton( tr("Remind me"), QMessageBox::NoRole);
+            noButton->setFont( font );
+            QPushButton* ignoreButton = msgBox.addButton( tr("Ignore for a while"), QMessageBox::RejectRole );
+            msgBox.setDefaultButton( yesButton );
+            msgBox.setIcon(QMessageBox::Question);
+            msgBox.exec();
+
+//            auto selected = QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore, QMessageBox::Yes  );
+            if ( msgBox.clickedButton() == ignoreButton )
             {
                 // remove the ver_fw.txt from the memory card, so the user is not nagged too often.
                 m_cardPage->removeFirmwareInfoFile();
-            } else if (selected == QMessageBox::Yes) {
+            } else if ( msgBox.clickedButton() == yesButton ) {
                 QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/firmware-en/")));
             }
         }
         else
         {
             if( !silentCheck ){
-                infoText += "\n\n"+tr("There is no never hörbert formware available.");
+                infoText += "\n\n"+tr("There is no newer hörbert firmware available.");
                 QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Ok );
             }
         }
@@ -2499,7 +2558,9 @@ void MainWindow::createActions()
 
     checkUpdatesAction = new QAction(tr("Check for updates"), this);
     checkUpdatesAction->setStatusTip(tr("Check for updates"));
-    connect(checkUpdatesAction, &QAction::triggered, this, &MainWindow::checkForUpdates);
+    connect(checkUpdatesAction, &QAction::triggered, this, [=]() {
+        checkForUpdates(false);
+    });
     m_helpMenu->addAction(checkUpdatesAction);
 
     m_serviceToolsMenu = new QMenu(tr("Service tools..."), this);
