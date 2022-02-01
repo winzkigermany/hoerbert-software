@@ -364,7 +364,8 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
 
     if (segment_count == 0)
     {
-        if (entry.path.startsWith(m_dirPath.replace("//", "/")))
+        QString entryPath0(entry.path);
+        if (entryPath0.replace("//", "/").startsWith(m_dirPath.replace("//", "/")))
         {
             // the audio cannot be split, it remains as it was
             return true;
@@ -384,14 +385,17 @@ bool HoerbertProcessor::splitEntry(const AudioEntry &entry)
 
     }
 
-    if (entry.path.startsWith(m_dirPath.replace("//", "/")))
+
+    QString entryPath1( entry.path );
+    if (entryPath1.replace("//", "/").startsWith(m_dirPath.replace("//", "/")))
     {
         qDebug() << "Operation is done on the card. Deleting original file";
 
-        if (remove(entry.path.toLocal8Bit().data()))
+        QFile f(entry.path.toLocal8Bit().data());
+        if (!f.remove())
         {
             perror("Failed to remove original file");
-            emit failed("Failed to remove original file: "+entry.path );
+            emit failed("Failed to remove original file: "+entry.path+" - Reason: "+f.errorString() );
             return false;
         }
     }
