@@ -88,7 +88,7 @@ ${EndIf}
  
   ; That will have written an uninstaller binary for us.  Now we sign it with your favorite code signing tool.
   !system "${SIGNTOOLEXE} sign $%TEMP%\Uninstall.exe" = 0
-  !system "${SIGNTOOLEXE} timestamp /t http://timestamp.comodoca.com $%TEMP%\Uninstall.exe" = 0
+  !system "${SIGNTOOLEXE} timestamp /t http://timestamp.sectigo.com $%TEMP%\Uninstall.exe" = 0
   !system "${SIGNTOOLEXE} verify /pa /d /v $%TEMP%\Uninstall.exe" = 0
  
   ; Good.  Now we can carry on writing the real installer.
@@ -115,6 +115,19 @@ function .onInit
 	${EndIf}
 
 functionEnd
+
+Section "Visual Studio Runtime"
+  SetOutPath "$INSTDIR"
+  File "VC_redist.x86.exe"
+  File "VC_redist.x64.exe"
+  ${If} ${RunningX64}
+  	ExecWait '"$INSTDIR\VC_redist.x64.exe" /install /passive /norestart'
+  ${Else}
+  	ExecWait '"$INSTDIR\VC_redist.x86.exe" /install /passive /norestart'
+  ${EndIf}
+  Delete "$INSTDIR\VC_redist.x86.exe"
+  Delete "$INSTDIR\VC_redist.x64.exe"
+SectionEnd
  
 section "install"
 	# Files for the install directory - to build the installer, these should be in the same directory as the install script (this file)
@@ -163,7 +176,7 @@ section "install"
 	# Now sign the installer, too.
 	!ifndef INNER
 		!finalize '${SIGNTOOLEXE} sign "%1"'
-		!finalize '${SIGNTOOLEXE} timestamp /t http://timestamp.comodoca.com "%1"'
+		!finalize '${SIGNTOOLEXE} timestamp /t http://timestamp.sectigo.com "%1"'
 		!finalize '${SIGNTOOLEXE} verify /pa /d /v "%1"'
 	!endif
 sectionEnd
