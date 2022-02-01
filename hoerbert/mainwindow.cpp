@@ -839,14 +839,7 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
 
     QString output_file;
     if (outputPath.isEmpty()) {
-        QString app_data_path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
-        QDir dir(app_data_path);
-        if (!dir.exists()) {
-            dir.mkpath(app_data_path);
-        }
-
-        output_file = tailPath(app_data_path) + CONTENT_HTML;
+        output_file = tailPath(HOERBERT_TEMP_PATH) + CONTENT_HTML;
     } else {
         output_file = tailPath(outputPath) + CONTENT_HTML;
     }

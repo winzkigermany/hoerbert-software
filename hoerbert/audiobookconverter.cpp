@@ -40,10 +40,6 @@ AudioBookConverter::AudioBookConverter(const QString &absoluteFilePath)
     m_isAborted = false;
 
     m_maxMetadataLength = METADATA_MAX_LENGTH;
-
-    QDir dir(HOERBERT_TEMP_PATH);
-    if (!dir.exists())
-        dir.mkpath(HOERBERT_TEMP_PATH);
 }
 
 QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
