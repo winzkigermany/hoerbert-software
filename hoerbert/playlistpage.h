@@ -216,9 +216,9 @@ private:
     PieButton *m_cancelButton;
     PlaylistView *m_playlistView;
 
-    QRadioButton *m_bluetoothRecordingsRadioButton;
-    QCheckBox *m_microphoneRecordingsCheckbox;
-    QCheckBox *m_wifiRecordingsCheckbox;
+    QPushButton *m_bluetoothRecordingsRadioButton;
+    QPushButton *m_microphoneRecordingsCheckbox;
+    QPushButton *m_wifiRecordingsCheckbox;
 
     QVBoxLayout *m_mainLayout;
     QHBoxLayout *m_toolLayout;

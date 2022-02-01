@@ -19,7 +19,7 @@ ManifestDPIAware true
 !define DESCRIPTION "Simply manage playlists of your hörbert"
 # These three must be integers
 !define VERSIONMAJOR 3
-!define VERSIONMINOR 0
+!define VERSIONMINOR 1
 !define VERSIONBUILD 0
 # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
 # It is possible to use "mailto:" links in here to open the email client

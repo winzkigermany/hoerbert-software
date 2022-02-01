@@ -69,3 +69,4 @@ qtinstaller-windows/packages/hoerbert64/data/*
 qtinstaller-windows/repository/*
 *.AppImage
 *.AppImage.sig
+hoerbert/.qmake.stash

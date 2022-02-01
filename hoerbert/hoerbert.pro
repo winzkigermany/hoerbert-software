@@ -73,8 +73,10 @@ SOURCES += \
         playsymbolbutton.cpp \
         pleasewaitdialog.cpp \
         processexecutor.cpp \
+        recordingselector.cpp \
         removabledrivelistener.cpp \
         runguard.cpp \
+        setmodedialog.cpp \
         triplecheckbox.cpp \
         triplecheckboxwidget.cpp \
         waitingspinnerwidget.cpp \
@@ -108,8 +110,10 @@ HEADERS += \
         playsymbolbutton.h \
         pleasewaitdialog.h \
         processexecutor.h \
+        recordingselector.h \
         removabledrivelistener.h \
         runguard.h \
+        setmodedialog.h \
         triplecheckbox.h \
         triplecheckboxwidget.h \
         version.h \

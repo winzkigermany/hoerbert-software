@@ -87,35 +87,21 @@ CardPage::CardPage(QWidget *parent)
     m_gridLayout->setHorizontalSpacing(30);
     m_gridLayout->setVerticalSpacing(30);
 
-    m_dir0 = new PieButton(m_gridWidget, 0);
-    m_dir1 = new PieButton(m_gridWidget, 1);
-    m_dir2 = new PieButton(m_gridWidget, 2);
-    m_dir3 = new PieButton(m_gridWidget, 3);
-    m_dir4 = new PieButton(m_gridWidget, 4);
-    m_dir5 = new PieButton(m_gridWidget, 5);
-    m_dir6 = new PieButton(m_gridWidget, 6);
-    m_dir7 = new PieButton(m_gridWidget, 7);
-    m_dir8 = new PieButton(m_gridWidget, 8);
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        m_dirs[i] = new PieButton(m_gridWidget, i);
+        m_recordingSelectors[i] = new RecordingSelector(m_gridWidget, i);
+        m_recordingSelectors[i]->setEnabled(false);
+    }
 
-    m_dir0->setBackgroundColor(CL_DIR0);
-    m_dir1->setBackgroundColor(CL_DIR1);
-    m_dir2->setBackgroundColor(CL_DIR2);
-    m_dir3->setBackgroundColor(CL_DIR3);
-    m_dir4->setBackgroundColor(CL_DIR4);
-    m_dir5->setBackgroundColor(CL_DIR5);
-    m_dir6->setBackgroundColor(CL_DIR6);
-    m_dir7->setBackgroundColor(CL_DIR7);
-    m_dir8->setBackgroundColor(CL_DIR8);
-
-    m_dirs[DIR0] = m_dir0;
-    m_dirs[DIR1] = m_dir1;
-    m_dirs[DIR2] = m_dir2;
-    m_dirs[DIR3] = m_dir3;
-    m_dirs[DIR4] = m_dir4;
-    m_dirs[DIR5] = m_dir5;
-    m_dirs[DIR6] = m_dir6;
-    m_dirs[DIR7] = m_dir7;
-    m_dirs[DIR8] = m_dir8;
+    m_dirs[0]->setBackgroundColor(CL_DIR0);
+    m_dirs[1]->setBackgroundColor(CL_DIR1);
+    m_dirs[2]->setBackgroundColor(CL_DIR2);
+    m_dirs[3]->setBackgroundColor(CL_DIR3);
+    m_dirs[4]->setBackgroundColor(CL_DIR4);
+    m_dirs[5]->setBackgroundColor(CL_DIR5);
+    m_dirs[6]->setBackgroundColor(CL_DIR6);
+    m_dirs[7]->setBackgroundColor(CL_DIR7);
+    m_dirs[8]->setBackgroundColor(CL_DIR8);
 
 // not ideal, not adjusted for different OSs
 /*    for (const auto& dir_button : m_dirs)
@@ -138,21 +124,39 @@ CardPage::CardPage(QWidget *parent)
     m_verticalGridSpacer1 = new QSpacerItem(GRID_SPACING, GRID_SPACING, QSizePolicy::Minimum, QSizePolicy::Fixed);
     m_verticalGridSpacer2 = new QSpacerItem(GRID_SPACING, GRID_SPACING, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        m_buttonArea[i] = new QWidget();
+        m_hbl[i] = new QHBoxLayout();
+        m_hbl[i]->setSpacing(0);
+        m_hbl[i]->addWidget(m_dirs[i]);
+        m_hbl[i]->addWidget(m_recordingSelectors[i]);
+        m_buttonArea[i]->setLayout( m_hbl[i] );
+    }
+
     m_gridLayout->addItem(m_leftGridSpacer, 0, 0, 1, 1);
-    m_gridLayout->addWidget(m_dir0, 0, 1, 1, 1);
+
+    m_gridLayout->addWidget( m_buttonArea[0], 0, 1, 1, 1 );
     m_gridLayout->addItem(m_horizontalGridSpacer1, 0, 2, 1, 1);
-    m_gridLayout->addWidget(m_dir1, 0, 3, 1, 1);
+    m_gridLayout->addWidget( m_buttonArea[1], 0, 3, 1, 1 );
     m_gridLayout->addItem(m_horizontalGridSpacer1, 0, 4, 1, 1);
-    m_gridLayout->addWidget(m_dir2, 0, 5, 1, 1);
+    m_gridLayout->addWidget( m_buttonArea[2], 0, 5, 1, 1 );
     m_gridLayout->addItem(m_rightGridSpacer, 0, 6, 1, 1);
+
     m_gridLayout->addItem(m_verticalGridSpacer1, 1, 1, 1, 1);
-    m_gridLayout->addWidget(m_dir3, 2, 1, 1, 1);
-    m_gridLayout->addWidget(m_dir4, 2, 3, 1, 1);
-    m_gridLayout->addWidget(m_dir5, 2, 5, 1, 1);
+
+    m_gridLayout->addWidget( m_buttonArea[3], 2, 1, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[4], 2, 3, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[5], 2, 5, 1, 1 );
+
     m_gridLayout->addItem(m_verticalGridSpacer2, 3, 1, 1, 1);
-    m_gridLayout->addWidget(m_dir6, 4, 1, 1, 1);
-    m_gridLayout->addWidget(m_dir7, 4, 3, 1, 1);
-    m_gridLayout->addWidget(m_dir8, 4, 5, 1, 1);
+
+    m_gridLayout->addWidget( m_buttonArea[6], 4, 1, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[7], 4, 3, 1, 1 );
+    m_gridLayout->addWidget( m_buttonArea[8], 4, 5, 1, 1 );
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        connect( (MainWindow*)parent, &MainWindow::isLatestHoerbert, m_recordingSelectors[i], &RecordingSelector::setVisible);
+    }
 
     m_diagWidget = new QWidget(this);
 
@@ -184,26 +188,35 @@ CardPage::CardPage(QWidget *parent)
     m_driveList->addItems(m_deviceManager->getDeviceList());
     updateButtons();
 
-    for (const auto& key : m_dirs.keys())
-    {
-        connect(m_dirs.value(key), &QPushButton::clicked, [this, key] (){
-            if (m_dirs[key]->percentage() > 0)
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        connect(m_dirs[i], &QPushButton::clicked, this, [this, i](){
+            if (m_dirs[i]->percentage() > 0){
                 return;
-            if (!getSelectedDrive().isEmpty())
-                this->onPlaylistButtonClicked(static_cast<qint8>(key));
+            }
+            if (!getSelectedDrive().isEmpty()){
+                onPlaylistButtonClicked(i);
+            }
         });
+        connect( m_recordingSelectors[i], &RecordingSelector::selectedBluetooth, this, &CardPage::setBluetoothRecordingPlaylist );
+        connect( m_recordingSelectors[i], &RecordingSelector::selectedMicrophone, this, &CardPage::setMicrophoneRecordingPermission );
+        connect( m_recordingSelectors[i], &RecordingSelector::selectedWifi, this, &CardPage::setWifiRecordingPermission );
+        connect( m_recordingSelectors[i], &RecordingSelector::valuesHaveChanged, this, &CardPage::generateIndexM3u );
     }
 
-    connect(m_selectDriveButton, &QPushButton::clicked, [this] () {
-        this->selectDrive(this->m_driveList->currentText());
+    connect(m_selectDriveButton, &QPushButton::clicked, this, [this]() {
+        selectDrive(m_driveList->currentText());
         if( qApp->property("hoerbertModel")!=2011 && !isDiagnosticsModeEnabled() ){
             convertAllToMp3();
+
+            if( QFile::exists(m_mainWindow->getCurrentDrivePath() + FIRMWARE_VERSION_FILE) ){
+                m_mainWindow->checkForFirmwareUpdates(true);
+            }
         }
     });
     connect(m_ejectDriveButton, &QPushButton::clicked, this, &CardPage::ejectDrive);
 
     connect(m_return2Normal, &QPushButton::clicked, this, [this] () {
-        toggleDiagnosticsMode();
+        emit toggleDiagnosticsMode();
     });
 
     m_windowsDriveListener = new RemovableDriveListener();
@@ -227,7 +240,6 @@ CardPage::~CardPage()
         delete m_verticalGridSpacer2;
     }
 }
-
 
 void CardPage::updateDriveList()
 {
@@ -513,12 +525,27 @@ void CardPage::initializePlaylists()
 }
 
 
+void CardPage::clearRecordingSettings(){
+    m_bluetoothRecordingPlaylist = 255;
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+        m_microphoneRecordingPermissions[i] = false;
+        m_wifiRecordingPermissions[i] = false;
+    }
+    updateRecordingSettings();
+}
+
+
 void CardPage::deselectDrive()
 {
     m_deviceManager->setCurrentDrive("");
     if( isWorkingOnCustomDirectory() )  // we need to throw out our manually selected directory
     {
         updateDriveList();
+    }
+
+    clearRecordingSettings();
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        m_recordingSelectors[i]->setEnabled(false);
     }
 
     initializePlaylists();
@@ -711,6 +738,8 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
         return;
     }
 
+    clearRecordingSettings();
+
     m_deviceManager->refresh(driveName);    // refresh the storageInfo object, or else cached info will persist between drive (e.g. memory card) changes
 
     if (m_deviceManager->isWriteProtected(driveName))
@@ -875,7 +904,11 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
             m_dirs[i]->setText("0");
             m_dirs[i]->setCount(list.size());
             m_dirs[i]->enable();
+
+            m_recordingSelectors[i]->setEnabled(true);
         }
+
+        readIndexM3u();
 
         //migrate old cards to the new format if there is no hoerbert.bak file on the card.
         if( qApp->property("hoerbertModel")==2011 ){
@@ -933,34 +966,34 @@ void CardPage::updateButtons()
     int buttonCount = settings.value("buttons").toInt();
     settings.endGroup();
 
-    for (const auto & btn : m_dirs) {
-        auto id_= btn->ID();
-
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
         switch( buttonCount ){
             case 3:
-                btn->setOverlaySize(128, 128);
-                btn->setFixedSize(128, 128);
-                if ( id_ != 1 && id_ != 6 && id_ != 8)
-                    btn->hide();
-                else
-                    btn->show();
+                m_dirs[i]->setOverlaySize(128, 128);
+                m_dirs[i]->setFixedSize(128, 128);
+                if ( i!=1 && i!=6 && i!=8 ){
+                    m_buttonArea[i]->hide();
+                } else {
+                    m_buttonArea[i]->show();
+                }
 
                 m_horizontalGridSpacer1->changeSize(0,80);
             break;
             case 1:
-                btn->setOverlaySize(128, 128);
-                btn->setFixedSize(128, 128);
-                if (id_ != 4)
-                    btn->hide();
-                else
-                    btn->show();
+                m_dirs[i]->setOverlaySize(128, 128);
+                m_dirs[i]->setFixedSize(128, 128);
+                if ( i != 4 ){
+                    m_buttonArea[i]->hide();
+                } else {
+                    m_buttonArea[i]->show();
+                }
+
             break;
             default:
-                btn->setOverlaySize(96, 96);
-                btn->setFixedSize(96, 96);
-                btn->show();
-        }
-
+                m_dirs[i]->setOverlaySize(96, 96);
+                m_dirs[i]->setFixedSize(96, 96);
+                m_buttonArea[i]->show();
+            }
     }
 }
 
@@ -1229,4 +1262,386 @@ QString CardPage::getSelectedDrive()    // this IS the drive that the user wants
 QString CardPage::getDisplayedDrive()
 {
     return m_driveList->currentText();  // this is NOT neccessarily the drive that the user wants to use!! (see getSelectedDrive() for that)
+}
+
+
+
+
+quint8 CardPage::getBluetoothRecordingPlaylist(){
+    return m_bluetoothRecordingPlaylist;
+}
+
+bool CardPage::isWifiRecordingAllowedInPlaylist( quint8 playlistIndex ){
+    if( playlistIndex<MAX_PLAYLIST_COUNT ){
+        return m_wifiRecordingPermissions[playlistIndex];
+    }
+    return false;
+}
+
+bool CardPage::isMicrophoneRecordingAllowedInPlaylist( quint8 playlistIndex ){
+    if( playlistIndex<MAX_PLAYLIST_COUNT ){
+        return m_microphoneRecordingPermissions[playlistIndex];
+    }
+    return false;
+}
+
+void CardPage::setBluetoothRecordingPlaylist( quint8 playlistIndex, bool onOff ){
+    qDebug() << "Setting bluetooth recording playlist: " << playlistIndex << ", value: " << onOff;
+
+    if( onOff ){
+        m_bluetoothRecordingPlaylist = playlistIndex;
+    } else {
+        m_bluetoothRecordingPlaylist = 255;
+    }
+    updateRecordingSettings();
+}
+
+void CardPage::setMicrophoneRecordingPermission( quint8 playlistIndex, bool onOff ){
+    qDebug() << "Setting microphone recording permission: " << playlistIndex << ", value: " << onOff;
+
+    if( playlistIndex<MAX_PLAYLIST_COUNT ){
+        m_microphoneRecordingPermissions[playlistIndex] = onOff;
+    }
+    updateRecordingSettings();
+}
+
+void CardPage::setWifiRecordingPermission( quint8 playlistIndex, bool onOff ){
+    qDebug() << "Setting wifi recording permission: " << playlistIndex << ", value: " << onOff;
+
+    if( playlistIndex<MAX_PLAYLIST_COUNT ){
+        m_wifiRecordingPermissions[playlistIndex] = onOff;
+    }
+    updateRecordingSettings();
+}
+
+void CardPage::updateRecordingSettings(){
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+        if( i==m_bluetoothRecordingPlaylist ){
+            m_recordingSelectors[i]->setBluetooth(true);
+        } else {
+            m_recordingSelectors[i]->setBluetooth(false);
+        }
+    }
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+        m_recordingSelectors[i]->setMicrophone( m_microphoneRecordingPermissions[i] );
+    }
+
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+        m_recordingSelectors[i]->setWifi( m_wifiRecordingPermissions[i] );
+    }
+}
+
+
+/**
+ * @brief CardPage::readIndexM3U read the index.m3u file
+ * @param rootPath
+ */
+void CardPage::readIndexM3u(){
+
+    QString rootPath = m_mainWindow->getCurrentDrivePath();
+    qDebug() << "root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
+
+    // reset all values
+    m_bluetoothRecordingPlaylist = 255;
+    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
+        m_microphoneRecordingPermissions[i] = false;
+        m_wifiRecordingPermissions[i] = false;
+    }
+
+    // Open file to read contents
+    QFile file(rootPath + INDEX_M3U_FILE);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+
+        while (!stream.atEnd())
+        {
+            QString newLine = stream.readLine();
+            QString dataString = "";
+            QString searchString;
+
+            searchString = "#hoerbert:set_bluetooth_recordings_playlist";
+
+            if( newLine.toLower().startsWith(searchString) ){
+                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+
+                if( dataString.trimmed()=="0.0"){
+                    m_bluetoothRecordingPlaylist = 0;
+                }
+
+                if( dataString.trimmed()=="0.1"){
+                    m_bluetoothRecordingPlaylist = 1;
+                }
+
+                if( dataString.trimmed()=="0.2"){
+                    m_bluetoothRecordingPlaylist = 2;
+                }
+
+                if( dataString.trimmed()=="0.3"){
+                    m_bluetoothRecordingPlaylist = 3;
+                }
+
+                if( dataString.trimmed()=="0.4"){
+                    m_bluetoothRecordingPlaylist = 4;
+                }
+
+                if( dataString.trimmed()=="0.5"){
+                    m_bluetoothRecordingPlaylist = 5;
+                }
+
+                if( dataString.trimmed()=="0.6"){
+                    m_bluetoothRecordingPlaylist = 6;
+                }
+
+                if( dataString.trimmed()=="0.7"){
+                    m_bluetoothRecordingPlaylist = 7;
+                }
+
+                if( dataString.trimmed()=="0.8"){
+                    m_bluetoothRecordingPlaylist = 8;
+                }
+            }
+
+            searchString = "#hoerbert:allow_microphone_recordings_in_playlist";
+            if( newLine.toLower().startsWith(searchString) ){
+                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
+                for ( const auto& i : list  )
+                {
+                    if( i.trimmed()=="0.0"){
+                        m_microphoneRecordingPermissions[0] = true;
+                    }
+
+                    if( i.trimmed()=="0.1"){
+                        m_microphoneRecordingPermissions[1] = true;
+                    }
+
+                    if( i.trimmed()=="0.2"){
+                        m_microphoneRecordingPermissions[2] = true;
+                    }
+
+                    if( i.trimmed()=="0.3"){
+                        m_microphoneRecordingPermissions[3] = true;
+                    }
+
+                    if( i.trimmed()=="0.4"){
+                        m_microphoneRecordingPermissions[4] = true;
+                    }
+
+                    if( i.trimmed()=="0.5"){
+                        m_microphoneRecordingPermissions[5] = true;
+                    }
+
+                    if( i.trimmed()=="0.6"){
+                        m_microphoneRecordingPermissions[6] = true;
+                    }
+
+                    if( i.trimmed()=="0.7"){
+                        m_microphoneRecordingPermissions[7] = true;
+                    }
+
+                    if( i.trimmed()=="0.8"){
+                        m_microphoneRecordingPermissions[8] = true;
+                    }
+                }
+            }
+
+            searchString = "#hoerbert:allow_wifi_recordings_in_playlist";
+            if( newLine.toLower().startsWith(searchString) ){
+                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
+                for ( const auto& i : list  )
+                {
+                    if( i.trimmed()=="0.0"){
+                        m_wifiRecordingPermissions[0] = true;
+                    }
+
+                    if( i.trimmed()=="0.1"){
+                        m_wifiRecordingPermissions[1] = true;
+                    }
+
+                    if( i.trimmed()=="0.2"){
+                        m_wifiRecordingPermissions[2] = true;
+                    }
+
+                    if( i.trimmed()=="0.3"){
+                        m_wifiRecordingPermissions[3] = true;
+                    }
+
+                    if( i.trimmed()=="0.4"){
+                        m_wifiRecordingPermissions[4] = true;
+                    }
+
+                    if( i.trimmed()=="0.5"){
+                        m_wifiRecordingPermissions[5] = true;
+                    }
+
+                    if( i.trimmed()=="0.6"){
+                        m_wifiRecordingPermissions[6] = true;
+                    }
+
+                    if( i.trimmed()=="0.7"){
+                        m_wifiRecordingPermissions[7] = true;
+                    }
+
+                    if( i.trimmed()=="0.8"){
+                        m_wifiRecordingPermissions[8] = true;
+                    }
+
+                }
+            }
+        }
+
+        file.close();
+    }
+    updateRecordingSettings();
+}
+
+/**
+ * @brief CardPage::generateIndexM3u
+ * @param rootPath
+ */
+void CardPage::generateIndexM3u(){
+
+    QString rootPath = m_mainWindow->getCurrentDrivePath();
+    qDebug() << "Generating index.m3u. Root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
+
+    // Open file to copy contents
+    bool isNewFile = false;
+    QFile file(rootPath + INDEX_M3U_FILE);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        // create the file to keep the rest working as if it existed.
+        file.open(QIODevice::ReadWrite | QIODevice::Text);
+        isNewFile = true;
+    }
+    file.close();
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        // Open new file to write
+        uint32_t lineNumber = 0;
+        QFile temp(rootPath + INDEX_M3U_FILE_BAK);
+        if( temp.open(QIODevice::ReadWrite | QIODevice::Text) )
+        {
+            QTextStream stream(&file);
+            QTextStream out(&temp);
+            bool foundOne = false;
+
+            out << "#EXTM3U" << "\n";
+
+            // there can be only one single bluetooth recording playlist
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+                if( true==m_recordingSelectors[i]->getBluetooth() ){
+                    out << "#hoerbert:set_bluetooth_recordings_playlist" << " 0." << QString::number(i) << "\n";
+                    break;
+                }
+            }
+
+
+            QString microphonePermissionsString = "";
+            foundOne = false;
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+                if( true==m_recordingSelectors[i]->getMicrophone() ){
+                    microphonePermissionsString += " 0."+QString::number(i);
+                    foundOne = true;
+                }
+            }
+            if( foundOne ){
+                out << "#hoerbert:allow_microphone_recordings_in_playlist" << microphonePermissionsString << "\n";
+            }
+
+            QString wifiPermissionsString = "";
+            foundOne = false;
+            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
+                if( true==m_recordingSelectors[i]->getWifi()  ){
+                    wifiPermissionsString += " 0."+QString::number(i);
+                    foundOne = true;
+                }
+            }
+            if( foundOne ){
+                out << "#hoerbert:allow_wifi_recordings_in_playlist" << wifiPermissionsString << "\n";
+            }
+
+            while (!stream.atEnd())
+            {
+                QString newLine = stream.readLine();
+
+                if( newLine.toLower().startsWith("#extm3u") ){
+                    lineNumber++;
+                    continue;
+                }
+                if( newLine.toLower().startsWith("#hoerbert:set_bluetooth_recordings_playlist") ){
+                    lineNumber++;
+                    continue;
+                }
+                if( newLine.toLower().startsWith("#hoerbert:allow_microphone_recordings_in_playlist") ){
+                    lineNumber++;
+                    continue;
+                }
+                if( newLine.toLower().startsWith("#hoerbert:allow_wifi_recordings_in_playlist") ){
+                    lineNumber++;
+                    continue;
+                }
+
+                out << newLine  << "\n";
+                lineNumber++;
+            }
+            temp.close();
+            file.close();
+
+            file.remove();
+            temp.rename(rootPath + INDEX_M3U_FILE);
+         }
+    }
+}
+
+
+/**
+ * @brief try to read ver_fw.txt from the memory card and extract the firmware version from it.
+ * @return
+ */
+QString CardPage::getHoerbertFirmwareString(){
+
+    QString extractedVersionString = "";
+
+    if (!getSelectedDrive().isEmpty()){
+        QString firmwareVersionFile = m_mainWindow->getCurrentDrivePath() + FIRMWARE_VERSION_FILE;
+
+        if( QFile(firmwareVersionFile).exists() ){
+            QFile inputFile(firmwareVersionFile);
+            if (inputFile.open(QIODevice::ReadOnly))
+            {
+                QTextStream in(&inputFile);
+                while (!in.atEnd())
+                {
+                    QString line = in.readLine();
+                    if( line.startsWith("App version:") ){
+                        extractedVersionString = line.mid(13).trimmed();
+                    }
+                }
+                inputFile.close();
+            }
+        }
+    }
+
+    return extractedVersionString;
+}
+
+
+/**
+ * @brief backup fw_ver.txt on the memory card if it is there.
+ */
+void CardPage::removeFirmwareInfoFile(){
+
+    QString firmwareVersionFileName = m_mainWindow->getCurrentDrivePath()+FIRMWARE_VERSION_FILE;
+    QString firmwareVersionBakFileName = firmwareVersionFileName+".bak";
+
+    if (!getSelectedDrive().isEmpty() && QFile::exists(firmwareVersionFileName) ){
+
+        if( QFile::exists( firmwareVersionBakFileName ) ){
+            QFile::remove( firmwareVersionBakFileName );
+        }
+        QFile::rename( firmwareVersionFileName, firmwareVersionBakFileName );
+    }
 }
