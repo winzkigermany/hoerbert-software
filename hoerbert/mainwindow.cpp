@@ -1895,7 +1895,7 @@ void MainWindow::showFirmwareVersion(const QString &version, bool silentCheck=fa
 
             QMessageBox msgBox;
             msgBox.setText( tr("Firmware version check") );
-            msgBox.setInformativeText( "<big><b>"+infoText+"</b></big>" );
+            msgBox.setInformativeText( "<big>"+infoText+"</big>" );
             QPushButton* yesButton = msgBox.addButton( tr("Install (recommended)"), QMessageBox::YesRole);
             yesButton->setFont( font );
             QPushButton* noButton = msgBox.addButton( tr("Remind me"), QMessageBox::NoRole);
