@@ -468,7 +468,6 @@ bool HoerbertProcessor::changeEntryMetadata(const AudioEntry &entry)
 
 bool HoerbertProcessor::convertToAudioFile(const QString &sourceFilePath, const QString &destFilePath, const MetaData &metadata)
 {
-
     QStringList arguments;
     arguments.append("-i");
     arguments.append(sourceFilePath);
@@ -520,6 +519,7 @@ bool HoerbertProcessor::convertToAudioFile(const QString &sourceFilePath, const 
 
 bool HoerbertProcessor::convertToMp3(const QString &sourceFilePath, const QString &destFilePath, bool deleteOriginalWhenSuccessful)
 {
+//    qDebug()<< "convertToMp3" << __LINE__;
 
     QStringList arguments;
     arguments.append("-i");

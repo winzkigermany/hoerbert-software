@@ -460,8 +460,10 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     }, Qt::UniqueConnection);
 
     connect(processor, &HoerbertProcessor::taskCompleted, m_cardPage, [=] (int failCounter, int totalEntryCount) {
-        Q_UNUSED(failCounter)
         Q_UNUSED(totalEntryCount)
+        if( failCounter>0 ){
+            QMessageBox::information(this, tr("Error"), tr("Something went wrong. One or more errors occurred during the last operation."));
+        }
     }, Qt::UniqueConnection);
 
     connect(processor, &HoerbertProcessor::noSilenceDetected, this, [=] () {
@@ -593,7 +595,7 @@ void MainWindow::migrate(const QString &dirPath)
 
         if(doGenerateHoerbertXml)
         {
-            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version 2.x")+"\n"+tr("If you are sure that you will never ever use the old hoerbert app 1.x,\nyou can skip some time consuming steps in the future\nby ticking the check box below."));
+            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version")+"\n"+tr("If you are sure that you will never ever use the old hoerbert app 1.x,\nyou can skip some time consuming steps in the future\nby ticking the check box below."));
             m_pleaseWaitDialog->setCheckBoxLabel(tr("I only will use my memory cards with this new software from now on."));
         }
         else

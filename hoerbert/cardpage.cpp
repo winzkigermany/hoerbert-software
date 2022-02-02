@@ -741,14 +741,14 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
     clearRecordingSettings();
 
     m_deviceManager->refresh(driveName);    // refresh the storageInfo object, or else cached info will persist between drive (e.g. memory card) changes
-
-    if (m_deviceManager->isWriteProtected(driveName))
+/*
+    if ( m_deviceManager->isWriteProtected(driveName))
     {
         QMessageBox::information(this, tr("Select drive"), tr("The selected device is write-protected. Please remove the write protection if you want to modify any playlists on it."));
         deselectDrive();
         return;
     }
-
+*/
     m_isFormatting = false;
 
     m_ejectDriveButton->show();
@@ -845,7 +845,16 @@ void CardPage::selectDrive(const QString &driveName, bool doUpdateCapacityBar)
                 {
                     qDebug() << "Failed creating sub-directory" << innerDir.absolutePath() << i;
                     perror("Creating directory");
+
+                    QString proposedSolution = "";
+                    if( m_deviceManager->isWorkingOnCustomDirectory() ){
+                        proposedSolution = tr("Please select a different destination folder.");
+                    } else {
+                        proposedSolution = tr("Please select a different destination drive.");
+                    }
+
                     deselectDrive();
+                    QMessageBox::information(this, tr("Can't write"), tr("This app can't write files to the selected destination.")+"\n"+proposedSolution, QMessageBox::Ok );
                     return;
                 }
             }
