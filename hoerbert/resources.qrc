@@ -50,5 +50,11 @@
         <file>images/hoerbert_without_switch_400.png</file>
         <file>images/hoerbert_with_switch_200.png</file>
         <file>images/hoerbert_with_switch_400.png</file>
+        <file>images/rec_bt_inactive_512.png</file>
+        <file>images/rec_bt_active_512.png</file>
+        <file>images/rec_mic_inactive_512.png</file>
+        <file>images/rec_mic_active_512.png</file>
+        <file>images/rec_wifi_inactive_512.png</file>
+        <file>images/rec_wifi_active_512.png</file>
     </qresource>
 </RCC>

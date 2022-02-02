@@ -57,7 +57,7 @@ ChooseHoerbertDialog::ChooseHoerbertDialog(QWidget* parent) : QDialog(parent)
     m_buttonHLayout->addWidget(m_model2021Button);
     connect( m_model2021Button, &QAbstractButton::clicked, this, &ChooseHoerbertDialog::confirm2021Clicked );
 
-    QMetaObject::connectSlotsByName(this);
+ //   QMetaObject::connectSlotsByName(this);
 }
 
 void ChooseHoerbertDialog::confirm2011Clicked()

@@ -60,10 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_hasBeenRemindedOfBackup = false;
 
     m_hoerbertVersion = 0;
-    m_bluetoothRecordingPlaylist = 255;
 
     QDesktopWidget dw;
-    setGeometry((dw.width() - 800) / 2, (dw.height() - 494) / 2, 800, 494);
     setWindowTitle("hörbert");
     setWindowIcon(QIcon(":/images/hoerbert.ico"));
     setObjectName("MainWindow");
@@ -153,11 +151,15 @@ MainWindow::MainWindow(QWidget *parent)
                 m_migrationPath = QString("");
             }
 
-            readIndexM3u();
+            m_cardPage->readIndexM3u();
         }
 
         updateActionAvailability(true);
     });
+
+    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, m_cardPage, &CardPage::setBluetoothRecordingPlaylist);
+    connect(m_playlistPage, &PlaylistPage::setWifiRecordingPermission, m_cardPage, &CardPage::setWifiRecordingPermission);
+    connect(m_playlistPage, &PlaylistPage::setMicrophoneRecordingPermission, m_cardPage, &CardPage::setMicrophoneRecordingPermission);
 
     connect(m_cardPage, &CardPage::playlistChanged, this, [this] (quint8 dir_num, const QString &dir_path, const AudioList &result) {
         m_stackWidget->setCurrentIndex(1);
@@ -200,34 +202,10 @@ MainWindow::MainWindow(QWidget *parent)
         m_cardPage->updateEstimatedDuration( playlistIndex, durationInSeconds );
     });
 
-    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, this, [=]( quint8 playlistIndex, bool onOff ) {
-        qDebug() << "Setting bluetooth recording playlist: " << playlistIndex << ", value: " << onOff;
-
-        if( onOff ){
-            m_bluetoothRecordingPlaylist = playlistIndex;
-        } else {
-            if( m_bluetoothRecordingPlaylist == playlistIndex ){
-                m_bluetoothRecordingPlaylist = 255;
-            }
-        }
-    });
-
-    connect(m_playlistPage, &PlaylistPage::setWifiRecordingPermission, this, [=]( quint8 playlistIndex, bool onOff ) {
-        qDebug() << "Setting Wifi recording permission: " << playlistIndex << ", value: " << onOff;
-
-        if( playlistIndex<MAX_PLAYLIST_COUNT ){
-            m_wifiRecordingPermissions[playlistIndex] = onOff;
-        }
-    });
-
-    connect(m_playlistPage, &PlaylistPage::setMicrophoneRecordingPermission, this, [=]( quint8 playlistIndex, bool onOff ) {
-        qDebug() << "Setting Microphone recording permission: " << playlistIndex << ", value: " << onOff;
-
-        if( playlistIndex<MAX_PLAYLIST_COUNT ){
-            m_microphoneRecordingPermissions[playlistIndex] = onOff;
-        }
-    });
-
+    connect(m_playlistPage, &PlaylistPage::setBluetoothRecordingPlaylist, m_cardPage, &CardPage::setBluetoothRecordingPlaylist );
+    connect(m_playlistPage, &PlaylistPage::setWifiRecordingPermission, m_cardPage, &CardPage::setWifiRecordingPermission );
+    connect(m_playlistPage, &PlaylistPage::setMicrophoneRecordingPermission, m_cardPage, &CardPage::setMicrophoneRecordingPermission );
+    connect(m_playlistPage, &PlaylistPage::commitChanges, m_cardPage, &CardPage::generateIndexM3u, Qt::QueuedConnection);
     connect(m_playlistPage, &PlaylistPage::commitChanges, this, &MainWindow::processCommit, Qt::QueuedConnection);
 
     m_shadow = new QGraphicsDropShadowEffect(this);
@@ -239,7 +217,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_aboutDlg = new AboutDialog(this);
 
-    connect(m_aboutDlg, &AboutDialog::checkForUpdateRequested, this, &MainWindow::checkForUpdates);
+    connect(m_aboutDlg, &AboutDialog::checkForUpdateRequested, this, [=](){
+        this->checkForUpdates(false);
+    });
 
     m_featuresDlg = new AdvancedFeaturesDialog(this);
     m_featuresDlg->setModal(true);
@@ -264,9 +244,22 @@ MainWindow::MainWindow(QWidget *parent)
     m_chooseHoerbertDialog = new ChooseHoerbertDialog(this);
     m_chooseHoerbertDialog->setModal(true);
     m_chooseHoerbertDialog->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);     // disable the close button. We NEED the user to choose.
-    connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, &MainWindow::setHoerbertModel);
+    connect( m_chooseHoerbertDialog, &ChooseHoerbertDialog::choseHoerbertModel, this, [=]( int modelVersion ){
+        setHoerbertModel(modelVersion);
+
+        QSettings settings;
+        settings.beginGroup("Global");
+        bool skip_update_check = settings.value("skipUpdateCheck").toBool();
+        settings.endGroup();
+
+        if ( !skip_update_check ){
+            checkForUpdates(true);  // do a silent check
+        }
+
+    });
     m_chooseHoerbertDialog->show();
 }
+
 
 void MainWindow::updateActionAvailability( bool ANDed )
 {
@@ -305,22 +298,25 @@ void MainWindow::updateActionAvailability( bool ANDed )
         m_backupAction->setEnabled(false);
     }
 
-    // The wifi settings action
-    if( m_cardPage->getSelectedDrive().isEmpty() )
-    {
-        m_hoerbertModel2011Action->setEnabled(true);
-        m_hoerbertModel2021Action->setEnabled(true);
-        m_wifiAction->setEnabled(false);
+    if( m_cardPage->getSelectedDrive().isEmpty()){
+        m_hoerbertModelMenu->setEnabled(true);
     } else {
-        m_hoerbertModel2011Action->setEnabled(false);
-        m_hoerbertModel2021Action->setEnabled(false);
-        if( getHoerbertVersion()==2011 ){
-            m_wifiAction->setEnabled(false);
-        } else {
-            m_wifiAction->setEnabled(true);
-        }
+        m_hoerbertModelMenu->setEnabled(false);
     }
 
+
+    if( getHoerbertVersion()==2011 ){
+        m_wifiAction->setEnabled(false);
+        m_setModeAction->setEnabled(false);
+    } else {
+        if( m_cardPage->getSelectedDrive().isEmpty() ){
+            m_wifiAction->setEnabled(false);
+            m_setModeAction->setEnabled(false);
+        } else {
+            m_wifiAction->setEnabled(true);
+            m_setModeAction->setEnabled(true);
+        }
+    }
 }
 
 MainWindow::~MainWindow()
@@ -418,238 +414,6 @@ void MainWindow::makePlausible(std::list <int> fixList)
 
 
 /**
- * @brief MainWindow::readIndexM3U read the index.m3u file
- * @param rootPath
- */
-void MainWindow::readIndexM3u(){
-
-    QString rootPath = getCurrentDrivePath();
-    qDebug() << "root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
-
-    // reset all values
-    m_bluetoothRecordingPlaylist = 255;
-    for( int i=0; i<MAX_PLAYLIST_COUNT; i++){
-        m_microphoneRecordingPermissions[i] = false;
-        m_wifiRecordingPermissions[i] = false;
-    }
-
-    // Open file to read contents
-    QFile file(rootPath + INDEX_M3U_FILE);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream stream(&file);
-
-        while (!stream.atEnd())
-        {
-            QString newLine = stream.readLine();
-            QString dataString = "";
-            QString searchString;
-
-            searchString = "#hoerbert:set_bluetooth_recordings_playlist";
-            if( newLine.toLower().startsWith(searchString) ){
-                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
-                m_bluetoothRecordingPlaylist = 255;
-
-                if( dataString.trimmed()=="0.0")
-                    m_bluetoothRecordingPlaylist = 0;
-
-                if( dataString.trimmed()=="0.1")
-                    m_bluetoothRecordingPlaylist = 1;
-
-                if( dataString.trimmed()=="0.2")
-                    m_bluetoothRecordingPlaylist = 2;
-
-                if( dataString.trimmed()=="0.3")
-                    m_bluetoothRecordingPlaylist = 3;
-
-                if( dataString.trimmed()=="0.4")
-                    m_bluetoothRecordingPlaylist = 4;
-
-                if( dataString.trimmed()=="0.5")
-                    m_bluetoothRecordingPlaylist = 5;
-
-                if( dataString.trimmed()=="0.6")
-                    m_bluetoothRecordingPlaylist = 6;
-
-                if( dataString.trimmed()=="0.7")
-                    m_bluetoothRecordingPlaylist = 7;
-
-                if( dataString.trimmed()=="0.8")
-                    m_bluetoothRecordingPlaylist = 8;
-
-            }
-
-            searchString = "#hoerbert:allow_microphone_recordings_in_playlist";
-            if( newLine.toLower().startsWith(searchString) ){
-                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
-                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
-                for ( const auto& i : list  )
-                {
-                    if( i.trimmed()=="0.0")
-                        m_microphoneRecordingPermissions[0] = true;
-
-                    if( i.trimmed()=="0.1")
-                        m_microphoneRecordingPermissions[1] = true;
-
-                    if( i.trimmed()=="0.2")
-                        m_microphoneRecordingPermissions[2] = true;
-
-                    if( i.trimmed()=="0.3")
-                        m_microphoneRecordingPermissions[3] = true;
-
-                    if( i.trimmed()=="0.4")
-                        m_microphoneRecordingPermissions[4] = true;
-
-                    if( i.trimmed()=="0.5")
-                        m_microphoneRecordingPermissions[5] = true;
-
-                    if( i.trimmed()=="0.6")
-                        m_microphoneRecordingPermissions[6] = true;
-
-                    if( i.trimmed()=="0.7")
-                        m_microphoneRecordingPermissions[7] = true;
-
-                    if( i.trimmed()=="0.8")
-                        m_microphoneRecordingPermissions[8] = true;
-                }
-            }
-
-            searchString = "#hoerbert:allow_wifi_recordings_in_playlist";
-            if( newLine.toLower().startsWith(searchString) ){
-                dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
-                QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
-                for ( const auto& i : list  )
-                {
-                    if( i.trimmed()=="0.0")
-                        m_wifiRecordingPermissions[0] = true;
-
-                    if( i.trimmed()=="0.1")
-                        m_wifiRecordingPermissions[1] = true;
-
-                    if( i.trimmed()=="0.2")
-                        m_wifiRecordingPermissions[2] = true;
-
-                    if( i.trimmed()=="0.3")
-                        m_wifiRecordingPermissions[3] = true;
-
-                    if( i.trimmed()=="0.4")
-                        m_wifiRecordingPermissions[4] = true;
-
-                    if( i.trimmed()=="0.5")
-                        m_wifiRecordingPermissions[5] = true;
-
-                    if( i.trimmed()=="0.6")
-                        m_wifiRecordingPermissions[6] = true;
-
-                    if( i.trimmed()=="0.7")
-                        m_wifiRecordingPermissions[7] = true;
-
-                    if( i.trimmed()=="0.8")
-                        m_wifiRecordingPermissions[8] = true;
-                }
-            }
-        }
-
-        file.close();
-    }
-}
-
-/**
- * @brief MainWindow::generateIndexM3u
- * @param rootPath
- */
-void MainWindow::generateIndexM3u(){
-
-    QString rootPath = getCurrentDrivePath();
-    qDebug() << "root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
-
-    // Open file to copy contents
-    bool isNewFile = false;
-    QFile file(rootPath + INDEX_M3U_FILE);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        // create the file to keep the rest working as if it existed.
-        file.open(QIODevice::ReadWrite | QIODevice::Text);
-        isNewFile = true;
-    }
-    file.close();
-
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        // Open new file to write
-        uint32_t lineNumber = 0;
-        QFile temp(rootPath + INDEX_M3U_FILE_BAK);
-        if( temp.open(QIODevice::ReadWrite | QIODevice::Text) )
-        {
-            QTextStream stream(&file);
-            QTextStream out(&temp);
-            bool foundOne = false;
-
-            out << "#EXTM3U" << "\n";
-
-            if( m_bluetoothRecordingPlaylist<MAX_PLAYLIST_COUNT ){
-                out << "#hoerbert:set_bluetooth_recordings_playlist" << " 0." << m_bluetoothRecordingPlaylist << "\n";
-            }
-
-            QString microphonePermissionsString = "";
-            foundOne = false;
-            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
-                if( m_microphoneRecordingPermissions[i] ){
-                    microphonePermissionsString += " 0."+QString::number(i);
-                    foundOne = true;
-                }
-            }
-            if( foundOne ){
-                out << "#hoerbert:allow_microphone_recordings_in_playlist" << microphonePermissionsString << "\n";
-            }
-
-            QString wifiPermissionsString = "";
-            foundOne = false;
-            for( int i=0; i<MAX_PLAYLIST_COUNT; i++ ){
-                if( m_wifiRecordingPermissions[i] ){
-                    wifiPermissionsString += " 0."+QString::number(i);
-                    foundOne = true;
-                }
-                foundOne = true;
-            }
-            if( foundOne ){
-                out << "#hoerbert:allow_wifi_recordings_in_playlist" << wifiPermissionsString << "\n";
-            }
-
-            while (!stream.atEnd())
-            {
-                QString newLine = stream.readLine();
-
-                if( newLine.toLower().startsWith("#extm3u") ){
-                    lineNumber++;
-                    continue;
-                }
-                if( newLine.toLower().startsWith("#hoerbert:set_bluetooth_recordings_playlist") ){
-                    lineNumber++;
-                    continue;
-                }
-                if( newLine.toLower().startsWith("#hoerbert:allow_microphone_recordings_in_playlist") ){
-                    lineNumber++;
-                    continue;
-                }
-                if( newLine.toLower().startsWith("#hoerbert:allow_wifi_recordings_in_playlist") ){
-                    lineNumber++;
-                    continue;
-                }
-
-                out << newLine  << "\n";
-                lineNumber++;
-            }
-            temp.close();
-            file.close();
-
-            file.remove();
-            temp.rename(rootPath + INDEX_M3U_FILE);
-         }
-    }
-}
-
-
-/**
  * @brief MainWindow::processCommit
  * @param list
  * @param dir_index
@@ -659,8 +423,6 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     m_cardPage->enableButtons(true);
     showHideEditMenuEntries(false);
     updateActionAvailability(false);
-
-    generateIndexM3u();
 
     if (list.count() == 0) {
         m_cardPage->update();
@@ -698,8 +460,10 @@ void MainWindow::processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, con
     }, Qt::UniqueConnection);
 
     connect(processor, &HoerbertProcessor::taskCompleted, m_cardPage, [=] (int failCounter, int totalEntryCount) {
-        Q_UNUSED(failCounter)
         Q_UNUSED(totalEntryCount)
+        if( failCounter>0 ){
+            QMessageBox::information(this, tr("Error"), tr("Something went wrong. One or more errors occurred during the last operation."));
+        }
     }, Qt::UniqueConnection);
 
     connect(processor, &HoerbertProcessor::noSilenceDetected, this, [=] () {
@@ -776,7 +540,7 @@ void MainWindow::migrate(const QString &dirPath)
         m_pleaseWaitDialog->setWindowFlags(Qt::Window | Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         m_pleaseWaitDialog->setWindowTitle(tr("Updating card contents"));
         m_pleaseWaitDialog->setWindowModality(Qt::ApplicationModal);
-        m_pleaseWaitDialog->setWaitMessage(tr("Updating the card contents for this new hoerbert app version 2.x.\nThis needs to be done only once per card.\nPlease wait and do not interrupt this process!"));
+        m_pleaseWaitDialog->setWaitMessage(tr("Updating the card contents for this new hoerbert app version.\nThis needs to be done only once per card.\nPlease wait and do not interrupt this process!"));
         m_pleaseWaitDialog->setProgressRange(0, 100);
         m_pleaseWaitDialog->showButton(false);
         m_pleaseWaitDialog->show();
@@ -831,7 +595,7 @@ void MainWindow::migrate(const QString &dirPath)
 
         if(doGenerateHoerbertXml)
         {
-            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version 2.x")+"\n"+tr("If you are sure that you will never ever use the old hoerbert app 1.x,\nyou can skip some time consuming steps in the future\nby ticking the check box below."));
+            m_pleaseWaitDialog->setResultString(tr("This card is now ready for use with this app version")+"\n"+tr("If you are sure that you will never ever use the old hoerbert app 1.x,\nyou can skip some time consuming steps in the future\nby ticking the check box below."));
             m_pleaseWaitDialog->setCheckBoxLabel(tr("I only will use my memory cards with this new software from now on."));
         }
         else
@@ -1077,14 +841,7 @@ void MainWindow::printHtml(const AudioList &list, const QString &outputPath, boo
 
     QString output_file;
     if (outputPath.isEmpty()) {
-        QString app_data_path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
-        QDir dir(app_data_path);
-        if (!dir.exists()) {
-            dir.mkpath(app_data_path);
-        }
-
-        output_file = tailPath(app_data_path) + CONTENT_HTML;
+        output_file = tailPath(HOERBERT_TEMP_PATH) + CONTENT_HTML;
     } else {
         output_file = tailPath(outputPath) + CONTENT_HTML;
     }
@@ -1569,6 +1326,10 @@ void MainWindow::formatCard()
     m_cardPage->formatSelectedDrive();
 }
 
+CardPage* MainWindow::getCardPage(){
+    return m_cardPage;
+}
+
 void MainWindow::advancedFeatures()
 {
     m_featuresDlg->open();
@@ -1923,8 +1684,18 @@ void MainWindow::about()
     m_aboutDlg->open();
 }
 
-void MainWindow::checkForUpdates()
+void MainWindow::checkForUpdates( bool silentCheck=false )
 {
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool skip_update_check = settings.value("skipUpdateCheck").toBool();
+    settings.endGroup();
+
+    if ( silentCheck && skip_update_check ){
+        return;
+    }
+
 #if defined (Q_OS_MACOS)
     QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkMacVersion2"));
 #elif defined (_WIN32)
@@ -1934,7 +1705,7 @@ void MainWindow::checkForUpdates()
 #endif
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
-    connect(manager, &QNetworkAccessManager::finished, this, [this] (QNetworkReply *reply) {
+    connect(manager, &QNetworkAccessManager::finished, this, [=] (QNetworkReply *reply) {
         if (reply->error()) {
             qDebug() << "Failed retrieving version code:" << reply->errorString();
             return;
@@ -1943,7 +1714,44 @@ void MainWindow::checkForUpdates()
         QString result = reply->readAll();
         QString version = result.section(":", 1);
 
-        showVersion(version);
+        showVersion(version, silentCheck);
+    });
+
+    manager->get(request);
+}
+
+
+/**
+ * @brief MainWindow::checkForFirmwareUpdates
+ * @param silentCheck
+ */
+void MainWindow::checkForFirmwareUpdates( bool silentCheck=false )
+{
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    bool skip_firmware_check = settings.value("skipUpdateCheck").toBool();
+    settings.endGroup();
+
+    if ( silentCheck && skip_firmware_check ){
+        return;
+    }
+
+    QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkFirmwareVersion"));
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+
+    connect(manager, &QNetworkAccessManager::finished, this, [this, silentCheck] (QNetworkReply *reply) {
+        if (reply->error()) {
+            qDebug() << "Failed retrieving version code:" << reply->errorString();
+            return;
+        }
+
+        QString result = reply->readAll();
+        QString version = result.section(":", 1);
+        if( !version.isEmpty() ){
+            showFirmwareVersion(version, silentCheck);
+        }
+
     });
 
     manager->get(request);
@@ -1983,17 +1791,20 @@ void MainWindow::closeEvent(QCloseEvent *e)
     e->ignore();
 }
 
-void MainWindow::showVersion(const QString &version)
+
+/**
+ * @brief The dialog that shows app version information to the user.
+ * @param version
+ */
+void MainWindow::showVersion(const QString &version, bool silentCheck=false )
 {
-
-
     QDialog *dlg = new QDialog();
     connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
 
     dlg->setModal(true);
     dlg->setFixedSize(320, 198);
 
-    QString infoText = tr("This version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version);
+    QString infoText = tr("This app version:")+" "+VER_PRODUCTVERSION_STR+"\n"+tr("Latest available version online: %1").arg(version);
     if( compareVersionWithThisApp(version)<0 )
     {
         infoText += "\n\n"+tr("There is a never version of this app available. Do you want do download it?");
@@ -2005,11 +1816,109 @@ void MainWindow::showVersion(const QString &version)
     }
     else
     {
-        infoText += "\n\n"+tr("There is no never version of this app available.");
-        QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+        if( !silentCheck ){
+            infoText += "\n\n"+tr("There is no never version of this app available.");
+            QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+        }
     }
 
+    if( m_cardPage->getSelectedDrive()!="" ){
+        checkForFirmwareUpdates();
+    }
 }
+
+
+/**
+ * @brief compare firmware version dates
+ * @param onlineVersionString
+ * @return
+ */
+int MainWindow::compareFirmwareVersionWithThisApp( const QString& onlineVersionString, const QString& localVersionString ){
+
+    // both strings begin with yyyy-mm-dd hh:mm
+    // and we need to find out which is the newer one.
+    if( onlineVersionString.length()>=16 && localVersionString.length()>=16){
+        QString onlineDateString = onlineVersionString.trimmed().left(16);
+        QString localDateString = localVersionString.trimmed().left(16);
+
+        QDateTime onlineDate = QDateTime::fromString(onlineDateString,"yyyy-MM-dd HH:mm");
+        QDateTime localDate = QDateTime::fromString(localDateString,"yyyy-MM-dd HH:mm");
+
+        if( onlineDate>localDate){
+            return -1;
+        } else if( onlineDate<localDate ){
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+
+/**
+ * @brief The dialog that shows firmware version information to the user.
+ * @param version
+ */
+void MainWindow::showFirmwareVersion(const QString &version, bool silentCheck=false )
+{
+    QDialog *dlg = new QDialog();
+    connect( dlg, &QDialog::finished, dlg, &QObject::deleteLater );
+
+    dlg->setModal(true);
+    dlg->setFixedSize(320, 198);
+
+    QString hoerbertFirmwareVersionString = m_cardPage->getHoerbertFirmwareString();
+    QString infoText = "";
+
+    if( hoerbertFirmwareVersionString.isEmpty() ){
+        if( !silentCheck ){
+            infoText = tr("There is no firmware version information on the selected memory card.<br>To get that information, please do the following:<br>1) Eject the card properly from your computer<br>2) Insert the memory card into hörbert<br>3) Remove power or one battery from hörbert<br>4) Add power or insert all batteries<br>5) Turn hörbert on and off again<br>6) Plug the memory card back in your computer<br>7) Repeat the firmware version check");
+            QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+        }
+    } else {
+        infoText = tr("Wait! Your hörbert may be missing bug fixes or new features.")+"<br><br>"+tr("This hörbert seems to have firmware version:<br>%1").arg(hoerbertFirmwareVersionString)+"<br>"+tr("Latest available version online:<br>%1").arg(version);
+        if( compareFirmwareVersionWithThisApp(version, hoerbertFirmwareVersionString)<0 )
+        {
+            if( silentCheck ){
+                infoText += "<br><br>"+tr("Updating your hörbert is free and we strongly recommend to do it.<br>Please install the latest firmware now.");
+            } else {
+                infoText += "<br><br>"+tr("There is a newer hörbert firmware available.<br>We strongly recommend to always install the latest firmware.");
+            }
+
+            QFont font;
+            font.setBold(true);
+
+            QMessageBox msgBox;
+            msgBox.setText( tr("Firmware version check") );
+            msgBox.setInformativeText( "<big>"+infoText+"</big>" );
+            QPushButton* yesButton = msgBox.addButton( tr("Install (recommended)"), QMessageBox::YesRole);
+            yesButton->setFont( font );
+            QPushButton* noButton = msgBox.addButton( tr("Remind me"), QMessageBox::NoRole);
+            noButton->setFont( font );
+            QPushButton* ignoreButton = msgBox.addButton( tr("Ignore for a while"), QMessageBox::RejectRole );
+            msgBox.setDefaultButton( yesButton );
+            msgBox.setIcon(QMessageBox::Question);
+            msgBox.exec();
+
+//            auto selected = QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore, QMessageBox::Yes  );
+            if ( msgBox.clickedButton() == ignoreButton )
+            {
+                // remove the ver_fw.txt from the memory card, so the user is not nagged too often.
+                m_cardPage->removeFirmwareInfoFile();
+            } else if ( msgBox.clickedButton() == yesButton ) {
+                QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/firmware-en/")));
+            }
+        }
+        else
+        {
+            if( !silentCheck ){
+                infoText += "\n\n"+tr("There is no newer hörbert firmware available.");
+                QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Ok );
+            }
+        }
+    }
+}
+
 
 void MainWindow::remindBackup()
 {
@@ -2450,7 +2359,7 @@ void MainWindow::createActions()
         setHoerbertModel(2011);
         updateActionAvailability();
     });
-    connect( this, &MainWindow::isNotLatestHoerbert, m_hoerbertModel2011Action, &QAction::setChecked);
+    connect( this, &MainWindow::isHoerbert2011, m_hoerbertModel2011Action, &QAction::setChecked);
     m_hoerbertModelMenu->addAction(m_hoerbertModel2011Action);
 
     {
@@ -2541,16 +2450,26 @@ void MainWindow::createActions()
 
     m_wifiDialog = new WifiDialog(this);
     m_wifiDialog->setModal(true);
-
     m_wifiAction = new QAction(tr("Configure WiFi connections"), this);
     m_wifiAction->setStatusTip(tr("Configure WiFi connections"));
-    m_wifiAction->setEnabled(true);
     m_wifiAction->setMenuRole(QAction::NoRole);
+    m_extrasMenu->addAction(m_wifiAction);
     connect(m_wifiAction, &QAction::triggered, this, [this] () {
         openWifiDialog();
     });
-    m_extrasMenu->addAction(m_wifiAction);
 
+
+    m_setModeDialog = new SetModeDialog(this);
+    m_setModeDialog->setModal(true);
+    m_setModeAction = new QAction(tr("Configure SET mode"), this);
+    m_setModeAction->setStatusTip(tr("Configure SET mode"));
+    m_setModeAction->setMenuRole(QAction::NoRole);
+    m_extrasMenu->addAction(m_setModeAction);
+    connect(m_setModeAction, &QAction::triggered, this, [this] () {
+        openSetModeDialog();
+    });
+
+    m_extrasMenu->addSeparator();
 
     m_printAction = new QAction(tr("Print table of contents"), this);
     m_printAction->setStatusTip(tr("Print table of contents"));
@@ -2634,7 +2553,9 @@ void MainWindow::createActions()
 
     checkUpdatesAction = new QAction(tr("Check for updates"), this);
     checkUpdatesAction->setStatusTip(tr("Check for updates"));
-    connect(checkUpdatesAction, &QAction::triggered, this, &MainWindow::checkForUpdates);
+    connect(checkUpdatesAction, &QAction::triggered, this, [=]() {
+        checkForUpdates(false);
+    });
     m_helpMenu->addAction(checkUpdatesAction);
 
     m_serviceToolsMenu = new QMenu(tr("Service tools..."), this);
@@ -2819,14 +2740,14 @@ void MainWindow::setHoerbertModel( int modelIdentifier )
         m_hoerbertModel2011Action->setChecked(false);
         setWindowTitle("hörbert");
         emit isLatestHoerbert(true);
-        emit isNotLatestHoerbert(false);
+        emit isHoerbert2011(false);
     } else {
         m_hoerbertVersion = 2011;
         m_hoerbertModel2021Action->setChecked(false);
         m_hoerbertModel2011Action->setChecked(true);
         setWindowTitle("hörbert 2011");
         emit isLatestHoerbert(false);
-        emit isNotLatestHoerbert(true);
+        emit isHoerbert2011(true);
     }
 
     qApp->setProperty("hoerbertModel", m_hoerbertVersion);
@@ -2844,24 +2765,10 @@ QString MainWindow::getCurrentDrivePath(){
     return m_cardPage->currentDrivePath();
 }
 
-quint8 MainWindow::getBluetoothRecordingPlaylist(){
-    return m_bluetoothRecordingPlaylist;
-}
-
 void MainWindow::openWifiDialog(){
     m_wifiDialog->show();
 }
 
-bool MainWindow::isWifiRecordingAllowedInPlaylist( quint8 playlistNumber ){
-    if( playlistNumber<MAX_PLAYLIST_COUNT && m_wifiRecordingPermissions[playlistNumber] ){
-        return true;
-    }
-    return false;
-}
-
-bool MainWindow::isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber ){
-    if( playlistNumber<MAX_PLAYLIST_COUNT && m_microphoneRecordingPermissions[playlistNumber] ){
-        return true;
-    }
-    return false;
+void MainWindow::openSetModeDialog(){
+    m_setModeDialog->show();
 }

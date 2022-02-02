@@ -54,6 +54,9 @@
 #include "devicemanager.h"
 #include "mainwindow.h"
 #include "removabledrivelistener.h"
+#include "recordingselector.h"
+
+#define MAX_PLAYLIST_COUNT 9
 
 class MainWindow;
 
@@ -261,6 +264,22 @@ public:
      */
     QString getDisplayedDrive();
 
+    quint8 getBluetoothRecordingPlaylist();
+
+    bool isWifiRecordingAllowedInPlaylist( quint8 playlistNumber );
+
+    bool isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber );
+
+    void readIndexM3u();
+
+    void generateIndexM3u();
+
+    void clearRecordingSettings();
+
+    QString getHoerbertFirmwareString();
+
+    void removeFirmwareInfoFile();
+
 signals:
 
     /**
@@ -317,6 +336,10 @@ signals:
 
     void convertingCurrentFile( QString );
 
+    void updateBluetoothRecordingPlaylist( quint8 index, bool onOff );
+
+
+
 public slots:
 
     /**
@@ -331,8 +354,14 @@ public slots:
      */
     void commitUsedSpace( int playlistIndex );
 
-
     void updateEstimatedDuration( int playlistIndex, quint64 seconds );
+
+public slots:
+    void setMicrophoneRecordingPermission( quint8 playlistIndex, bool onOff );
+
+    void setWifiRecordingPermission( quint8 playlistIndex, bool onOff );
+
+    void setBluetoothRecordingPlaylist( quint8 playlistIndex, bool onOff );
 
 private slots:
 
@@ -382,6 +411,8 @@ private:
 
     void convertAllAudioFilesToMp3( QString rootPath);
 
+    void updateRecordingSettings();
+
     bool m_isProcessing;
     bool m_migrationSuggested;
     bool m_hoerbertXMLIsDirty;
@@ -408,16 +439,10 @@ private:
     QLabel *m_diagModeHint;
     QPushButton *m_return2Normal;
 
-    PieButton *m_dir0;
-    PieButton *m_dir1;
-    PieButton *m_dir2;
-    PieButton *m_dir3;
-    PieButton *m_dir4;
-    PieButton *m_dir5;
-    PieButton *m_dir6;
-    PieButton *m_dir7;
-    PieButton *m_dir8;
-    QMap<int, PieButton*> m_dirs;
+    QWidget* m_buttonArea[MAX_PLAYLIST_COUNT];
+    QHBoxLayout* m_hbl[MAX_PLAYLIST_COUNT];
+    PieButton *m_dirs[MAX_PLAYLIST_COUNT];
+    RecordingSelector* m_recordingSelectors[MAX_PLAYLIST_COUNT];
 
     QSpacerItem *m_horizontalGridSpacer1;
     QSpacerItem *m_horizontalGridSpacer2;
@@ -436,6 +461,10 @@ private:
     quint64 m_playlistEstimatedSize[9];
     quint64 m_usedSpaceOffset = 0;           // this is the used space on the card that's NOT in any playlist.
     bool m_isFormatting = false;                // this flag tells us if a formatting operation is underway and keeps us from being afraid of sudden loss of the memory card.
+
+    quint8 m_bluetoothRecordingPlaylist;
+    bool m_wifiRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
+    bool m_microphoneRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
 };
 
 #endif // CARDPAGE_H

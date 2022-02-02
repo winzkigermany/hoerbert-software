@@ -52,11 +52,11 @@
 #include "backuprestoredialog.h"
 #include "choosehoerbertdialog.h"
 #include "wifidialog.h"
-
-#define MAX_PLAYLIST_COUNT 9
+#include "setmodedialog.h"
 
 class CardPage;
 class WifiDialog;
+class SetModeDialog;
 class PlaylistPage;
 
 class MainWindow : public QMainWindow
@@ -91,13 +91,13 @@ public:
 
     QString getCurrentDrivePath();
 
-    quint8 getBluetoothRecordingPlaylist();
-
-    bool isWifiRecordingAllowedInPlaylist( quint8 playlistNumber );
-
-    bool isMicrophoneRecordingAllowedInPlaylist( quint8 playlistNumber );
-
     void backupCard();
+
+    CardPage* getCardPage();
+
+    void checkForFirmwareUpdates( bool silentCheck );
+    void checkForUpdates( bool silentCheck );
+
 
 signals:
     /**
@@ -114,8 +114,7 @@ signals:
 
     void isLatestHoerbert(bool latestOlder );
 
-    void isNotLatestHoerbert(bool latestOlder );
-
+    void isHoerbert2011(bool latestOlder );
 
 private slots:
     void addTitle();
@@ -131,7 +130,6 @@ private slots:
     void switchDiagnosticsMode();
 
     void about();
-    void checkForUpdates();
 
     void processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index);
     void processorErrorOccurred(const QString &errorString);
@@ -148,7 +146,8 @@ private:
 
     void closeEvent(QCloseEvent *e) override;
 
-    void showVersion(const QString &version);
+    void showVersion(const QString &version, bool silentCheck);
+    void showFirmwareVersion(const QString &version, bool silentCheck );
 
     void remindBackup();
 
@@ -165,10 +164,6 @@ private:
 
     bool m_hasBeenRemindedOfBackup = false;  // we set this flag once the user has been reminded of a backup for this card. Then we will keep from reminding him unless a new card is selected.
 
-    void readIndexM3u();
-
-    void generateIndexM3u();
-
     /**
      * @brief updateFormatActionAvailability The format action needs special care as of when to enable or disable it.
      */
@@ -179,6 +174,7 @@ private:
      * @return 0 if the same, -1 if app version is lower than the online version, +1 if app version is higher than the online version
      */
     int compareVersionWithThisApp( const QString& onlineVersionString );
+    int compareFirmwareVersionWithThisApp( const QString& onlineVersionString, const QString& localVersionString );
 
     uint m_hoerbertVersion;
     QString m_migrationPath;
@@ -231,6 +227,7 @@ private:
     QAction *m_hoerbertModel2011Action;
     QAction *m_hoerbertModel2021Action;
     QAction *m_wifiAction;
+    QAction *m_setModeAction;
 
     QAction *m_moveToB1;
     QAction *m_moveToB2;
@@ -266,10 +263,9 @@ private:
     PleaseWaitDialog* m_pleaseWaitDialog;
     WifiDialog* m_wifiDialog;
     void openWifiDialog();
+    SetModeDialog* m_setModeDialog;
+    void openSetModeDialog();
 
-    quint8 m_bluetoothRecordingPlaylist;
-    bool m_wifiRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
-    bool m_microphoneRecordingPermissions[MAX_PLAYLIST_COUNT] = {false};
 };
 
 #endif // MAINWINDOW_H

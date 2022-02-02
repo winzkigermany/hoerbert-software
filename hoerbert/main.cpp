@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
         EJECT_DRIVE_PATH = QCoreApplication::applicationDirPath() + "/EjectMedia/EjectMedia.exe";
 #endif
 
-        HOERBERT_TEMP_PATH = tailPath(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+//        HOERBERT_TEMP_PATH = tailPath(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
 
 #if defined (Q_OS_WIN)
         ZIP_PATH = QCoreApplication::applicationDirPath() + "/7z/7za.exe";
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 
         SYNC_PATH    = "/bin/sync";
 
-        HOERBERT_TEMP_PATH = "/tmp/.hoerbert/";
+//        HOERBERT_TEMP_PATH = "/tmp/.hoerbert/";
     }
     else if ( QSysInfo::kernelType() == "linux" )
     {
@@ -170,15 +170,9 @@ int main(int argc, char *argv[])
 
         SYNC_PATH    = "/bin/sync";
 
-        HOERBERT_TEMP_PATH = "/tmp/.hoerbert/";
+//        HOERBERT_TEMP_PATH = "/tmp/.hoerbert/";
     }
 
-    QDir dir(HOERBERT_TEMP_PATH);
-    if (!dir.exists())
-    {
-        if (!dir.mkpath(HOERBERT_TEMP_PATH))
-            qDebug() << "Failed creating temp directory for ripping.";
-    }
 
     QFile ffmpeg_file(FFMPEG_PATH);
     if (!ffmpeg_file.exists())
@@ -230,9 +224,26 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    QCoreApplication::setOrganizationName("WINZKI GmbH & Co. KG");
     QCoreApplication::setOrganizationDomain("hoerbert.com");
     QCoreApplication::setApplicationName("hörbert");
+
+
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    if (!dir.exists()){
+        dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    }
+
+    /* create a temp dir which is deleted automagically after use */
+    QTemporaryDir tempDir( QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/" );
+    if (tempDir.isValid()) {
+        HOERBERT_TEMP_PATH = tempDir.path();
+    } else {
+        perror("Failed to create a temp folder for this app");
+    }
+    qDebug()<< "temp dir:" << HOERBERT_TEMP_PATH;
+
+    // set this AFTER creating the temp path to avoid having the ampersand in a path name.
+    QCoreApplication::setOrganizationName("WINZKI GmbH & Co. KG");
 
     // default settings of the app
     QSettings settings;
@@ -309,6 +320,7 @@ int main(int argc, char *argv[])
     }
 
     MainWindow w;
+    w.resize(800,494);
     w.show();
 
     return a.exec();

@@ -36,10 +36,6 @@ CDRipper::CDRipper(const QFileInfoList &fileInfoList)
     m_fileList = fileInfoList;
     m_abort = false;
 
-    QDir dir(HOERBERT_TEMP_PATH);
-    if (!dir.exists())
-        dir.mkpath(HOERBERT_TEMP_PATH);
-
     qRegisterMetaType <QProcess::ProcessState> ("QProcess::ProcessState");
     qRegisterMetaType <QProcess::ExitStatus> ("QProcess::ExitStatus");
 }
