@@ -236,7 +236,6 @@ private:
     QString m_splitOnSilenceSegmentLength; // minmum length of split audio by silence detection, in seconds
 
     int m_counter;
-    int m_failCounter;
     int m_totalEntryCount;
 
     int m_splitOffset; // this offset is used to get correct split files while dealing with split files.

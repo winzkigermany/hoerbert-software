@@ -95,6 +95,8 @@ void HoerbertProcessor::setEntryList(const QMap<ENTRY_LIST_TYPE, AudioList> &lis
 
 void HoerbertProcessor::run()
 {
+    int failCounter = 0;
+
     if (m_totalEntryCount == 0) {
         qDebug() << "Nothing to process!";
         return;
@@ -127,7 +129,7 @@ void HoerbertProcessor::run()
     for (const auto& entry : m_entries[REMOVED_ENTRIES])
     {
         if (!removeEntry(entry))
-            m_failCounter++;
+            failCounter++;
     }
     if (m_entries[REMOVED_ENTRIES].count() > 0) {
         m_counter++;
@@ -183,7 +185,7 @@ void HoerbertProcessor::run()
         for (const auto& entry : moved_list)
         {
             if (!moveEntry(entry))
-                m_failCounter++;
+                failCounter++;
             else {
 
                 /* the path of the entry is updated due to move, thus update path of entry on other lists
@@ -217,7 +219,7 @@ void HoerbertProcessor::run()
     for (const auto& entry : m_entries[ADDED_ENTRIES])
     {
         if (!addEntry(entry))
-            m_failCounter++;
+            failCounter++;
 
         m_counter++;
         emit processUpdated(m_counter * 100 / m_totalEntryCount);
@@ -228,7 +230,7 @@ void HoerbertProcessor::run()
     for (const auto& entry : m_entries[METADATA_CHANGED_ENTRIES])
     {
         if (!changeEntryMetadata(entry))
-            m_failCounter++;
+            failCounter++;
         m_counter++;
         emit processUpdated(m_counter * 100 / m_totalEntryCount);
         if (m_abort)
@@ -239,7 +241,7 @@ void HoerbertProcessor::run()
     for (const auto& entry : m_entries[SPLIT_ENTRIES])
     {
         if (!splitEntry(entry))
-            m_failCounter++;
+            failCounter++;
         m_counter++;
         emit processUpdated(m_counter * 100 / m_totalEntryCount);
         if (m_abort)
@@ -247,8 +249,8 @@ void HoerbertProcessor::run()
     }
     if (m_entries[SPLIT_ENTRIES].count() > 0)
         renameSplitFiles(m_dirPath);
-    if (m_failCounter > 0)
-        emit taskCompleted(m_failCounter, m_totalEntryCount);
+    if (failCounter > 0)
+        emit taskCompleted(failCounter, m_totalEntryCount);
 
     HoerbertProcessor::m_processingMutex.unlock();
 }
