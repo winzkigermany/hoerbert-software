@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include "cardpage.h"
+#include "functions.h"
+extern QString HOERBERT_TEMP_PATH;
 
 CardPage::CardPage(QWidget *parent)
     : QWidget(parent)
@@ -1508,6 +1510,7 @@ void CardPage::readIndexM3u(){
     updateRecordingSettings();
 }
 
+
 /**
  * @brief CardPage::generateIndexM3u
  * @param rootPath
@@ -1518,19 +1521,17 @@ void CardPage::generateIndexM3u(){
     qDebug() << "Generating index.m3u. Root path for index.m3u: " << rootPath + INDEX_M3U_FILE;
 
     // Open file to copy contents
-    bool isNewFile = false;
     QFile file(rootPath + INDEX_M3U_FILE);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         // create the file to keep the rest working as if it existed.
         file.open(QIODevice::ReadWrite | QIODevice::Text);
-        isNewFile = true;
     }
     file.close();
 
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
         // Open new file to write
         uint32_t lineNumber = 0;
-        QFile temp(rootPath + INDEX_M3U_FILE_BAK);
+        QFile temp( tailPath(HOERBERT_TEMP_PATH) + INDEX_M3U_FILE_BAK );
         if( temp.open(QIODevice::ReadWrite | QIODevice::Text) )
         {
             QTextStream stream(&file);
@@ -1600,8 +1601,12 @@ void CardPage::generateIndexM3u(){
             file.close();
 
             file.remove();
-            temp.rename(rootPath + INDEX_M3U_FILE);
-         }
+            if( !temp.rename(rootPath + INDEX_M3U_FILE) ){
+                m_mainWindow->processorErrorOccurred( tr("Unable to write index.m3u to the memory card. Reason: %1").arg(temp.errorString()) );
+            }
+         } else {
+            m_mainWindow->processorErrorOccurred( tr("Unable to create index.m3u in a temporary directory. Reason: %1").arg(temp.errorString()) );
+        }
     }
 }
 

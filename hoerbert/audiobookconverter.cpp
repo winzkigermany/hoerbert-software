@@ -29,6 +29,7 @@
 #include <QApplication>
 
 #include "define.h"
+#include "functions.h"
 
 extern QString FFMPEG_PATH;
 extern QString HOERBERT_TEMP_PATH;
@@ -123,9 +124,9 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
 
         QString output_path;
         if( qApp->property("hoerbertModel")==2011 ){
-            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_WAV;
+            output_path = tailPath(HOERBERT_TEMP_PATH) + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_WAV;
         } else {
-            output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_MP3.toLower();
+            output_path = tailPath(HOERBERT_TEMP_PATH) + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DESTINATION_FORMAT_MP3.toLower();
         }
         arguments.replace(lastArgumentIndex, output_path);
 

@@ -21,6 +21,8 @@
 
 #include "setmodedialog.h"
 #include "define.h"
+#include "functions.h"
+extern QString HOERBERT_TEMP_PATH;
 
 #include <QLocale>
 #include <QWidget>
@@ -510,14 +512,16 @@ void SetModeDialog::writeIndexM3uSettings(){
     bool foundWifiSettings = false;
     bool foundMicrophoneSettings = false;
 
-    QFile inputFile(indexM3uFileName);
-    QFile outputFile(indexM3uFileName+".tmp");
+    QFile inputFile( indexM3uFileName );
+    QFile outputFile( tailPath(HOERBERT_TEMP_PATH)+"index.m3u"+".tmp");
     QString outLine = "";
 
-    bool writeSuccess = false;
+    bool fileExists = false;
     if( outputFile.open(QIODevice::WriteOnly)){
 
         if (inputFile.open(QIODevice::ReadOnly)){       // an input file exists. If we find our settings, modify them.
+            fileExists = true;
+
             QTextStream in(&inputFile);
             while (!in.atEnd())
             {
@@ -599,6 +603,11 @@ void SetModeDialog::writeIndexM3uSettings(){
             inputFile.rename(indexM3uFileName+".bak");
         }
 
+        if(!fileExists){
+            QString extm3u = "#EXTM3U";
+            outputFile.write( extm3u.toUtf8()+"\n" );
+        }
+
         // maybe some settings were not found OR maybe there was no input file at all.
         outLine = "";
         if( !foundSleepTimerSettings && getSleepTimerSettingsLine(&outLine) ){
@@ -629,8 +638,6 @@ void SetModeDialog::writeIndexM3uSettings(){
         if( !foundMicrophoneSettings && getMicrophoneSettingsLine(&outLine) ){
             outputFile.write( outLine.toUtf8()+"\n" );
         }
-
-        writeSuccess = true;
 
         // we've got our output file with ".tmp" appended to its name.
         // now rename it to its real file name, and overwrite the original.

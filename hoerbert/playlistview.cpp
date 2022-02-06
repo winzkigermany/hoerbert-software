@@ -54,7 +54,6 @@ int CDRipper::uniqueID = 0;
 using namespace std;
 
 extern QString FFPLAY_PATH;
-extern QString HOERBERT_TEMP_PATH;
 
 PlaylistView::PlaylistView(QWidget *parent)
     : QTableWidget(parent)

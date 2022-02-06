@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "cdripper.h"
+#include "functions.h"
 
 #include <QProcess>
 #include <QDir>
@@ -76,7 +77,7 @@ void CDRipper::run()
             return;
         }
 
-        arguments[3] = HOERBERT_TEMP_PATH + QString::number(uniqueID) + ".FLAC";
+        arguments[3] = tailPath(HOERBERT_TEMP_PATH) + QString::number(uniqueID) + ".FLAC";
         arguments[4] = track.filePath();
 
         qDebug() << "UniqueID:" << uniqueID;

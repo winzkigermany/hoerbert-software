@@ -324,10 +324,12 @@ void MainWindow::updateActionAvailability( bool ANDed )
 
 MainWindow::~MainWindow()
 {
+    /*
     if (!deleteAllFilesInDirecotry(HOERBERT_TEMP_PATH))
     {
         perror("Failed to delete old files in temp folder");
     }
+    */
 }
 
 void MainWindow::makePlausible(std::list <int> fixList)
