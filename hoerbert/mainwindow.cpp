@@ -1740,6 +1740,31 @@ void MainWindow::checkForFirmwareUpdates( bool silentCheck=false )
         return;
     }
 
+    QString hoerbertFirmwareVersionString = m_cardPage->getHoerbertFirmwareString();
+    QString infoText = "";
+    QFont font;
+    font.setBold(true);
+
+    if( hoerbertFirmwareVersionString.isEmpty() ){
+        infoText = tr("There is no firmware version information on the selected memory card.<br>To get that information, there is an online guide about how to find out the firmware version of your hörbert in a few simple steps.<br>");
+
+        QMessageBox msgBox;
+        msgBox.setText( tr("Firmware version check") );
+        msgBox.setInformativeText( "<big>"+infoText+"</big>" );
+        QPushButton* readButton = msgBox.addButton( tr("Read instructions online"), QMessageBox::YesRole);
+        readButton->setFont( font );
+        msgBox.addButton( tr("Close"), QMessageBox::RejectRole );
+        msgBox.setDefaultButton( readButton );
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.exec();
+
+        if ( msgBox.clickedButton() == readButton ) {
+            QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/firmware-version-check/?from=software")));
+            msgBox.close();
+        }
+        return;
+    }
+
     QNetworkRequest request = QNetworkRequest(QUrl("https://www.hoerbert.com/client/checkFirmwareVersion"));
     QNetworkAccessManager *manager = new QNetworkAccessManager();
 
@@ -1754,7 +1779,6 @@ void MainWindow::checkForFirmwareUpdates( bool silentCheck=false )
         if( !version.isEmpty() ){
             showFirmwareVersion(version, silentCheck);
         }
-
     });
 
     manager->get(request);
@@ -1872,54 +1896,47 @@ void MainWindow::showFirmwareVersion(const QString &version, bool silentCheck=fa
 
     QString hoerbertFirmwareVersionString = m_cardPage->getHoerbertFirmwareString();
     QString infoText = "";
+    QFont font;
+    font.setBold(true);
 
-    if( hoerbertFirmwareVersionString.isEmpty() ){
-        if( !silentCheck ){
-            infoText = tr("There is no firmware version information on the selected memory card.<br>To get that information, please do the following:<br>1) Eject the card properly from your computer<br>2) Insert the memory card into hörbert<br>3) Remove power or one battery from hörbert<br>4) Add power or insert all batteries<br>5) Turn hörbert on and off again<br>6) Plug the memory card back in your computer<br>7) Repeat the firmware version check");
-            QMessageBox::information(this, tr("Version check"), infoText, QMessageBox::Ok );
+    infoText = tr("Wait! Your hörbert may be missing bug fixes or new features.")+"<br><br>"+tr("This hörbert seems to have firmware version:<br>%1").arg(hoerbertFirmwareVersionString)+"<br>"+tr("Latest available version online:<br>%1").arg(version);
+    if( compareFirmwareVersionWithThisApp(version, hoerbertFirmwareVersionString)<0 )
+    {
+        if( silentCheck ){
+            infoText += "<br><br>"+tr("Updating your hörbert is free and we strongly recommend to do it.<br>Please install the latest firmware now.");
+        } else {
+            infoText += "<br><br>"+tr("There is a newer hörbert firmware available.<br>We strongly recommend to always install the latest firmware.");
         }
-    } else {
-        infoText = tr("Wait! Your hörbert may be missing bug fixes or new features.")+"<br><br>"+tr("This hörbert seems to have firmware version:<br>%1").arg(hoerbertFirmwareVersionString)+"<br>"+tr("Latest available version online:<br>%1").arg(version);
-        if( compareFirmwareVersionWithThisApp(version, hoerbertFirmwareVersionString)<0 )
-        {
-            if( silentCheck ){
-                infoText += "<br><br>"+tr("Updating your hörbert is free and we strongly recommend to do it.<br>Please install the latest firmware now.");
-            } else {
-                infoText += "<br><br>"+tr("There is a newer hörbert firmware available.<br>We strongly recommend to always install the latest firmware.");
-            }
-
-            QFont font;
-            font.setBold(true);
-
-            QMessageBox msgBox;
-            msgBox.setText( tr("Firmware version check") );
-            msgBox.setInformativeText( "<big>"+infoText+"</big>" );
-            QPushButton* yesButton = msgBox.addButton( tr("Install (recommended)"), QMessageBox::YesRole);
-            yesButton->setFont( font );
-            QPushButton* noButton = msgBox.addButton( tr("Remind me"), QMessageBox::NoRole);
-            noButton->setFont( font );
-            QPushButton* ignoreButton = msgBox.addButton( tr("Ignore for a while"), QMessageBox::RejectRole );
-            msgBox.setDefaultButton( yesButton );
-            msgBox.setIcon(QMessageBox::Question);
-            msgBox.exec();
+        QMessageBox msgBox;
+        msgBox.setText( tr("Firmware version check") );
+        msgBox.setInformativeText( "<big>"+infoText+"</big>" );
+        QPushButton* yesButton = msgBox.addButton( tr("Install (recommended)"), QMessageBox::YesRole);
+        yesButton->setFont( font );
+        QPushButton* noButton = msgBox.addButton( tr("Remind me"), QMessageBox::NoRole);
+        noButton->setFont( font );
+        QPushButton* ignoreButton = msgBox.addButton( tr("Ignore for a while"), QMessageBox::RejectRole );
+        msgBox.setDefaultButton( yesButton );
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.exec();
 
 //            auto selected = QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore, QMessageBox::Yes  );
-            if ( msgBox.clickedButton() == ignoreButton )
-            {
-                // remove the ver_fw.txt from the memory card, so the user is not nagged too often.
-                m_cardPage->removeFirmwareInfoFile();
-            } else if ( msgBox.clickedButton() == yesButton ) {
-                QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/firmware-en/")));
-            }
-        }
-        else
+        if ( msgBox.clickedButton() == ignoreButton )
         {
-            if( !silentCheck ){
-                infoText += "\n\n"+tr("There is no newer hörbert firmware available.");
-                QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Ok );
-            }
+            // remove the ver_fw.txt from the memory card, so the user is not nagged too often.
+            m_cardPage->removeFirmwareInfoFile();
+        } else if ( msgBox.clickedButton() == yesButton ) {
+            m_downloadDialog->show();
+            m_downloadDialog->downloadFile();
         }
     }
+    else
+    {
+        if( !silentCheck ){
+            infoText += "\n\n"+tr("There is no newer hörbert firmware available.");
+            QMessageBox::information(this, tr("Firmware version check"), infoText, QMessageBox::Ok );
+        }
+    }
+
 }
 
 

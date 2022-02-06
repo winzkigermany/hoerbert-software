@@ -57,22 +57,23 @@ private slots:
 #endif
 
 private:
-    void startRequest(QUrl url);
-    QLabel *statusLabel;
-    QLineEdit *urlLineEdit;
-    QPushButton *downloadButton;
-    QPushButton *quitButton;
-    QDialogButtonBox *buttonBox;
-    QProgressBar *progressBar;
+    QLabel *m_statusLabel;
+    QPushButton *m_quitButton;
+    QPushButton *m_instructionButton;
+    QDialogButtonBox *m_buttonBox;
+    QProgressBar *m_progressBar;
+    QString m_redirectedFileName;
 
     MainWindow* m_mainWindow;
 
-    QUrl url;
-    QNetworkAccessManager qnam;
-    QNetworkReply *reply;
-    QFile *file;
-    int httpGetId;
-    bool httpRequestAborted;
+    QUrl m_url;
+    QNetworkAccessManager m_qnam;
+    QNetworkReply *m_reply;
+    QFile *m_downloadedFile;
+    int m_httpGetId;
+    bool m_httpRequestAborted;
+
+    void startRequest(QUrl url);
 };
 
 

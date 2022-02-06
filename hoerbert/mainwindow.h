@@ -99,6 +99,7 @@ public:
     void checkForFirmwareUpdates( bool silentCheck );
     void checkForUpdates( bool silentCheck );
 
+    void processorErrorOccurred(const QString &errorString);
 
 signals:
     /**
@@ -133,7 +134,6 @@ private slots:
     void about();
 
     void processCommit(const QMap<ENTRY_LIST_TYPE, AudioList> &list, const quint8 dir_index);
-    void processorErrorOccurred(const QString &errorString);
     void taskCompleted(int failCount, int totalCount);
 
     void migrate(const QString &dirPath);

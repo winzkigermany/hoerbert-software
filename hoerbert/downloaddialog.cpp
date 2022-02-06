@@ -44,22 +44,29 @@ DownloadDialog::DownloadDialog(QWidget *parent)
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setSizePolicy(sizePolicy);
 
-    statusLabel = new QLabel();
-    statusLabel->setWordWrap(true);
+    m_statusLabel = new QLabel();
+    m_statusLabel->setWordWrap(true);
 
-    quitButton = new QPushButton(tr("Close"));
-    quitButton->setAutoDefault(false);
-    connect( quitButton, &QPushButton::clicked, this, &DownloadDialog::close);
+    m_quitButton = new QPushButton(tr("Close"));
+    m_quitButton->setAutoDefault(false);
+    connect( m_quitButton, &QPushButton::clicked, this, &DownloadDialog::close);
 
-    buttonBox = new QDialogButtonBox;
-    buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
+    m_instructionButton = new  QPushButton(tr("Read online: Next steps to update the firmware"));
+    connect( m_instructionButton, &QPushButton::clicked, this, [=](){
+        QDesktopServices::openUrl(QUrl(tr("https://en.hoerbert.com/firmware-update-en/?downloaded=%1").arg(m_redirectedFileName)));
+        this->close();
+    });
 
-    progressBar = new QProgressBar(this);
+    m_buttonBox = new QDialogButtonBox;
+    m_buttonBox->addButton(m_instructionButton, QDialogButtonBox::AcceptRole);
+    m_buttonBox->addButton(m_quitButton, QDialogButtonBox::RejectRole);
+
+    m_progressBar = new QProgressBar(this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(statusLabel);
-    mainLayout->addWidget( progressBar );
-    mainLayout->addWidget(buttonBox);
+    mainLayout->addWidget(m_statusLabel);
+    mainLayout->addWidget( m_progressBar );
+    mainLayout->addWidget(m_buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Firmware download"));
@@ -67,15 +74,15 @@ DownloadDialog::DownloadDialog(QWidget *parent)
 
 void DownloadDialog::startRequest(QUrl url)
 {
-    reply = qnam.get(QNetworkRequest(url));
-    connect(reply, &QNetworkReply::finished, this, &DownloadDialog::httpFinished);
-    connect(reply, &QNetworkReply::readyRead, this, &DownloadDialog::httpReadyRead);
-    connect(reply, &QNetworkReply::downloadProgress, this, &DownloadDialog::updateDataReadProgress);
+    m_reply = m_qnam.get(QNetworkRequest(url));
+    connect(m_reply, &QNetworkReply::finished, this, &DownloadDialog::httpFinished);
+    connect(m_reply, &QNetworkReply::readyRead, this, &DownloadDialog::httpReadyRead);
+    connect(m_reply, &QNetworkReply::downloadProgress, this, &DownloadDialog::updateDataReadProgress);
 }
 
 void DownloadDialog::downloadFile()
 {
-    url.setUrl( FIRMWARE_DOWNLOAD_URL );
+    m_url.setUrl( FIRMWARE_DOWNLOAD_URL );
     QString fileName = tailPath(HOERBERT_TEMP_PATH)+FIRMWARE_BINARY_FILE;
 
     if (QFile::exists(fileName)) {
@@ -83,80 +90,87 @@ void DownloadDialog::downloadFile()
         QFile::remove(fileName);
     }
 
-    file = new QFile(fileName);
-    if (!file->open(QIODevice::WriteOnly)) {
-        QMessageBox::information(this, tr("Firmware download"), tr("Unable to save the file %1: %2.").arg(fileName).arg(file->errorString()));
-        delete file;
-        file = 0;
+    m_downloadedFile = new QFile(fileName);
+    if (!m_downloadedFile->open(QIODevice::WriteOnly)) {
+        QMessageBox::information(this, tr("Firmware download"), tr("Unable to save the file %1: %2.").arg(fileName).arg(m_downloadedFile->errorString()));
+        delete m_downloadedFile;
+        m_downloadedFile = 0;
         return;
     }
 
     // schedule the request
-    httpRequestAborted = false;
-    startRequest(url);
+    m_httpRequestAborted = false;
+    startRequest(m_url);
 }
 
 void DownloadDialog::cancelDownload()
 {
-    statusLabel->setText(tr("Download canceled."));
-    httpRequestAborted = true;
-    if( reply ){
-        reply->abort();
+    m_statusLabel->setText(tr("Download canceled."));
+    m_httpRequestAborted = true;
+    if( m_reply ){
+        m_reply->abort();
     }
 }
 
 void DownloadDialog::httpFinished()
 {
-    if (httpRequestAborted) {
-        if (file) {
-            file->close();
-            file->remove();
-            delete file;
-            file = 0;
+    if (m_httpRequestAborted) {
+        if (m_downloadedFile) {
+            m_downloadedFile->close();
+            m_downloadedFile->remove();
+            delete m_downloadedFile;
+            m_downloadedFile = 0;
         }
-        reply->deleteLater();
+        m_reply->deleteLater();
         return;
     }
 
-    file->flush();
-    file->close();
+    m_downloadedFile->flush();
+    m_downloadedFile->close();
 
-    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    if (reply->error()) {
-        file->remove();
-        QMessageBox::information(this, tr("Firmware download error"), tr("Download failed:")+"\n"+reply->errorString() );
+    QVariant redirectionTarget = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    if (m_reply->error()) {
+        m_downloadedFile->remove();
+        QMessageBox::information(this, tr("Firmware download error"), tr("Download failed:")+"\n"+m_reply->errorString() );
 
     } else if (!redirectionTarget.isNull()) {
-        QUrl newUrl = url.resolved(redirectionTarget.toUrl());
+        QUrl newUrl = m_url.resolved(redirectionTarget.toUrl());
 
-        reply->deleteLater();
-        file->open(QIODevice::WriteOnly);
-        file->resize(0);
+        m_reply->deleteLater();
+        m_downloadedFile->open(QIODevice::WriteOnly);
+        m_downloadedFile->resize(0);
         startRequest(newUrl.toString());
         qDebug() << "http redirect to: " << newUrl.toString();
+
+        m_redirectedFileName = newUrl.toString().section("/", -2, -2);
         return;
 
     } else {
-        statusLabel->setText( tr("Successufully downloaded the firmware") );
+        m_statusLabel->setText( tr("Successufully downloaded the firmware") );
 
         QString fileName =  tailPath(HOERBERT_TEMP_PATH)+FIRMWARE_BINARY_FILE;
         QFile downloadedFile( fileName );
         QString destinationFilename = m_mainWindow->getCurrentDrivePath()+FIRMWARE_BINARY_FILE;
 
+        if (QFile::exists(destinationFilename)) {
+            qDebug() << "removing existing file: " << destinationFilename;
+            QFile::remove(destinationFilename);
+        }
+
         if( downloadedFile.copy(destinationFilename) ){
             qDebug() << "file " << fileName << " downloaded and copied to " << destinationFilename;
+            m_instructionButton->show();
 
         } else {
-            qDebug() << "error copying the downloaded file" << fileName << "to" << destinationFilename;
-
+            m_mainWindow->processorErrorOccurred( "Error saving the downloaded firmware" + fileName + " to " + destinationFilename );
         }
 
     }
 
-    reply->deleteLater();
-    reply = 0;
-    delete file;
-    file = 0;
+    m_reply->deleteLater();
+    m_reply = 0;
+    delete m_downloadedFile;
+    m_downloadedFile = 0;
 }
 
 void DownloadDialog::httpReadyRead()
@@ -165,15 +179,15 @@ void DownloadDialog::httpReadyRead()
     // We read all of its new data and write it into the file.
     // That way we use less RAM than when reading it at the finished()
     // signal of the QNetworkReply
-    if (file)
-        file->write(reply->readAll());
+    if (m_downloadedFile)
+        m_downloadedFile->write(m_reply->readAll());
 }
 
 void DownloadDialog::updateDataReadProgress(qint64 bytesRead, qint64 totalBytes)
 {
-    if (httpRequestAborted)
+    if (m_httpRequestAborted)
         return;
 
-    progressBar->setMaximum(totalBytes);
-    progressBar->setValue(bytesRead);
+    m_progressBar->setMaximum(totalBytes);
+    m_progressBar->setValue(bytesRead);
 }
