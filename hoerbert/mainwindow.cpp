@@ -308,13 +308,16 @@ void MainWindow::updateActionAvailability( bool ANDed )
     if( getHoerbertVersion()==2011 ){
         m_wifiAction->setEnabled(false);
         m_setModeAction->setEnabled(false);
+        m_downloadAction->setEnabled(false);
     } else {
         if( m_cardPage->getSelectedDrive().isEmpty() ){
             m_wifiAction->setEnabled(false);
             m_setModeAction->setEnabled(false);
+            m_downloadAction->setEnabled(false);
         } else {
             m_wifiAction->setEnabled(true);
             m_setModeAction->setEnabled(true);
+            m_downloadAction->setEnabled(true);
         }
     }
 }
@@ -2458,7 +2461,6 @@ void MainWindow::createActions()
         openWifiDialog();
     });
 
-
     m_setModeDialog = new SetModeDialog(this);
     m_setModeDialog->setModal(true);
     m_setModeAction = new QAction(tr("Configure SET mode"), this);
@@ -2467,6 +2469,17 @@ void MainWindow::createActions()
     m_extrasMenu->addAction(m_setModeAction);
     connect(m_setModeAction, &QAction::triggered, this, [this] () {
         openSetModeDialog();
+    });
+
+    m_downloadDialog = new DownloadDialog(this);
+    m_downloadDialog->setModal(true);
+    m_downloadAction = new QAction(tr("Download hörbert firmware"), this);
+    m_downloadAction->setStatusTip(tr("Download the latest hörbert firmware to your memory card"));
+    m_downloadAction->setMenuRole(QAction::NoRole);
+    m_extrasMenu->addAction(m_downloadAction);
+    connect(m_downloadAction, &QAction::triggered, this, [this] () {
+        m_downloadDialog->show();
+        m_downloadDialog->downloadFile();
     });
 
     m_extrasMenu->addSeparator();

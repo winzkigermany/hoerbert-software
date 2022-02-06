@@ -53,6 +53,7 @@
 #include "choosehoerbertdialog.h"
 #include "wifidialog.h"
 #include "setmodedialog.h"
+#include "downloaddialog.h"
 
 class CardPage;
 class WifiDialog;
@@ -228,6 +229,7 @@ private:
     QAction *m_hoerbertModel2021Action;
     QAction *m_wifiAction;
     QAction *m_setModeAction;
+    QAction *m_downloadAction;
 
     QAction *m_moveToB1;
     QAction *m_moveToB2;
@@ -265,6 +267,7 @@ private:
     void openWifiDialog();
     SetModeDialog* m_setModeDialog;
     void openSetModeDialog();
+    DownloadDialog* m_downloadDialog;
 
 };
 

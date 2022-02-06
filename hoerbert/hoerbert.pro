@@ -60,6 +60,7 @@ SOURCES += \
         choosehoerbertdialog.cpp \
         debugdialog.cpp \
         devicemanager.cpp \
+        downloaddialog.cpp \
         dpiscale.cpp \
         functions.cpp \
         generalexception.cpp \
@@ -97,6 +98,7 @@ HEADERS += \
         choosehoerbertdialog.h \
         debugdialog.h \
         devicemanager.h \
+        downloaddialog.h \
         dpiscale.h \
         functions.h \
         generalexception.h \

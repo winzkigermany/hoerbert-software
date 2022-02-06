@@ -407,6 +407,8 @@ private:
 
     void openWifiDialog();
 
+    void openDownloadDialog();
+
     bool hasAudioFiles( QString );
 
     void convertAllAudioFilesToMp3( QString rootPath);
