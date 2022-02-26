@@ -511,6 +511,9 @@ bool HoerbertProcessor::convertToAudioFile(const QString &sourceFilePath, const 
     arguments.append("-y");
     arguments.append("-hide_banner");
 
+    arguments.append("-map");
+    arguments.append("a");
+
     arguments.append(destFilePath);
 
     std::pair<int, QString> output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments);
@@ -535,6 +538,9 @@ bool HoerbertProcessor::convertToMp3(const QString &sourceFilePath, const QStrin
 
     arguments.append("-y");
     arguments.append("-hide_banner");
+
+    arguments.append("-map");
+    arguments.append("a");
 
     arguments.append(destFilePath);
 
@@ -574,6 +580,10 @@ bool HoerbertProcessor::splitPer3Mins(const QString &sourceFilePath, const QStri
     }
     arguments.append("-y");
     arguments.append("-hide_banner");
+
+    arguments.append("-map");
+    arguments.append("a");
+
     arguments.append("-metadata");
     arguments.append(QString("title=%1").arg(metadata.title));
 
@@ -753,6 +763,9 @@ bool HoerbertProcessor::splitOnSilence(const QString &sourceFilePath, const QStr
         arguments.append("-af");
         arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
     }
+
+    arguments.append("-map");
+    arguments.append("a");
 
     QString output_filename;
     if( qApp->property("hoerbertModel")==2011 ){
