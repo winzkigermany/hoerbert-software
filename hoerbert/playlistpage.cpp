@@ -618,7 +618,9 @@ void PlaylistPage::onClosePage(bool doCommitChanges)
             return;
         }
     } else {
-        emit setBluetoothRecordingPlaylist( m_dirNum, m_bluetoothRecordingsRadioButton->isChecked() );
+        if( m_bluetoothRecordingsRadioButton->isChecked() ){
+            emit setBluetoothRecordingPlaylist( m_dirNum, true );
+        }
         emit setWifiRecordingPermission( m_dirNum, m_wifiRecordingsCheckbox->isChecked() );
         emit setMicrophoneRecordingPermission( m_dirNum, m_microphoneRecordingsCheckbox->isChecked() );
     }
