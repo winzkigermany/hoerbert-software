@@ -122,6 +122,8 @@ void AudioInfoThread::run()
                 entry.duration = 0;
                 entry.flag = 6;     // url
                 entry.metadata.title = line;
+                entry.metadata.album = "";
+                entry.metadata.comment = "";
                 entry.path = info.absoluteFilePath();
                 entry.id = m_IDBeginsFrom++;
                 entry.fileSuffix = info.suffix();
