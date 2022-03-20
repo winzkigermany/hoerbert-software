@@ -296,22 +296,27 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="768"/>
+        <location filename="../cardpage.cpp" line="703"/>
+        <source>Audio files need to be converted for this hörbert. This gets you more space on the card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="770"/>
         <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="768"/>
+        <location filename="../cardpage.cpp" line="770"/>
         <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="774"/>
+        <location filename="../cardpage.cpp" line="776"/>
         <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="774"/>
+        <location filename="../cardpage.cpp" line="776"/>
         <source>Do you you want to format this drive [%1] now?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -331,40 +336,40 @@ please format the memory card in terminal with the following command:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="768"/>
-        <location filename="../cardpage.cpp" line="774"/>
-        <location filename="../cardpage.cpp" line="791"/>
-        <location filename="../cardpage.cpp" line="831"/>
+        <location filename="../cardpage.cpp" line="770"/>
+        <location filename="../cardpage.cpp" line="776"/>
+        <location filename="../cardpage.cpp" line="793"/>
+        <location filename="../cardpage.cpp" line="833"/>
         <source>Select drive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="791"/>
+        <location filename="../cardpage.cpp" line="793"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="791"/>
+        <location filename="../cardpage.cpp" line="793"/>
         <source>Volume size is bigger than 64GB. This may not be a memory card at all.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="698"/>
+        <location filename="../cardpage.cpp" line="699"/>
         <source>In the next step, you will need to select a folder on your computer for a backup of this card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="701"/>
+        <location filename="../cardpage.cpp" line="703"/>
         <source>Convert files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="831"/>
+        <location filename="../cardpage.cpp" line="833"/>
         <source>This card has never been used with hörbert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="831"/>
+        <location filename="../cardpage.cpp" line="833"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -461,52 +466,47 @@ skip this step by ticking the check box below.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="701"/>
-        <source>Audio files need to be converted for this hörbert.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../cardpage.cpp" line="701"/>
+        <location filename="../cardpage.cpp" line="700"/>
         <source>After converting files, this card will NOT WORK in the older hörbert model 2011</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="701"/>
+        <location filename="../cardpage.cpp" line="703"/>
         <source>Do you want this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="726"/>
+        <location filename="../cardpage.cpp" line="728"/>
         <source>Finished converting all files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="853"/>
+        <location filename="../cardpage.cpp" line="855"/>
         <source>Please select a different destination folder.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="855"/>
+        <location filename="../cardpage.cpp" line="857"/>
         <source>Please select a different destination drive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="859"/>
+        <location filename="../cardpage.cpp" line="861"/>
         <source>Can&apos;t write</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="859"/>
+        <location filename="../cardpage.cpp" line="861"/>
         <source>This app can&apos;t write files to the selected destination.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="1605"/>
+        <location filename="../cardpage.cpp" line="1607"/>
         <source>Unable to write index.m3u to the memory card. Reason: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="1608"/>
+        <location filename="../cardpage.cpp" line="1610"/>
         <source>Unable to create index.m3u in a temporary directory. Reason: %1</source>
         <translation type="unfinished"></translation>
     </message>

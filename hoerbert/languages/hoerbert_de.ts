@@ -630,32 +630,37 @@ skip this step by ticking the check box below.</source>
         <translation>Bitte noch einmal versuchen - oder die Karte mit den Funktionen des Betriebssystems auswerfen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="853"/>
+        <location filename="../cardpage.cpp" line="703"/>
+        <source>Audio files need to be converted for this hörbert. This gets you more space on the card.</source>
+        <translation>Audiodateien müssen für diesen hörbert konvertiert werden. Dadurch erhältst Du mehr Speicherplatz auf der Karte.</translation>
+    </message>
+    <message>
+        <location filename="../cardpage.cpp" line="855"/>
         <source>Please select a different destination folder.</source>
         <translation>Bitte wähle einen anderen Zielordner.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="855"/>
+        <location filename="../cardpage.cpp" line="857"/>
         <source>Please select a different destination drive.</source>
         <translation>Bitte wähle ein anderes Ziellaufwerk.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="859"/>
+        <location filename="../cardpage.cpp" line="861"/>
         <source>Can&apos;t write</source>
         <translation>Kann nicht schreiben</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="859"/>
+        <location filename="../cardpage.cpp" line="861"/>
         <source>This app can&apos;t write files to the selected destination.</source>
         <translation>Diese App kann keine Dateien in das ausgewählte Ziel schreiben.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="1605"/>
+        <location filename="../cardpage.cpp" line="1607"/>
         <source>Unable to write index.m3u to the memory card. Reason: %1</source>
         <translation>index.m3u kann nicht auf die Speicherkarte geschrieben werden. Grund: %1</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="1608"/>
+        <location filename="../cardpage.cpp" line="1610"/>
         <source>Unable to create index.m3u in a temporary directory. Reason: %1</source>
         <translation>index.m3u kann nicht in einem temporären Verzeichnis erstellt werden. Grund: %1</translation>
     </message>
@@ -664,37 +669,36 @@ skip this step by ticking the check box below.</source>
         <translation type="vanished">Das ausgewählte Gerät ist schreibgeschützt. Bitte entferne den Schreibschutz, wenn Du darauf Playlists bearbeiten möchtest.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="768"/>
+        <location filename="../cardpage.cpp" line="770"/>
         <source>The selected target path is not FAT32 formatted. It needs to be formatted correctly, or else playback will not work with hörbert.</source>
         <translation>Das gewählte Ziel ist nicht FAT32 formatiert. Es muss FAT32-formatiert sein, damit hörbert die Daten lesen kann.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="768"/>
+        <location filename="../cardpage.cpp" line="770"/>
         <source>Please make sure that your destination has the correct FAT32 format for hörbert.</source>
         <translation>Bitte stelle sicher, dass das Ziel FAT32-formatiert ist.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="774"/>
+        <location filename="../cardpage.cpp" line="776"/>
         <source>The selected memory card is not FAT32 formatted. It needs to be formatted correctly, which will erase everything that is on the card.</source>
         <translation>Die gewählte Speicherkarte ist nicht im FAT32-Format formatiert. Sie muss richtig formatiert werden, dadurch werden alle Daten auf der Karte gelöscht.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="774"/>
+        <location filename="../cardpage.cpp" line="776"/>
         <source>Do you you want to format this drive [%1] now?</source>
         <translation>Soll das Laufwerk [%1] jetzt formatiert werden?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="701"/>
         <source>Audio files need to be converted for this hörbert.</source>
-        <translation>Audiodateien müssen für diesen hörbert konvertiert werden.</translation>
+        <translation type="vanished">Audiodateien müssen für diesen hörbert konvertiert werden.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="701"/>
+        <location filename="../cardpage.cpp" line="700"/>
         <source>After converting files, this card will NOT WORK in the older hörbert model 2011</source>
         <translation>Nach der Konvertierung wird diese Karte NICHT im älteren hörbert Modell 2011 spielen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="701"/>
+        <location filename="../cardpage.cpp" line="703"/>
         <source>Do you want this?</source>
         <translation>Willst du das?</translation>
     </message>
@@ -703,7 +707,7 @@ skip this step by ticking the check box below.</source>
         <translation type="vanished">Platz schaffen durch Konvertierung aller Dateien in mp3?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="726"/>
+        <location filename="../cardpage.cpp" line="728"/>
         <source>Finished converting all files.</source>
         <translation>Die Konvertierung aller Dateien ist abgeschlossen.</translation>
     </message>
@@ -746,10 +750,10 @@ skip this step by ticking the check box below.</source>
         <translation type="vanished">Wird abgebrochen...</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="768"/>
-        <location filename="../cardpage.cpp" line="774"/>
-        <location filename="../cardpage.cpp" line="791"/>
-        <location filename="../cardpage.cpp" line="831"/>
+        <location filename="../cardpage.cpp" line="770"/>
+        <location filename="../cardpage.cpp" line="776"/>
+        <location filename="../cardpage.cpp" line="793"/>
+        <location filename="../cardpage.cpp" line="833"/>
         <source>Select drive</source>
         <translation>Laufwerk auswählen</translation>
     </message>
@@ -762,22 +766,22 @@ skip this step by ticking the check box below.</source>
         <translation type="vanished">Die Größe der Speicherkarte is größer als 32GB. Ist das überhaupt eine Speicherkarte?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="791"/>
+        <location filename="../cardpage.cpp" line="793"/>
         <source>Are you sure you want to work on this drive? [%1]</source>
         <translation>Soll wirklich auf diesem Laufwerk [%1] gearbeitet werden?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="791"/>
+        <location filename="../cardpage.cpp" line="793"/>
         <source>Volume size is bigger than 64GB. This may not be a memory card at all.</source>
         <translation>Die Größe der Speicherkarte is größer als 64 GB. Ist das überhaupt eine Speicherkarte?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="698"/>
+        <location filename="../cardpage.cpp" line="699"/>
         <source>In the next step, you will need to select a folder on your computer for a backup of this card.</source>
         <translation>Im nächsten Schritt musst Du einen Ordner auf Deinem Computer für die Sicherung dieser Karte auswählen.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="701"/>
+        <location filename="../cardpage.cpp" line="703"/>
         <source>Convert files</source>
         <translation>Dateien konvertieren</translation>
     </message>
@@ -790,12 +794,12 @@ skip this step by ticking the check box below.</source>
         <translation type="vanished">Speicherplatz durch Konvertierung von Dateien in mp3 freigeben?</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="831"/>
+        <location filename="../cardpage.cpp" line="833"/>
         <source>This card has never been used with hörbert.</source>
         <translation>Diese Karte wurde noch nie mit hörbert verwendet.</translation>
     </message>
     <message>
-        <location filename="../cardpage.cpp" line="831"/>
+        <location filename="../cardpage.cpp" line="833"/>
         <source>Do you want to make it ready for use with hörbert?</source>
         <translation>Möchtest Du sie für die Verwendung mit hörbert vorbereiten?</translation>
     </message>

@@ -693,12 +693,14 @@ void CardPage::convertAllToMp3(){
     if( hasAudioFiles(drive_path) ){
         bool backupFirst = false;
         QString backupString = "";
+        QString conversionString = "";
         if( !cardContainsMp3FilesAlready(drive_path) ){
             backupFirst = true;
             backupString = "\n\n"+tr("In the next step, you will need to select a folder on your computer for a backup of this card.");
+            conversionString = tr("After converting files, this card will NOT WORK in the older hörbert model 2011")+"\n\n";
         }
 
-        auto selected = QMessageBox::question(this, tr("Convert files"), tr("Audio files need to be converted for this hörbert.")+"\n\n"+tr("After converting files, this card will NOT WORK in the older hörbert model 2011")+"\n\n"+tr("Do you want this?")+backupString, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
+        auto selected = QMessageBox::question(this, tr("Convert files"), tr("Audio files need to be converted for this hörbert. This gets you more space on the card.")+"\n\n"+conversionString+tr("Do you want this?")+backupString, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes );
         if (selected == QMessageBox::Yes)
         {
 
