@@ -726,6 +726,9 @@ void CardPage::convertAllToMp3(){
             convertAllAudioFilesToMp3(drive_path);
 
             m_pleaseWaitDialog->setResultString(tr("Finished converting all files."));
+
+            // re-read the card and fill the playlist counters
+            update();
         } else {
             selectDrive("");
             updateDriveList();
