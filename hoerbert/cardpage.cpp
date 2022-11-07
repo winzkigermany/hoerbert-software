@@ -1420,7 +1420,11 @@ void CardPage::readIndexM3u(){
             searchString = "#hoerbert:allow_microphone_recordings_in_playlist";
             if( newLine.toLower().startsWith(searchString) ){
                 dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 2)
+                QStringList list = dataString.split(" ", QString::SkipEmptyParts);
+#else
                 QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
+#endif
                 for ( const auto& i : list  )
                 {
                     if( i.trimmed()=="0.0"){
@@ -1464,7 +1468,11 @@ void CardPage::readIndexM3u(){
             searchString = "#hoerbert:allow_wifi_recordings_in_playlist";
             if( newLine.toLower().startsWith(searchString) ){
                 dataString = newLine.toLower().right( newLine.length()-searchString.length() ).trimmed();
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 2)
+                QStringList list = dataString.split(" ", QString::SkipEmptyParts);
+#else
                 QStringList list = dataString.split(" ", Qt::SkipEmptyParts);
+#endif
                 for ( const auto& i : list  )
                 {
                     if( i.trimmed()=="0.0"){
