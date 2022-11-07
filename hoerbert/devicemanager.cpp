@@ -79,6 +79,8 @@ bool DeviceManager::isRemovable(const QString &volumeRoot)
 #elif defined (Q_OS_MACOS)
     QString cmd = "diskutil info " + volumeRoot;
     QString output = m_processExecutor.executeCommand(cmd).second;
+    qDebug() << cmd << " " << output;
+
 
     return output.contains(QRegExp("Removable Media:.*Removable", Qt::CaseInsensitive));
 #elif defined (Q_OS_LINUX)
@@ -149,7 +151,16 @@ ListString DeviceManager::getDeviceList()
 
 QString DeviceManager::getRoot(const QStorageInfo &info)
 {
-#ifdef _WIN32
+#if defined (Q_OS_MACOS)
+    QString theDevice = info.device();
+    if( theDevice.contains("msdos://") ){       // ventura returns devices like: msdos://disk2s1/TEST-IMAGE instead of /dev/disk2s1
+        theDevice.replace( "msdos://", "/dev/" );
+
+        const int lastPos = theDevice.lastIndexOf("/");
+        theDevice = theDevice.left(lastPos);
+    }
+    return theDevice;
+#elif defined _WIN32
     return info.rootPath();
 #else
     return info.device();
@@ -533,7 +544,18 @@ QString DeviceManager::getVolumeFileSystem(const QString &driveName)
         return "";
     }
 
-    return ret->second->storageInfo.fileSystemType();
+#if defined (Q_OS_MACOS)
+    QString theDevice = ret->second->storageInfo.device();
+    if( theDevice.startsWith("/dev/") ){
+        return ret->second->storageInfo.fileSystemType();
+    } else if( theDevice.startsWith("msdos://") ){
+        return "msdos";
+    }
+
+    return "other";
+#else
+     return ret->second->storageInfo.fileSystemType();
+#endif
 }
 
 bool DeviceManager::hasFat32FileSystem(const QString &driveName)
@@ -544,7 +566,7 @@ bool DeviceManager::hasFat32FileSystem(const QString &driveName)
         return false;
     }
 
-    auto fileSystem=ret->second->storageInfo.fileSystemType();
+    auto fileSystem=getVolumeFileSystem(driveName);
     if(fileSystem == "msdos" || fileSystem == "FAT32" || fileSystem == "vfat")
     {
         return true;
