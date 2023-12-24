@@ -50,7 +50,7 @@ const QString BAR_STYLE_TEMPLATE = "#CardSizeBar {background: qlineargradient(sp
 
 //qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 rgba(255,30,30,255), stop: 0.2 rgba(255,30,30,144), stop: 0.4 rgba(255,30,30,32)
 
-const QString SUPPORTED_FILES = "*.wav *.mp3 *.ogg *.flac *.m4a *.m4b *.wma *.aif *.aiff *cda *.m3u *.m3u8 *.wpl *.xml *.xspf";
+const QString SUPPORTED_FILES = "*.wav *.mp3 *.ogg *.opus *.flac *.m4a *.m4b *.wma *.aif *.aiff *cda *.m3u *.m3u8 *.wpl *.xml *.xspf";
 
 const QColor CL_DIR0 = QColor(60, 40, 43);
 const QColor CL_DIR1 = QColor(169, 21, 11);
