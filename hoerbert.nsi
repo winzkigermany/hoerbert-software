@@ -20,7 +20,7 @@ ManifestDPIAware true
 # These three must be integers
 !define VERSIONMAJOR 3
 !define VERSIONMINOR 1
-!define VERSIONBUILD 3
+!define VERSIONBUILD 4
 # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
 # It is possible to use "mailto:" links in here to open the email client
 !define HELPURL "https://www.hoerbert.com/service/" # "Support Information" link
