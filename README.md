@@ -1,6 +1,12 @@
 # hörbert-software
 Hörbert playlist management software. 
 
+--
+This software is obsolete for hörbert models from October 2021 (models without a mechanical rocker switch):
+If you have such a newer model, please upgrade to the latest firmware (for free!) https://www.hoerbert.com/firmware
+Then you will be able to do all settings, upload contents, configure radio stations and podcasts in a browser interface via WiFi.
+--
+
 Our hörbert-software is a tool to manage and transfer audio data for hörbert (https://www.hoerbert.com) memory cards.  
 It mainly helps users to put contents of hörbert playlists into the right order.  
 Also during transfer, the files are converted to a format that hörbert plays with the least amount of energy - which results in a veeery long playback time.  
