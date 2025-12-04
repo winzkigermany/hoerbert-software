@@ -27,6 +27,7 @@
 #include <QTableWidget>
 #include <QFileInfoList>
 
+#include "audiobookconverter.h"
 #include "define.h"
 
 class QObject;
@@ -345,6 +346,8 @@ private:
 
     int m_playingEntryID;
     QProcess *m_player;
+
+    AudioBookConverter m_audioBookConverter;
 
     CDRipper *m_ripperThread;
     AudioInfoThread *m_infoThread;

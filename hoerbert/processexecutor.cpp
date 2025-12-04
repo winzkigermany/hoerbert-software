@@ -6,6 +6,22 @@ ProcessExecutor::ProcessExecutor(QObject *parent) : QObject(parent)
 
 }
 
+std::unique_ptr<QProcess> ProcessExecutor::runProcess(const QString &cmdString, const QStringList& arguments)
+{
+    qDebug() << QString( "executeCommand: %1 %2").arg(cmdString).arg( arguments.join(" ") );
+    std::unique_ptr<QProcess> p = std::make_unique<QProcess>(this);
+    p->setProcessChannelMode(QProcess::MergedChannels);
+    if( arguments.count()>0 )
+    {
+        p->start(cmdString, arguments);
+    }
+    else
+    {
+        p->start(cmdString);
+    }
+    return p;
+}
+
 
 std::pair<int, QString> ProcessExecutor::executeCommand(const QString &cmdString, const QStringList& arguments, const QString &workingDirectory)
 {

@@ -57,6 +57,7 @@ SOURCES += \
         capacitybar.cpp \
         cardpage.cpp \
         cdripper.cpp \
+        convertchaptertask.cpp \
         debugdialog.cpp \
         devicemanager.cpp \
         dpiscale.cpp \
@@ -90,6 +91,7 @@ HEADERS += \
         capacitybar.h \
         cardpage.h \
         cdripper.h \
+        convertchaptertask.h \
         debugdialog.h \
         devicemanager.h \
         dpiscale.h \

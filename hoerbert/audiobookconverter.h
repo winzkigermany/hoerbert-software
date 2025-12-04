@@ -25,6 +25,7 @@
 #include <QThread>
 #include <QFileInfoList>
 #include "processexecutor.h"
+#include "convertchaptertask.h"
 
 /**
  * @brief The AudioBookConverter class converts audio book(*.m4b) into several audio files based on chapters in it
@@ -36,14 +37,18 @@ public:
     /**
      * @brief AudioBookConverter constructor
      */
-    AudioBookConverter(const QString &absoluteFilePath = QString());
+    AudioBookConverter();
 
     /**
      * @brief getConvertedFileInfoList
      * @return list of QFileInfo for converted files
      */
-    QFileInfoList convert(const QString &absoluteFilePath = QString());
+    void convert(const QString &absoluteFilePath = QString());
 
+    bool is_finished() const
+    {
+        return m_is_finished;
+    }
     /**
      * @brief abort cancel processing at current stage
      */
@@ -63,6 +68,8 @@ signals:
      */
     void processUpdated(int processedCount);
 
+    void finished(QFileInfoList);
+
 private:
 
     /**
@@ -80,12 +87,17 @@ private:
      */
     double getVolumeDifference(const QString &sourceFilePath);
 
+    std::unique_ptr<ConvertChapterTask> m_convertChapterTasks;
     QString m_filePath;
-    bool m_isAborted;
+    bool m_is_finished;
+    int m_counter;
+    QStringList m_chapters;
 
     QString m_audioVolume;
     int m_maxMetadataLength;
     ProcessExecutor m_processExecutor;
+
+    std::map<int,QString> info_list_map;
 };
 
 #endif // AUDIOBOOKCONVERTER_H

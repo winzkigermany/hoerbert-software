@@ -33,29 +33,40 @@ extern QString FFMPEG_PATH;
 extern QString HOERBERT_TEMP_PATH;
 extern QStringList PROCESS_ERROR;
 
-AudioBookConverter::AudioBookConverter(const QString &absoluteFilePath)
+
+
+AudioBookConverter::AudioBookConverter()
 {
-    m_filePath = absoluteFilePath;
-    m_isAborted = false;
-
+    m_is_finished = true;
     m_maxMetadataLength = METADATA_MAX_LENGTH;
-
     QDir dir(HOERBERT_TEMP_PATH);
     if (!dir.exists())
         dir.mkpath(HOERBERT_TEMP_PATH);
 }
 
-QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
+void AudioBookConverter::abort()
 {
-    QFileInfoList info_list;
-    m_filePath = absoluteFilePath.isEmpty() ? m_filePath : absoluteFilePath;
+    if(!m_is_finished)
+    {
+        if(m_convertChapterTasks)
+            m_convertChapterTasks->stop();
+    }
+}
+
+void AudioBookConverter::convert(const QString &absoluteFilePath)
+{
+    if(!m_is_finished)
+        return;
+
+    m_filePath = absoluteFilePath;
     if (m_filePath.isEmpty() || !QFile::exists(m_filePath))
     {
         qDebug() << "Cannot find the audio book file!";
         emit failed("Cannot find the audio book file!");
-        return info_list;
+        return;
     }
 
+    m_is_finished = false;
     QStringList arguments;
     arguments.append("-i");
     arguments.append(m_filePath);
@@ -63,29 +74,7 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
 
     QString output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments).second;
 
-    auto chapters = parseForChapters(output);
-
-    if (m_isAborted)
-        return info_list;
-
-    arguments.clear();
-
-    arguments.append("-i");
-    arguments.append(m_filePath);
-    arguments.append("-ss");
-    arguments.append("0"); // index = 3
-    arguments.append("-to");
-    arguments.append("<END>"); // index = 5
-    arguments.append("-acodec");
-    arguments.append("pcm_s16le");
-    arguments.append("-ar");
-    arguments.append("32k");
-    arguments.append("-ac");
-    arguments.append("1");
-    arguments.append("-metadata");
-    arguments.append("<METADATA>"); // index = 13
-    arguments.append("-y");
-    arguments.append("-hide_banner");
+    m_chapters = parseForChapters(output);
 
     double adjustByDb = getVolumeDifference(m_filePath);
     if( qAbs(adjustByDb)>0.1 && qAbs(adjustByDb)<20.0 )
@@ -94,41 +83,18 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
         arguments.append(QString("volume=%1dB").arg( adjustByDb, 0, 'f', 1 ) );
     }
 
-    arguments.append("<OUTPUT_PATH>"); // index = 18 or 16
-
-    int counter = 0;
-    int lastArgumentIndex = arguments.count()-1;
-
-    for (const auto &chapter : chapters)
+    m_counter = 0;
+    m_convertChapterTasks = std::make_unique<ConvertChapterTask>(FFMPEG_PATH,m_filePath,m_chapters,adjustByDb,m_maxMetadataLength,HOERBERT_TEMP_PATH, DEFAULT_DESTINATION_FORMAT);
+    QObject::connect(m_convertChapterTasks.get(),
+        &ConvertChapterTask::chapterFinished, this, [this](int returnCode, QString stdOut, QString filePath, int id)
     {
-        if (m_isAborted)
-            return info_list;
-
-        auto start = chapter.section("<!@#^&>", 0, 0);
-        auto end = chapter.section("<!@#^&>", 1, 1);
-        auto metadata = chapter.section("<!@#^&>", 2);
-
-        if (start.toDouble() != 0.000000)
-            arguments.replace(3, start);
-        arguments.replace(5, end);
-
-        metadata.resize(m_maxMetadataLength, ' ');
-        arguments.replace(13, QString("title=%1").arg(metadata.trimmed()));
-
-        auto output_path = HOERBERT_TEMP_PATH + QDateTime::currentDateTime().toString("yyyyMMddHHmmss") + QString("-%1").arg(counter) + DEFAULT_DESTINATION_FORMAT;
-        arguments.replace(lastArgumentIndex, output_path);
-
-        info_list.append(output_path);
-
-        QString output = m_processExecutor.executeCommand(FFMPEG_PATH, arguments).second;
-
-        auto tail = output.right(300);
-
+        auto tail = stdOut.right(300);
+        m_counter++;
         if (tail.contains("Error", Qt::CaseSensitive) || tail.contains("Invalid", Qt::CaseSensitive))
         {
-            auto error_string = QString("Conversion failed! (%1)\n[Source File]\n%2\n\n%3").arg(counter).arg(m_filePath).arg(output);
+            auto error_string = QString("Conversion failed! (%1)\n[Source File]\n%2\n\n%3").arg(id).arg(m_filePath).arg(filePath);
 
-            QFile file(output_path);
+            QFile file(filePath);
             if (!file.exists())
             {
                 qDebug() << error_string;
@@ -136,25 +102,35 @@ QFileInfoList AudioBookConverter::convert(const QString &absoluteFilePath)
             }
             else
             {
-                if (QFileInfo(output_path).size() == 0)
+                if (QFileInfo(filePath).size() == 0)
                 {
                     qDebug() << error_string;
                     emit failed(error_string);
                 }
             }
+        } else
+        {
+            if(returnCode>=0)
+            {
+                info_list_map[id] = filePath;
+                emit processUpdated(100 * m_counter / m_chapters.count());
+            }
         }
 
-        counter++;
-
-        emit processUpdated(100 * counter / chapters.count());
-    }
-
-    return info_list;
-}
-
-void AudioBookConverter::abort()
-{
-    m_isAborted = true;
+        if(m_counter == m_chapters.count())
+        {
+            m_is_finished = true;
+            QFileInfoList info_list;
+            for(auto& k : info_list_map)
+            {
+                qDebug() << k.first << " " << k.second;
+                info_list.append(k.second);
+            }
+            emit finished(info_list);
+        }
+    });
+    m_convertChapterTasks->start();
+    return;
 }
 
 QStringList AudioBookConverter::parseForChapters(const QString &output)

@@ -45,7 +45,6 @@
 #include "playsymbolbutton.h"
 #include "cdripper.h"
 #include "playlistparser.h"
-#include "audiobookconverter.h"
 #include "functions.h"
 
 int CDRipper::uniqueID = 0;
@@ -541,6 +540,8 @@ void PlaylistView::stopPlayer()
 
 void PlaylistView::readEntries(const QFileInfoList &fileInfoList, int rowIndex)
 {
+    qDebug() << "read entries call ";
+    qDebug() << fileInfoList;
     setCursor(Qt::WaitCursor);
     QFileInfoList rip_info_list;
     QFileInfoList *file_info_list = new QFileInfoList;
@@ -757,8 +758,6 @@ QFileInfoList PlaylistView::parsePlaylist(const QString &absoluteFilePath)
 
 QFileInfoList PlaylistView::parseAudioBook(const QString &absoluteFilePath)
 {
-    AudioBookConverter *converter = new AudioBookConverter(absoluteFilePath);
-
     m_progress = new QProgressDialog(this);
     m_progress->setWindowTitle(tr("Converting Audio Book"));
     m_progress->setLabelText(tr("Converting..."));
@@ -766,7 +765,6 @@ QFileInfoList PlaylistView::parseAudioBook(const QString &absoluteFilePath)
     m_progress->setModal(true);
     m_progress->setFixedWidth(360);
     m_progress->setRange(0, 100);
-
     m_isAborted = false;
 
     m_abortButton = new QPushButton(m_progress);
@@ -778,31 +776,37 @@ QFileInfoList PlaylistView::parseAudioBook(const QString &absoluteFilePath)
     m_progress->disconnect(m_abortButton);
 
     // then define custom connections
-    connect(m_abortButton, &QPushButton::clicked, this, [this, converter] () {
+    connect(m_abortButton, &QPushButton::clicked, this, [this] () {
         m_progress->setLabelText(tr("Aborting..."));
         m_abortButton->setDisabled(true);
-        converter->abort();
         m_isAborted = true;
+        m_audioBookConverter.abort();
     });
 
     m_progress->show();
     m_progress->setValue(0);
 
-    connect(converter, &AudioBookConverter::processUpdated, this, [this] (int percentage) {
+    connect(&m_audioBookConverter, &AudioBookConverter::processUpdated, this, [this] (int percentage) {
         m_progress->setValue(percentage);
     });
 
-    connect(converter, &AudioBookConverter::failed, this, [this] (const QString &errorString) {
+    connect(&m_audioBookConverter, &AudioBookConverter::failed, this, [this] (const QString &errorString) {
         errorOccurred("AudioBookConverter\n" + errorString);
     });
+    QFileInfoList file_list;
+    connect(&m_audioBookConverter, &AudioBookConverter::finished, this, [&file_list] (QFileInfoList files) {
+        file_list = files;
+    });
 
-    QFileInfoList list = converter->convert();
+    QEventLoop loop;
+    QTimer::singleShot(0,[&]{m_audioBookConverter.convert(absoluteFilePath);});
+    connect(&m_audioBookConverter, &AudioBookConverter::finished, &loop, &QEventLoop::quit);
+    loop.exec();
 
     m_progress->close();
     m_progress->deleteLater();
     m_abortButton->deleteLater();
-
-    return list;
+    return file_list;
 }
 
 void PlaylistView::onCellChanged(int row, int col)

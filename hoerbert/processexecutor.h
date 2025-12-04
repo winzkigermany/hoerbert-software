@@ -14,6 +14,8 @@ class ProcessExecutor : public QObject
 public:
     explicit ProcessExecutor(QObject *parent = nullptr);
 
+    std::unique_ptr<QProcess> runProcess(const QString &cmdString, const QStringList& arguments);
+
      /**
      * @brief execute a command and return the output
      * @param cmdString
