@@ -85,7 +85,7 @@ bool DeviceManager::isRemovable(const QString &volumeRoot)
     QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
     QString output = m_processExecutor.executeCommand(cmd).second;
 
-    return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
+    return output.contains(QRegExp("ID_(USB_DRIVER='usb-storage'|DRIVE_FLASH_SD='1'|BUS='usb')", Qt::CaseSensitive));
 #endif
 }
 
@@ -101,10 +101,7 @@ bool DeviceManager::isEjectable(const QString &volumeRoot)
 
     return output.contains(QRegExp("Ejectable", Qt::CaseInsensitive));
 #elif defined (Q_OS_LINUX)
-    QString cmd = "udevadm info --query=property --export --name=" + volumeRoot;
-    QString output = m_processExecutor.executeCommand(cmd).second;
-
-    return output.contains(QRegExp("ID_USB_DRIVER='usb-storage'", Qt::CaseSensitive));
+    return isRemovable(volumeRoot);
 #endif
 }
 
